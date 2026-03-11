@@ -1,4 +1,6 @@
 Navn: Vegard van Jole, 
+Navn: Nicholas Uribarri,
+
 
 
 ### Instruksjoner:
