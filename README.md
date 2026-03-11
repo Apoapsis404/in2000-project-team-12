@@ -3,7 +3,7 @@ Nicholas Uribarri,\
 Heran Jabessa-Wodajo,\
 Ada Christine Saastad, \
 Marius Iversen, \
-Ada Graah
+Ada Graah \
 
 
 
