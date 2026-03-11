@@ -1,6 +1,7 @@
 Navn: Vegard van Jole \
 Nicholas Uribarri,\
 Heran Jabessa-Wodajo,\
+Ada Christine Saastad, \
 
 
 
