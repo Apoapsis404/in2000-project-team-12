@@ -23,4 +23,5 @@ Nicholas Uribarri,
 >\$ git status (sjekk at det har sjedd en endring)\
 >\$ git add . (legger til alle filer som er modifisert eller untracked)\
 >\$ git status (sjekk at filen er updatert) \
->\$ git commit -m \"\<Navn\> commit\"
+>\$ git commit -m \"\<Navn\> commit\" \
+>\$ git push
