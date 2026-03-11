@@ -1,5 +1,5 @@
-Navn: Vegard van Jole, 
-Navn: Nicholas Uribarri,
+Navn: Vegard van Jole \
+Nicholas Uribarri,
 
 
 
