@@ -1,5 +1,6 @@
 Navn: Vegard van Jole \
-Nicholas Uribarri,
+Nicholas Uribarri,\
+Heran Jabessa-Wodajo,\
 
 
 
