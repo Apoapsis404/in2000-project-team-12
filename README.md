@@ -7,7 +7,7 @@ Navn: Nicholas Uribarri,
 
 #### SSH
 >\$ ssh-keygen -t ed25519 \
->Skriv inn filsti \
+>Skriv inn filsti (Bare trykk enter!) \
 >Hopp over passord \
 >Gå til GitHub.uio.no \
 >Gå til Settings -> SSH / GPG keys \
