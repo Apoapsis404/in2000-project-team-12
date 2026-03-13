@@ -18,6 +18,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreen
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,36 +27,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val oslo = LatLng(59.9127, 10.7461)
-            val osloState = MarkerState(position = oslo)
-            val cameraPosition = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(oslo, 10f)
-            }
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPosition,
-            ) {
-                Marker(
-                    state = osloState,
-                    title = "marker singapore"
-                )
-            }
+            HomeScreen()
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Team12ProjectTheme {
-        Greeting("Android")
-    }
-}
