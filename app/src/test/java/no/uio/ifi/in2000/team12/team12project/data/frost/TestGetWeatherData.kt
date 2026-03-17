@@ -13,7 +13,8 @@ class GetWeatherDataTest {
 
 
         launch {
-            val station = dataSource.getWeatherData("SN18700", "mean(min(air_temperature P1D) P1M)", "R4/2016-01-01/2017-01-01")
+            val station = dataSource.getWeatherData("SN18700", "mean(air_temperature P1M)", "R4/2016-01-01/2017-01-01")
+            printWeatherObservations(station)
         }
     }
 
@@ -25,8 +26,9 @@ class GetWeatherDataTest {
 
         launch {
             val stations = obsDataSource.getNearestStation(59.9423, 10.72)
-            val stationIds = obsDataSource.getStationIdsFromList(stations)
-            val station = weatherDataSource.getWeatherData(stationIds, "mean(min(air_temperature P1D) P1M)", "R4/2016-01-01/2017-01-01")
+            val stationIds = getStationIdsFromList(stations)
+            val station = weatherDataSource.getWeatherData(stationIds, "mean(min(air_temperature P1D) P1M)", "2016-01-01/2017-01-01")
+            printWeatherObservations(station)
         }
     }
 }

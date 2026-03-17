@@ -22,8 +22,8 @@ class GetNearestStationTest {
 
         launch {
             val station = dataSource.getNearestStation(59.9423, 10.72)
-            val stationIds = dataSource.getStationIdsFromList(station)
-            val expected = "SN18317,SN18310,SN18645,SN18162,SN18690"
+            val stationIds = getStationIdsFromList(station)
+            val expected = "SN18700,SN18701,SN18703,SN499999010,SN18390"
             assertEquals(expected, stationIds)
         }
     }

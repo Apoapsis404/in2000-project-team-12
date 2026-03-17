@@ -59,15 +59,4 @@ class ObsStationsDataSource {
         }
     }
 
-    fun getStationIdsFromList(stationList: List<ObsStation>): String {
-        var stationIds: String = ""
-        for (station in stationList) {
-            if (stationIds != ""){
-                stationIds += ","
-            }
-            stationIds += station.id
-        }
-        return stationIds
-    }
-
 }
