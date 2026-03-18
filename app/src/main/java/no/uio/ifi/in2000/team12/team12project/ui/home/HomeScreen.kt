@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -38,19 +41,29 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.R
+import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
 import java.util.Locale
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun HomeScreen() {
+fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel()) {
+
+
+    val uiState by homeScreenViewModel.uiState.collectAsState()
+
+
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val obsStationsDataSource : ObsStationsDataSource by remember {mutableStateOf(
+        ObsStationsDataSource())}
 
     var searchQuery by remember { mutableStateOf("") }
     var searchedLocation by remember { mutableStateOf<LatLng?>(LatLng(59.9127, 10.7461)) }
     var markerTitle by remember {mutableStateOf("")}
-    var markerPosition by remember{mutableStateOf(LatLng(59.9127, 10.7461))}
+    //var markerPosition by remember{mutableStateOf(LatLng(59.9127, 10.7461))}
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(59.9127, 10.7461), 10f)
@@ -63,11 +76,15 @@ fun HomeScreen() {
             val location = results[0]
             val latLng = LatLng(location.latitude, location.longitude)
             searchedLocation = latLng
-            markerPosition = latLng
+            homeScreenViewModel.setMarkerPosition(latLng)
             markerTitle = query
             cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 20f)
         }
     }
+
+
+
+
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -76,14 +93,14 @@ fun HomeScreen() {
             cameraPositionState = cameraPositionState,
             onMapClick = { latLng ->
                 searchedLocation = latLng
-                markerPosition = latLng
+                homeScreenViewModel.setMarkerPosition(latLng)
                 searchQuery = ""
             }
         ) {
             val location = searchedLocation
             if (location != null) {
                 Marker(
-                    state = MarkerState(markerPosition),
+                    state = MarkerState(homeScreenViewModel.getMarkerPosition()),
                     title = searchQuery
                 )
             }
@@ -104,7 +121,7 @@ fun HomeScreen() {
                     onSearch = {
                         searchLocation(searchQuery)
                         keyboardController?.hide()
-                        markerPosition
+                        homeScreenViewModel.getMarkerPosition()
                     }
                 ),
                 colors = TextFieldDefaults.colors(
@@ -120,8 +137,9 @@ fun HomeScreen() {
 
             OutlinedButton(
                 onClick = {
-                    cameraPositionState.move(CameraUpdateFactory.newLatLng(LatLng(59.9127, 10.7461)))
-                    markerPosition = LatLng(59.9127, 10.7461)
+                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(LatLng(59.9127, 10.7461),12f))
+                    homeScreenViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
+
                 },
                 contentPadding = PaddingValues(8.dp),
                 shape = CircleShape,
@@ -135,6 +153,13 @@ fun HomeScreen() {
                         .clip(CircleShape)
 
                 )
+            }
+            Button(
+                onClick = {
+                    homeScreenViewModel.getNearestStationData()
+                }
+            ){
+                Text("Get nearest station")
             }
         }
 
