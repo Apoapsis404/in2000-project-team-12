@@ -1,0 +1,46 @@
+package no.uio.ifi.in2000.team12.team12project.data.frost
+
+import kotlinx.coroutines.launch
+import org.junit.Test
+import kotlinx.coroutines.test.runTest
+import no.uio.ifi.in2000.team12.team12project.model.frost.Months
+
+class TestWeatherDataRepository {
+
+    @Test
+    fun testGetWeatherDataFromYear() = runTest {
+        val weatherDataRepository = WeatherDataRepository()
+        weatherDataRepository.getWeatherData(
+            "SN18700,SN18701,SN18703,SN499999010,SN18390",
+            "mean(air_temperature P1M)",
+            "R4/2016-01-01/2017-01-01"
+        )
+        val obsFromYear = weatherDataRepository.getObsFromYear(2016)
+        printWeatherObservations(obsFromYear)
+    }
+
+    @Test
+    fun testGetWeatherDataFromMonth() = runTest {
+        val weatherDataRepository = WeatherDataRepository()
+        weatherDataRepository.getWeatherData(
+            "SN18700,SN18701,SN18703,SN499999010,SN18390",
+            "mean(air_temperature P1M)",
+            "R4/2016-01-01/2017-01-01"
+        )
+        val obsFromMonth = weatherDataRepository.getObsFromMonth(Months.FEBRUARY)
+        printWeatherObservations(obsFromMonth)
+    }
+
+    @Test
+    fun testFindMeanValue_FromMonth() = runTest {
+        val weatherDataRepository = WeatherDataRepository()
+        weatherDataRepository.getWeatherData(
+            "SN18700,SN18701,SN18703,SN499999010,SN18390",
+            "mean(air_temperature P1M)",
+            "R4/2016-01-01/2017-01-01"
+        )
+        val obsFromMonth = weatherDataRepository.getObsFromMonth(Months.DECEMBER)
+        val meanValue = weatherDataRepository.findMeanValue(obsFromMonth)
+        println("Mean value: $meanValue")
+    }
+}
