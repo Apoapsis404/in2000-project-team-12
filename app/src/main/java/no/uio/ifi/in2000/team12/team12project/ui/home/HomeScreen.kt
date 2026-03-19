@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.ui.home
 
-import android.annotation.SuppressLint
 import android.location.Geocoder
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -22,9 +21,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -33,7 +30,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -41,29 +38,15 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.R
-import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
 import java.util.Locale
-import androidx.lifecycle.viewmodel.compose.viewModel
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel()) {
-
-
     val uiState by homeScreenViewModel.uiState.collectAsState()
-
 
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val obsStationsDataSource : ObsStationsDataSource by remember {mutableStateOf(
-        ObsStationsDataSource())}
-
-    var searchQuery by remember { mutableStateOf("") }
-    var searchedLocation by remember { mutableStateOf<LatLng?>(LatLng(59.9127, 10.7461)) }
-    var markerTitle by remember {mutableStateOf("")}
-    //var markerPosition by remember{mutableStateOf(LatLng(59.9127, 10.7461))}
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(59.9127, 10.7461), 10f)
@@ -75,15 +58,10 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel()) {
         if (!results.isNullOrEmpty()) {
             val location = results[0]
             val latLng = LatLng(location.latitude, location.longitude)
-            searchedLocation = latLng
-            homeScreenViewModel.setMarkerPosition(latLng)
-            markerTitle = query
             cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 20f)
+            homeScreenViewModel.onSearchedLocation(query, latLng)
         }
     }
-
-
-
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -92,18 +70,13 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel()) {
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             onMapClick = { latLng ->
-                searchedLocation = latLng
-                homeScreenViewModel.setMarkerPosition(latLng)
-                searchQuery = ""
+                homeScreenViewModel.onMapClick(latLng)  //updates marker position
             }
         ) {
-            val location = searchedLocation
-            if (location != null) {
-                Marker(
-                    state = MarkerState(homeScreenViewModel.getMarkerPosition()),
-                    title = searchQuery
-                )
-            }
+            Marker(
+                state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
+                title = uiState.markerTitle
+            )
         }
 
         Column(
@@ -112,16 +85,15 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel()) {
                 .padding(8.dp)
         ) {
             TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
+                value = uiState.searchQuery,    // value is read from uiState
+                onValueChange = { homeScreenViewModel.setSearchQuery(it) }, // updates value of uiState.searchQuery
                 placeholder = { Text("Search location...") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        searchLocation(searchQuery)
+                        searchLocation(uiState.searchQuery)
                         keyboardController?.hide()
-                        homeScreenViewModel.getMarkerPosition()
                     }
                 ),
                 colors = TextFieldDefaults.colors(
@@ -137,8 +109,9 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel()) {
 
             OutlinedButton(
                 onClick = {
-                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(LatLng(59.9127, 10.7461),12f))
-                    homeScreenViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
+                    val temporaryReturnPosition = LatLng(59.9127, 10.7461)
+                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(temporaryReturnPosition,12f))
+                    homeScreenViewModel.setMarkerPosition(temporaryReturnPosition)
 
                 },
                 contentPadding = PaddingValues(8.dp),
@@ -146,17 +119,18 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel()) {
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
                 Image(
-                    painter = painterResource(R.drawable.my_location),
-                    contentDescription = "home",
+                    painter = painterResource(R.drawable.my_location),  // Needs a better image
+                    contentDescription = "return to current position",
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
 
                 )
             }
+            // Should be removed at some point
             Button(
                 onClick = {
-                    homeScreenViewModel.getNearestStationData()
+                    homeScreenViewModel.getNearestStations()
                 }
             ){
                 Text("Get nearest station")

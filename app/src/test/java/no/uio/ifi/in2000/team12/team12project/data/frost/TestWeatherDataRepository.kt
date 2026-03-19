@@ -1,9 +1,8 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
-import kotlinx.coroutines.launch
-import org.junit.Test
 import kotlinx.coroutines.test.runTest
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
+import org.junit.Test
 
 class TestWeatherDataRepository {
 
