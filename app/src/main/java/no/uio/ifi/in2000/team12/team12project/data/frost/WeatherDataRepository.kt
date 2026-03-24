@@ -3,6 +3,11 @@ package no.uio.ifi.in2000.team12.team12project.data.frost
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
 
+data class WeatherChartData(
+    val years: List<Double>,
+    val values: List<Double>
+)
+
 class WeatherDataRepository {
 
     private val weatherDataSource = WeatherDataSource()
@@ -53,5 +58,26 @@ class WeatherDataRepository {
             mean += obsMean
         }
         return mean / weatherObsList.size
+    }
+
+    fun findMeanObs(weatherObs: WeatherObs): Double {
+        var obsMean = 0.0
+        for (detail in weatherObs.observations) {
+            obsMean += detail.value
+        }
+        return obsMean / weatherObs.observations.size
+    }
+
+    fun getYearAndData(weatherObsList: List<WeatherObs>): WeatherChartData {
+        val years = mutableListOf<Double>()
+        val data = mutableListOf<Double>()
+
+        for (obs in weatherObsList) {
+            val year = obs.referenceTime.substring(0, 4).toDouble()
+            val mean = findMeanObs(obs)
+            years.add(year)
+            data.add(mean)
+        }
+        return WeatherChartData(years, data)
     }
 }

@@ -42,4 +42,18 @@ class TestWeatherDataRepository {
         val meanValue = weatherDataRepository.findMeanValue(obsFromMonth)
         println("Mean value: $meanValue")
     }
+
+    @Test
+    fun testGetYearAndDate() = runTest {
+        val weatherDataRepository = WeatherDataRepository()
+        weatherDataRepository.getWeatherData(
+            "SN18700",
+            "mean(air_temperature P1M)",
+            "R10/2010-01-01/2011-01-01"
+        )
+        val obsFromMonth = weatherDataRepository.getObsFromMonth(Months.DECEMBER)
+        val weatherChartData = weatherDataRepository.getYearAndData(obsFromMonth)
+        println("${weatherChartData.years.size}, ${weatherChartData.years}")
+        println("${weatherChartData.values.size}, ${weatherChartData.values}")
+    }
 }
