@@ -3,11 +3,9 @@ package no.uio.ifi.in2000.team12.team12project.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreen
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreen
@@ -19,12 +17,12 @@ import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewMode
 
 @Composable
 fun Navigator(
+    modifier: Modifier = Modifier,
     homeViewModel: HomeScreenViewModel = viewModel(),
     graphViewModel: GraphScreenViewModel = viewModel(),
     settingsViewModel: SettingsScreenViewModel = viewModel(),
     favoritesViewModel: FavoritesScreenViewModel = viewModel(),
     navController: NavHostController,
-    modifier: Modifier = Modifier
 ){
     NavHost(
         navController = navController,
