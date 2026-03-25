@@ -40,6 +40,7 @@ class ObsStationsDataSource {
             basicAuth(clientId, clientSecret)
 
             url {
+                parameters.append("maxdist", maxDist.toString())
                 parameters.append("geometry", nearestString)
                 parameters.append("nearestmaxcount", maxCount.toString())
                 parameters.append("fields", fieldsString)
