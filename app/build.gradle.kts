@@ -69,6 +69,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    implementation(libs.androidx.compose.material.icons.extended)
+
     // kart
     implementation("com.google.android.gms:play-services-maps:20.0.0")
     implementation("com.google.maps.android:maps-compose:8.2.1")

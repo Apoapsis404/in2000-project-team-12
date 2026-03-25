@@ -1,7 +1,10 @@
 package no.uio.ifi.in2000.team12.team12project.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,14 +22,14 @@ fun Navigator(
     homeViewModel: HomeScreenViewModel = viewModel(),
     graphViewModel: GraphScreenViewModel = viewModel(),
     settingsViewModel: SettingsScreenViewModel = viewModel(),
-    favoritesViewModel: FavoritesScreenViewModel = viewModel()
-
-
+    favoritesViewModel: FavoritesScreenViewModel = viewModel(),
+    navController: NavHostController,
+    modifier: Modifier = Modifier
 ){
-    val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "home",
+        modifier = modifier
     ){
         composable(
             route = "home"
