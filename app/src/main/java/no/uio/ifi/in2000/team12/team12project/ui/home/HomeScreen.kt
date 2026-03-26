@@ -2,9 +2,11 @@ package no.uio.ifi.in2000.team12.team12project.ui.home
 
 import android.location.Geocoder
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -109,34 +111,45 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
 
             Spacer(modifier = Modifier.weight(1f))
 
-            OutlinedButton(
-                onClick = {
-                    val temporaryReturnPosition = LatLng(59.9127, 10.7461)
-                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(temporaryReturnPosition,12f))
-                    homeScreenViewModel.setMarkerPosition(temporaryReturnPosition)
-                    homeScreenViewModel.setSearchQuery("")
-
-                },
-                contentPadding = PaddingValues(8.dp),
-                shape = CircleShape,
-                modifier = Modifier.padding(bottom = 16.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Image(
-                    painter = painterResource(R.drawable.outline_my_location_24),  // Needs a better image
-                    contentDescription = "return to current position",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
+                OutlinedButton(
+                    onClick = {
+                        val temporaryReturnPosition = LatLng(59.9127, 10.7461)
+                        cameraPositionState.move(
+                            CameraUpdateFactory.newLatLngZoom(
+                                temporaryReturnPosition,
+                                12f
+                            )
+                        )
+                        homeScreenViewModel.setMarkerPosition(temporaryReturnPosition)
+                        homeScreenViewModel.setSearchQuery("")
 
-                )
-            }
-            // Should be removed at some point
-            Button(
-                onClick = {
-                    navHostController.navigate("graph")
+                    },
+                    contentPadding = PaddingValues(8.dp),
+                    shape = CircleShape,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.outline_my_location_24),  // Needs a better image
+                        contentDescription = "return to current position",
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+
+                    )
                 }
-            ){
-                Text("Show me the numbers!")
+
+                Button(
+                    onClick = {
+                        navHostController.navigate("graph")
+                    },
+
+                    ) {
+                    Text("Show me the numbers!")
+                }
             }
         }
 
