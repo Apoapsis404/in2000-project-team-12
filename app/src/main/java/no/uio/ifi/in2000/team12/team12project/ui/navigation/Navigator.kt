@@ -20,7 +20,7 @@ fun Navigator(
     modifier: Modifier = Modifier,
     homeViewModel: HomeScreenViewModel = viewModel(),
     graphViewModel: GraphScreenViewModel = viewModel(),
-    settingsViewModel: SettingsScreenViewModel = viewModel(),
+    settingsViewModel: SettingsScreenViewModel,
     favoritesViewModel: FavoritesScreenViewModel = viewModel(),
     navController: NavHostController,
 ){

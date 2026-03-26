@@ -50,15 +50,18 @@ class MainActivity : ComponentActivity() {
             Team12ProjectTheme(
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
-            ) { }
-            MainComp(settingsViewModel)
+            ) {
+                MainComp(settingsViewModel)
+            }
         }
     }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainComp(settingsScreenViewModel: SettingsScreenViewModel) {
+fun MainComp(
+    settingsScreenViewModel: SettingsScreenViewModel
+) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
