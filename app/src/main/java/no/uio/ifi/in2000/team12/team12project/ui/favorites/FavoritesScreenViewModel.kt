@@ -15,8 +15,8 @@ class FavoritesScreenViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(FavoritesScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun addFavoriteLocation(location: LatLng, name: String){
-        val favoriteLocation : FavoriteLocation = FavoriteLocation(location, name)
+    fun addFavoriteLocation(location: LatLng, name: String, address : String){
+        val favoriteLocation = FavoriteLocation(location, name, address)
         val tempList = _uiState.value.favoritesLocationList + favoriteLocation
 
         _uiState.update { it.copy(favoritesLocationList = tempList) }

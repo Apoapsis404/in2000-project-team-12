@@ -5,4 +5,5 @@ import com.google.android.gms.maps.model.LatLng
 data class FavoriteLocation(
     val coordinates: LatLng,
     val name: String,
+    val address : String
 )
