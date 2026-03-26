@@ -26,13 +26,13 @@ fun Navigator(
 ){
     NavHost(
         navController = navController,
-        startDestination = "home",
+        startDestination = "graph",
         modifier = modifier
     ){
         composable(
             route = "home"
         ) {
-            HomeScreen(homeViewModel)
+            HomeScreen(homeViewModel, navController)
         }
         composable(
             route = "graph"

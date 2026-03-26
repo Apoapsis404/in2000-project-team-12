@@ -25,14 +25,18 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.ui.navigation.Navigator
+import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
+import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
@@ -40,22 +44,28 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val settingsViewModel : SettingsScreenViewModel = viewModel()
             //HomeScreen()
             //GraphScreen()
-            MainComp()
+            Team12ProjectTheme(
+                darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
+                dynamicColor = false
+            ) { }
+            MainComp(settingsViewModel)
         }
     }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainComp() {
+fun MainComp(settingsScreenViewModel: SettingsScreenViewModel) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = false,
         drawerContent = {
             ModalDrawerSheet {
                 Text("Menu Header", modifier = Modifier.padding(16.dp))
@@ -93,7 +103,7 @@ fun MainComp() {
         Scaffold(
             topBar = { Header(onClick = { scope.launch { drawerState.open() } }) },
         ) { innerPadding ->
-            Navigator(
+            Navigator( settingsViewModel = settingsScreenViewModel,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding), navController = navController
@@ -107,7 +117,7 @@ fun MainComp() {
 @Composable
 fun Header(modifier: Modifier = Modifier, onClick: () -> Unit){
     TopAppBar(
-        {Text("BondeknølApp")},
+        {Text("App")},
         modifier = modifier
             .fillMaxWidth(),
         navigationIcon = {

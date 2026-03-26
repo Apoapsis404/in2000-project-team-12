@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -42,7 +43,8 @@ import no.uio.ifi.in2000.team12.team12project.R
 import java.util.Locale
 
 @Composable
-fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel()) {
+fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
+               navHostController: NavHostController) {
     val uiState by homeScreenViewModel.uiState.collectAsState()
 
     val context = LocalContext.current
@@ -130,10 +132,10 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel()) {
             // Should be removed at some point
             Button(
                 onClick = {
-                    homeScreenViewModel.getNearestStations()
+                    navHostController.navigate("graph")
                 }
             ){
-                Text("Get nearest station")
+                Text("Show me the numbers!")
             }
         }
 

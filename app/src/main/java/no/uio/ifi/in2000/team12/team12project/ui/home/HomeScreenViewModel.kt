@@ -18,7 +18,9 @@ data class HomeScreenUiState(
     val markerTitle : String = ""
 )
 
+fun stfuMarius(roast : String){
 
+}
 
 class HomeScreenViewModel : ViewModel(){
     private val obsStationsDataSource : ObsStationsDataSource = ObsStationsDataSource()
