@@ -16,23 +16,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun BulletedList(items : List<String>, modifier: Modifier){
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.Start) {
         items.forEach { item ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+
                 modifier = modifier.padding(start = 16.dp)
             ){
                 Box(
                     modifier = modifier
                         .padding(end = 8.dp)
-                        .size(6.dp)
+                        .size(10.dp)
                         .clip(CircleShape)
                         .background(Color.Black)
                 )
-                Text(text = item,style = MaterialTheme.typography.bodyMedium)
+                Text(text = item,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 18.sp)
             }
         }
     }

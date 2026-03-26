@@ -74,12 +74,10 @@ fun MainComp(settingsScreenViewModel: SettingsScreenViewModel) {
                     label = { Text("Home") },
                     selected = false,
                     onClick = {
-                        // Handle navigation
                         navController.navigate("home")
                         scope.launch { drawerState.close() }
                     }
                 )
-                // Add more items here
                 NavigationDrawerItem(
                     label = { Text("Favorites") },
                     selected = false,

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,7 +21,9 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.Scroll
@@ -51,7 +54,11 @@ import kotlin.math.max
 
 // Graph library used:
 // https://github.com/patrykandpatrick/vico
-val dummyList = listOf("Apple", "Banana", "Cherry")
+val dummyList = listOf(
+    "Januar er 4 grader varmere nå",
+    "Temp i oktober varierer, men er stabil",
+    "Desember preges av plussgrader"
+)
 
 @Composable
 fun GraphScreen(
@@ -71,40 +78,53 @@ fun GraphScreen(
         }
     }
 
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+    Column(modifier = modifier.fillMaxSize()
+    ) {
+        Column(
+//            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-        Row(modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 5.dp, end = 5.dp, top = 16.dp, bottom = 12.dp),
-            horizontalArrangement = Arrangement.Center
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(start = 5.dp, end = 5.dp, top = 16.dp, bottom = 12.dp),
+                horizontalArrangement = Arrangement.Center
 
-        ){
-            RoundCornerButton(
-                label = " Sammenlign år ",
-                selected = yearSelected,
-                onClick = { yearSelected = true},
-            )
+            ) {
+                RoundCornerButton(
+                    label = " Sammenlign år ",
+                    selected = yearSelected,
+                    onClick = { yearSelected = true },
+                )
 
-            RoundCornerButton(
-                label = " Sammenlign måned ",
-                selected = !yearSelected,
-                onClick = {yearSelected = false}
-            )
+                RoundCornerButton(
+                    label = " Sammenlign måned ",
+                    selected = !yearSelected,
+                    onClick = { yearSelected = false }
+                )
 
+            }
+            ComposeTemperatureAnomalies(modelProducer)
+
+            Spacer(modifier = modifier.height(10.dp))
+
+            Row(modifier = modifier.fillMaxWidth()) {
+                DropDown<Months>(uiState.month.name, modifier = modifier.weight(1f)) {
+                    graphScreenViewModel.setMonth(it)
+                }
+                DropDown<ObsType>(uiState.obsType.name, modifier = modifier.weight(1f)) {
+                    graphScreenViewModel.setObsType(it)
+                }
+            }
         }
-        ComposeTemperatureAnomalies(modelProducer)
-        Spacer(modifier = modifier.height(10.dp))
-        DropDown<Months>(uiState.month.name, modifier = modifier.fillMaxWidth()) {
-            graphScreenViewModel.setMonth(it)
-        }
-        DropDown<ObsType>(uiState.obsType.name, modifier = modifier.fillMaxWidth()) {
-            graphScreenViewModel.setObsType(it)
-        }
+        Text(
+            text = "Innsiktsoppsummering:",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = modifier.padding(top = 5.dp, bottom = 16.dp)
+        )
         BulletedList(summaryList, modifier)
-
     }
 }
 
