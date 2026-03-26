@@ -19,6 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemColors
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -53,14 +55,15 @@ class MainActivity : ComponentActivity() {
             ) {
                 MainComp(settingsViewModel)
             }
-
         }
     }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainComp(settingsScreenViewModel: SettingsScreenViewModel) {
+fun MainComp(
+    settingsScreenViewModel: SettingsScreenViewModel
+) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
@@ -69,7 +72,10 @@ fun MainComp(settingsScreenViewModel: SettingsScreenViewModel) {
         drawerState = drawerState,
         gesturesEnabled = false,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                drawerContainerColor = MaterialTheme.colorScheme.primary,
+                drawerContentColor = MaterialTheme.colorScheme.secondary,
+            ) {
                 Text("Menu Header", modifier = Modifier.padding(16.dp))
                 HorizontalDivider()
                 NavigationDrawerItem(
@@ -78,7 +84,11 @@ fun MainComp(settingsScreenViewModel: SettingsScreenViewModel) {
                     onClick = {
                         navController.navigate("home")
                         scope.launch { drawerState.close() }
-                    }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
+                        selectedTextColor = MaterialTheme.colorScheme.tertiary
+                    )
                 )
                 NavigationDrawerItem(
                     label = { Text("Favorites") },
@@ -86,7 +96,11 @@ fun MainComp(settingsScreenViewModel: SettingsScreenViewModel) {
                     onClick = {
                         navController.navigate("favorites")
                         scope.launch { drawerState.close() }
-                    }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
+                        selectedTextColor = MaterialTheme.colorScheme.tertiary
+                    )
                 )
                 NavigationDrawerItem(
                     label = { Text("Settings") },
@@ -94,7 +108,11 @@ fun MainComp(settingsScreenViewModel: SettingsScreenViewModel) {
                     onClick = {
                         navController.navigate("settings")
                         scope.launch { drawerState.close() }
-                    }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
+                        selectedTextColor = MaterialTheme.colorScheme.tertiary
+                    )
 
                 )
             }
@@ -117,7 +135,11 @@ fun MainComp(settingsScreenViewModel: SettingsScreenViewModel) {
 @Composable
 fun Header(modifier: Modifier = Modifier, onClick: () -> Unit){
     TopAppBar(
-        {Text("App")},
+        {
+            Text("App",
+            color = MaterialTheme.colorScheme.secondary
+            )
+        },
         modifier = modifier
             .fillMaxWidth(),
         navigationIcon = {
@@ -131,7 +153,7 @@ fun Header(modifier: Modifier = Modifier, onClick: () -> Unit){
         colors = TopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             scrolledContainerColor = Color.Blue,
-            navigationIconContentColor = Color.Green,
+            navigationIconContentColor = MaterialTheme.colorScheme.secondary,
             titleContentColor = Color.DarkGray,
             actionIconContentColor = Color.Magenta,
 

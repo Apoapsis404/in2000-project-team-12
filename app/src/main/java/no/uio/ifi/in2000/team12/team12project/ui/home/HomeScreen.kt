@@ -122,7 +122,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
                 Image(
-                    painter = painterResource(R.drawable.my_location),  // Needs a better image
+                    painter = painterResource(R.drawable.outline_my_location_24),  // Needs a better image
                     contentDescription = "return to current position",
                     modifier = Modifier
                         .size(40.dp)
