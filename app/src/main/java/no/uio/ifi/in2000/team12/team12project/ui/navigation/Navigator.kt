@@ -26,7 +26,7 @@ fun Navigator(
 ){
     NavHost(
         navController = navController,
-        startDestination = "graph",
+        startDestination = "home",
         modifier = modifier
     ){
         composable(

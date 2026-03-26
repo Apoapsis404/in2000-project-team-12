@@ -114,6 +114,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                     val temporaryReturnPosition = LatLng(59.9127, 10.7461)
                     cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(temporaryReturnPosition,12f))
                     homeScreenViewModel.setMarkerPosition(temporaryReturnPosition)
+                    homeScreenViewModel.setSearchQuery("")
 
                 },
                 contentPadding = PaddingValues(8.dp),

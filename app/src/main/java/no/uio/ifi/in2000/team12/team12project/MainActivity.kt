@@ -50,8 +50,10 @@ class MainActivity : ComponentActivity() {
             Team12ProjectTheme(
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
-            ) { }
-            MainComp(settingsViewModel)
+            ) {
+                MainComp(settingsViewModel)
+            }
+
         }
     }
 }
