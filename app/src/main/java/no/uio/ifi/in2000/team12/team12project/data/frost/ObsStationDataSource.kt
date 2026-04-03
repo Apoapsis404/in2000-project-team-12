@@ -30,7 +30,7 @@ class ObsStationsDataSource {
     val clientSecret: String = "58727131-5656-406b-84f7-4838513e45f0"
 
 
-    suspend fun getNearestStation(latitude: Double, longitude: Double, maxDist: Double = 5.0, maxCount: Int = 5): List<ObsStation> {
+    suspend fun getNearestStation(latitude: Double, longitude: Double, maxDist: Double = 50.0, maxCount: Int = 5): List<ObsStation> {
 
         val nearestString: String = "nearest(POINT ($longitude $latitude))"
         val fieldsString: String = "id,name,masl,geometry"
@@ -40,7 +40,7 @@ class ObsStationsDataSource {
             basicAuth(clientId, clientSecret)
 
             url {
-                parameters.append("maxdist", maxDist.toString())
+                //parameters.append("maxdist", maxDist.toString())
                 parameters.append("geometry", nearestString)
                 parameters.append("nearestmaxcount", maxCount.toString())
                 parameters.append("fields", fieldsString)

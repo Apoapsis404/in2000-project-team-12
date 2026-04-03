@@ -76,7 +76,7 @@ fun MainComp(
                 drawerContainerColor = MaterialTheme.colorScheme.primary,
                 drawerContentColor = MaterialTheme.colorScheme.secondary,
             ) {
-                Text("Menu Header", modifier = Modifier.padding(16.dp))
+                Text("Menu", modifier = Modifier.padding(16.dp))
                 HorizontalDivider()
                 NavigationDrawerItem(
                     label = { Text("Home") },

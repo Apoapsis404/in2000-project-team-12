@@ -6,9 +6,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
 import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherChartData
 import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherDataRepository
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
+import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsType
 import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
 
@@ -23,6 +25,7 @@ data class GraphScreenUiState(
 class GraphScreenViewModel : ViewModel() {
 
     private val weatherDataRepository = WeatherDataRepository()
+    private val obsDataSource = ObsStationsDataSource()
 
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
@@ -34,7 +37,23 @@ class GraphScreenViewModel : ViewModel() {
     fun getWeatherObs() {
         if(uiState.value.weatherObs.isNotEmpty()) return
         viewModelScope.launch {
-            val weatherObs = weatherDataRepository.getWeatherData("SN18700", "mean(air_temperature P1M)", "R10/2010-01-01/2011-01-01")
+            val nearestStation = obsDataSource.getNearestStation(68.208,13.915)
+            var weatherObs : List<WeatherObs> = emptyList()
+
+            for (station in nearestStation){
+                try{
+                    weatherObs = weatherDataRepository.getWeatherData(station.id, "mean(air_temperature P1M)", "R10/2010-01-01/2011-01-01")
+
+                }catch (e : Exception){
+                    println(e.message)
+                    continue
+                }
+                if (weatherObs.isNotEmpty()){
+                    break
+                }
+            }
+
+
             _uiState.update { it.copy(weatherObs = weatherObs) }
             updateChartData()
         }

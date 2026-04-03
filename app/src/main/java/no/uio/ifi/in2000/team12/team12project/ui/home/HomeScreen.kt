@@ -75,6 +75,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
             cameraPositionState = cameraPositionState,
             onMapClick = { latLng ->
                 homeScreenViewModel.onMapClick(latLng)  //updates marker position
+                println(uiState.markerPosition)
             }
         ) {
             Marker(
@@ -98,6 +99,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                     onSearch = {
                         searchLocation(uiState.searchQuery)
                         keyboardController?.hide()
+                        //println(uiState.markerPosition)
                     }
                 ),
                 colors = TextFieldDefaults.colors(
