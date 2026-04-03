@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreen
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreen
@@ -32,6 +33,7 @@ fun Navigator(
         composable(
             route = "home"
         ) {
+            homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
             HomeScreen(homeViewModel, navController)
         }
         composable(

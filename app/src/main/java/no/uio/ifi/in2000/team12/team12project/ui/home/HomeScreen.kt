@@ -53,7 +53,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(59.9127, 10.7461), 10f)
+        position = CameraPosition.fromLatLngZoom(uiState.markerPosition, 10f)
     }
 
     fun searchLocation(query: String) {

@@ -11,7 +11,6 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
 import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherChartData
 import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherDataRepository
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
-import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsType
 import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
 
@@ -38,15 +37,15 @@ class GraphScreenViewModel : ViewModel() {
 
 
 
-    fun getWeatherObs() {
+    fun getWeatherObs(minCount : Int = 0, maxCount : Int = 5) {
         _uiState.update { it.copy(weatherObs = emptyList()) }
         //if(uiState.value.weatherObs.isNotEmpty()) return
         viewModelScope.launch {
-            println(_uiState.value.markerPosition)
-            val nearestStation = obsDataSource.getNearestStation(_uiState.value.markerPosition.latitude,_uiState.value.markerPosition.longitude)
+            println("position: " + _uiState.value.markerPosition)
+            val nearestStation = obsDataSource.getNearestStation(_uiState.value.markerPosition.latitude,_uiState.value.markerPosition.longitude, maxCount = maxCount)
             var weatherObs : List<WeatherObs> = emptyList()
 
-            for (station in nearestStation){
+            for (station in nearestStation.subList(minCount, maxCount)){
                 try{
                     weatherObs = weatherDataRepository.getWeatherData(station.id, "mean(air_temperature P1M)", "R10/2016-01-01/2017-01-01")
 
@@ -58,6 +57,9 @@ class GraphScreenViewModel : ViewModel() {
                     println(station.name)
                     break
                 }
+            }
+            if (weatherObs.isEmpty() and (maxCount < 25)){ //FIX
+                getWeatherObs(maxCount, maxCount+5)
             }
 
 
@@ -74,9 +76,6 @@ class GraphScreenViewModel : ViewModel() {
         _uiState.update { it.copy(obsType = obsType) }
     }
 
-    fun getWeatherChartData() {
-        updateChartData()
-    }
 
     fun setMarkerPosition(position : LatLng){
         _uiState.update { it.copy(markerPosition = position) }

@@ -48,7 +48,7 @@ class WeatherDataRepository {
 
     fun findMeanValue(weatherObsList: List<WeatherObs>): Double {
         var mean = 0.0
-        var obsMean = 0.0
+        var obsMean : Double
         for (obs in weatherObsList) {
             obsMean = 0.0
             for (detail in obs.observations) {

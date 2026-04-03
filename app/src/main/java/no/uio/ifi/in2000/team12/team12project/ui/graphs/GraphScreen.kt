@@ -25,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.gms.maps.model.LatLng
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.Scroll
 import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
@@ -37,7 +36,6 @@ import com.patrykandpatrick.vico.compose.cartesian.data.ColumnCartesianLayerMode
 import com.patrykandpatrick.vico.compose.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.compose.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.Fill
@@ -143,7 +141,7 @@ private val RangeProvider =
 
 private val StartAxisValueFormatter = CartesianValueFormatter.decimal(suffix = " °C")
 
-private val MarkerValueFormatter = DefaultCartesianMarker.ValueFormatter.default(suffix = " °C")
+
 
 private fun getColumnProvider(positive: LineComponent, negative: LineComponent) =
     object : ColumnCartesianLayer.ColumnProvider {

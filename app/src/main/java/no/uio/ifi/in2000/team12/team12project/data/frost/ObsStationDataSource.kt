@@ -1,19 +1,15 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
-import android.util.Log
-import androidx.compose.ui.res.stringResource
-import io.ktor.client.call.body
+import io.ktor.client.request.basicAuth
+import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.*
-import io.ktor.client.request.*
-import io.ktor.http.HttpMethod
+import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
+import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.Point
-import org.json.JSONObject
 
 @Serializable
 data class NearestParam(val maxdist: Double, val maxcount: Int, val points: List<Point>)
@@ -30,17 +26,16 @@ class ObsStationsDataSource {
     val clientSecret: String = "58727131-5656-406b-84f7-4838513e45f0"
 
 
-    suspend fun getNearestStation(latitude: Double, longitude: Double, maxDist: Double = 50.0, maxCount: Int = 5): List<ObsStation> {
+    suspend fun getNearestStation(latitude: Double, longitude: Double, maxCount: Int = 5): List<ObsStation> {
 
-        val nearestString: String = "nearest(POINT ($longitude $latitude))"
-        val fieldsString: String = "id,name,masl,geometry"
+        val nearestString = "nearest(POINT ($longitude $latitude))"
+        val fieldsString = "id,name,masl,geometry"
 
         val response: HttpResponse = KtorClient.client.get(urlV0) {
 
             basicAuth(clientId, clientSecret)
 
             url {
-                //parameters.append("maxdist", maxDist.toString())
                 parameters.append("geometry", nearestString)
                 parameters.append("nearestmaxcount", maxCount.toString())
                 parameters.append("fields", fieldsString)
