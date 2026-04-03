@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.gms.maps.model.LatLng
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.Scroll
 import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
@@ -64,6 +65,7 @@ val dummyList = listOf(
 fun GraphScreen(
     modifier: Modifier = Modifier,
     graphScreenViewModel: GraphScreenViewModel = viewModel(),
+
 ) {
     val modelProducer = remember { CartesianChartModelProducer() }
     val uiState by graphScreenViewModel.uiState.collectAsState()

@@ -45,6 +45,10 @@ class HomeScreenViewModel : ViewModel(){
         _uiState.update { it.copy(searchQuery = query) }
     }
 
+    fun getMarkerPosition() : LatLng{
+        return _uiState.value.markerPosition
+    }
+
     // updates values when a location is searched in the search bar
     fun onSearchedLocation(query : String, position : LatLng){
         _uiState.update {

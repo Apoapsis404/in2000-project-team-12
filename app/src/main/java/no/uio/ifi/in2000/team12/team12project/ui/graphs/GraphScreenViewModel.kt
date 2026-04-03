@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team12.team12project.ui.graphs
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,7 +19,8 @@ data class GraphScreenUiState(
     val weatherObs: List<WeatherObs> = emptyList(),
     val month: Months = Months.JANUARY,
     val obsType: ObsType = ObsType.MEAN_AIR_TEMP,
-    val weatherChartData: WeatherChartData = WeatherChartData(emptyList(), emptyList())
+    val weatherChartData: WeatherChartData = WeatherChartData(emptyList(), emptyList()),
+    val markerPosition : LatLng = LatLng(0.0,0.0)
 )
 
 
@@ -34,21 +36,26 @@ class GraphScreenViewModel : ViewModel() {
         getWeatherObs()
     }
 
+
+
     fun getWeatherObs() {
-        if(uiState.value.weatherObs.isNotEmpty()) return
+        _uiState.update { it.copy(weatherObs = emptyList()) }
+        //if(uiState.value.weatherObs.isNotEmpty()) return
         viewModelScope.launch {
-            val nearestStation = obsDataSource.getNearestStation(68.208,13.915)
+            println(_uiState.value.markerPosition)
+            val nearestStation = obsDataSource.getNearestStation(_uiState.value.markerPosition.latitude,_uiState.value.markerPosition.longitude)
             var weatherObs : List<WeatherObs> = emptyList()
 
             for (station in nearestStation){
                 try{
-                    weatherObs = weatherDataRepository.getWeatherData(station.id, "mean(air_temperature P1M)", "R10/2010-01-01/2011-01-01")
+                    weatherObs = weatherDataRepository.getWeatherData(station.id, "mean(air_temperature P1M)", "R10/2016-01-01/2017-01-01")
 
                 }catch (e : Exception){
                     println(e.message)
                     continue
                 }
                 if (weatherObs.isNotEmpty()){
+                    println(station.name)
                     break
                 }
             }
@@ -63,13 +70,16 @@ class GraphScreenViewModel : ViewModel() {
         _uiState.update { it.copy(month = month) }
         updateChartData()
     }
-
     fun setObsType(obsType: ObsType) {
         _uiState.update { it.copy(obsType = obsType) }
     }
 
     fun getWeatherChartData() {
         updateChartData()
+    }
+
+    fun setMarkerPosition(position : LatLng){
+        _uiState.update { it.copy(markerPosition = position) }
     }
 
     private fun updateChartData() {

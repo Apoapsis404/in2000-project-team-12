@@ -37,7 +37,10 @@ fun Navigator(
         composable(
             route = "graph"
         ) {
+            graphViewModel.setMarkerPosition(homeViewModel.getMarkerPosition())
+            graphViewModel.getWeatherObs()
             GraphScreen(graphScreenViewModel = graphViewModel)
+
         }
         composable  (
             route = "settings"
