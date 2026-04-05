@@ -1,19 +1,18 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
-import android.util.Log
-import androidx.compose.ui.res.stringResource
-import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.*
 import io.ktor.client.request.*
-import io.ktor.http.HttpMethod
+import io.ktor.http.vary
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import no.uio.ifi.in2000.team12.team12project.data.exceptions.BadRequestException
+import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoDataException
+import no.uio.ifi.in2000.team12.team12project.data.exceptions.UnauthorizedException
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.Point
-import org.json.JSONObject
 
 @Serializable
 data class NearestParam(val maxdist: Double, val maxcount: Int, val points: List<Point>)
@@ -30,7 +29,7 @@ class ObsStationsDataSource {
     val clientSecret: String = "58727131-5656-406b-84f7-4838513e45f0"
 
 
-    suspend fun getNearestStation(latitude: Double, longitude: Double, maxDist: Double = 5.0, maxCount: Int = 5): List<ObsStation> {
+    suspend fun getNearestStation(latitude: Double, longitude: Double, maxDist: Double = 5.0, maxCount: Int = 5, clientId: String = this.clientId, clientSecret: String = this.clientSecret): List<ObsStation> {
 
         val nearestString: String = "nearest(POINT ($longitude $latitude))"
         val fieldsString: String = "id,name,masl,geometry"
@@ -40,7 +39,7 @@ class ObsStationsDataSource {
             basicAuth(clientId, clientSecret)
 
             url {
-                parameters.append("maxdist", maxDist.toString())
+                //parameters.append("maxdist", maxDist.toString())
                 parameters.append("geometry", nearestString)
                 parameters.append("nearestmaxcount", maxCount.toString())
                 parameters.append("fields", fieldsString)
@@ -51,12 +50,26 @@ class ObsStationsDataSource {
 
         val responseBodyString = response.bodyAsText()
 
-        //println(responseBodyString)
-        return if (response.status.value in 200..299) {
-            //response.body<ObsStation>()
-            Json { ignoreUnknownKeys = true }.decodeFromString<ObsStationResponse>(responseBodyString).data
-        } else {
-            throw Exception("Error getting nearest station: ${response.status}")
+        println(response.status.value)
+        return when (response.status.value) {
+            in 200..299 -> {
+                //response.body<ObsStation>()
+                Json { ignoreUnknownKeys = true }.decodeFromString<ObsStationResponse>(
+                    responseBodyString
+                ).data
+            }
+            400 -> {
+                throw BadRequestException(message = "Invalid parameter value or malformed request")
+            }
+            401 -> {
+                throw UnauthorizedException("Unauthorized client ID")
+            }
+            404 -> {
+                throw NoDataException("No data found")
+            }
+            else -> {
+                throw Exception("Unknown error")
+            }
         }
     }
 

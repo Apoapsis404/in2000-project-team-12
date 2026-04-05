@@ -86,4 +86,5 @@ dependencies {
     implementation(libs.vico.compose.m3)
 
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(kotlin("test"))
 }
