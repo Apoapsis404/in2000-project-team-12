@@ -19,8 +19,8 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
 
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
 
-    LaunchedEffect(uiState.favoritesLocationList) {
-        if (uiState.favoritesLocationList.isEmpty()) {
+    LaunchedEffect(uiState.favoritesLocationMap) {
+        if (uiState.favoritesLocationMap.isEmpty()) {
             favoritesScreenViewModel.addFavoriteLocation(
                 location = LatLng(1.1, 1.1),
                 "Pappas gård",
@@ -51,7 +51,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
     }
 
     LazyColumn(modifier = Modifier ) {
-        items(uiState.favoritesLocationList) { favoriteLocation ->
+        items(uiState.favoritesLocationMap.toList()) { (key, favoriteLocation) ->
             FavoriteCard(
                 title = favoriteLocation.name,
                 subtitle = favoriteLocation.address,
