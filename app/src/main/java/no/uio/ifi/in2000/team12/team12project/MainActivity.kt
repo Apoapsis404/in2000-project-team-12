@@ -5,14 +5,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,13 +38,16 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.MintGreen
 import no.uio.ifi.in2000.team12.team12project.ui.navigation.Navigator
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
@@ -62,7 +74,7 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainComp(
-    settingsScreenViewModel: SettingsScreenViewModel
+    settingsScreenViewModel: SettingsScreenViewModel = viewModel()
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -76,7 +88,32 @@ fun MainComp(
                 drawerContainerColor = MaterialTheme.colorScheme.primary,
                 drawerContentColor = MaterialTheme.colorScheme.secondary,
             ) {
-                Text("Menu", modifier = Modifier.padding(16.dp))
+                Row {
+                    Text("Menu", modifier = Modifier.padding(16.dp))
+
+                    //spacer
+                    Spacer(modifier = Modifier.weight(1f))
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .clickable {
+                                navController.navigate("Home")
+                                scope.launch { drawerState.close() }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Exit",
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                }
                 HorizontalDivider()
                 NavigationDrawerItem(
                     label = { Text("Home") },
@@ -130,6 +167,12 @@ fun MainComp(
         }
     }
 }
+@Preview
+@Composable
+fun MainCompPreview(){
+    MainComp()
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)     // må vi forsvare denne?
 @Composable
