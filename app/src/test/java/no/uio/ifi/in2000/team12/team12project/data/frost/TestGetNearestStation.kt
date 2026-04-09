@@ -13,6 +13,7 @@ class GetNearestStationTest {
 
         launch {
             val station = dataSource.getNearestStation(59.9423, 10.72)
+            assertEquals("SN18700", station[0].id)
         }
     }
 
