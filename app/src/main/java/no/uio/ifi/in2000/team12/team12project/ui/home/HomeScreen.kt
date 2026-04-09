@@ -5,6 +5,8 @@ import android.location.Geocoder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -114,28 +117,74 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            TextField(
-                value = uiState.searchQuery,    // value is read from uiState
-                onValueChange = { homeScreenViewModel.setSearchQuery(it) }, // updates value of uiState.searchQuery
-                placeholder = { Text("Search location...") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        searchLocation(uiState.searchQuery)
-                        keyboardController?.hide()
-                        //println(uiState.markerPosition)
-                    }
-                ),
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
-                ),
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-            )
+            ) {
+                TextField(
+                    value = uiState.searchQuery,    // value is read from uiState
+                    onValueChange = {
+                        homeScreenViewModel.setSearchQuery(it)
+                        //DENNE MÅ REAKTIVERES FOR Å FÅ FORSLAG PÅ SØK
+                        //homeScreenViewModel.fetchSuggestions(it)
+                    },
+                    placeholder = { Text("Search location...") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            searchLocation(uiState.searchQuery)
+                            keyboardController?.hide()
+                            //println(uiState.markerPosition)
+                        }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.White,
+                        focusedContainerColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                       // .padding(16.dp)
+                )
 
+                if (uiState.suggestions.isNotEmpty() && uiState.searchQuery.isNotEmpty()){
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                    ){
+                        uiState.suggestions.forEach { suggestion ->
+                            Text(
+                                text = suggestion,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        searchLocation(suggestion)
+                                        homeScreenViewModel.clearSuggestions()
+                                        keyboardController?.hide()
+                                    }
+                                    .padding(12.dp)
+                            )
+                            HorizontalDivider()
+                        }
+                    }
+                }
+                if (uiState.searchQuery.isNotEmpty() && uiState.suggestions.isEmpty()){
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+
+                    ) {
+                        Text(
+                            text = "Søket ga ingen treff",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                        )
+                    }
+                }
+            }
             Spacer(modifier = Modifier.weight(1f))
 
             Row(

@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,7 +23,8 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 data class HomeScreenUiState(
     val markerPosition : LatLng = LatLng(59.91,10.74),
     val searchQuery : String = "",
-    val markerTitle : String = ""
+    val markerTitle : String = "",
+    val suggestions: List<String> = emptyList()
 )
 
 
@@ -31,6 +35,39 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
     val uiState = _uiState.asStateFlow()
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
+
+
+    private val placesClient = Places.createClient(application)
+    private val sessionToken = AutocompleteSessionToken.newInstance()
+
+    fun fetchSuggestions(query: String) {
+        println("fetchSuggestions called with: $query")
+        if (query.isBlank()) {
+            _uiState.update { it.copy(suggestions = emptyList()) }
+            return
+        }
+
+        val request = FindAutocompletePredictionsRequest.builder()
+            .setSessionToken(sessionToken)
+            .setQuery(query)
+            .build()
+
+        placesClient.findAutocompletePredictions(request)
+            .addOnSuccessListener { response ->
+                val suggestions = response.autocompletePredictions
+                    .map { it.getFullText(null).toString() }
+                println("Suggestions received: $suggestions")
+                _uiState.update { it.copy(suggestions = suggestions) }
+            }
+            .addOnFailureListener { exception ->
+                println("Places autocomplete failed: ${exception.message}")
+                _uiState.update { it.copy(suggestions = emptyList()) }
+            }
+    }
+
+    fun clearSuggestions() {
+        _uiState.update { it.copy(suggestions = emptyList()) }
+    }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     fun fetchCurrentLocation(onLocationFound: (LatLng) -> Unit) {
