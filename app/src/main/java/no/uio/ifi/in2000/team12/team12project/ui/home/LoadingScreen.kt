@@ -24,8 +24,7 @@ import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team12.team12project.R
 
 
-private val LogoGreen = Color(0xFF8BBF5A)   // matches the green ring in the logo
-private val LogoAmber = Color(0xFFF5A623)   // matches the wheat/text color in the logo
+
 
 @Composable
 fun LoadingScreen(){
@@ -46,13 +45,13 @@ fun LoadingScreen(){
 
             )
             CircularProgressIndicator(
-                color = LogoAmber,
+                color = Color(0xFFF5A623),
                 //trackColor = LogoGreen,
                 modifier = Modifier.size(48.dp)
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Henter klimadata...",
+                text = "Laster inn kartet...",
                 color = Color.DarkGray,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium

@@ -86,6 +86,10 @@ dependencies {
 
     implementation(libs.vico.compose.m3)
 
+
+    implementation("androidx.core:core-splashscreen:1.2.0")
+
+
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
 }

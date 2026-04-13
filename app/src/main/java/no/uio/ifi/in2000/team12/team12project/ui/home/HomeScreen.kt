@@ -55,6 +55,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                navHostController: NavHostController) {
     val uiState by homeScreenViewModel.uiState.collectAsState()
 
+
+
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -98,6 +100,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
+            onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = { latLng ->
                 homeScreenViewModel.onMapClick(latLng)  //updates marker position
                 println(uiState.markerPosition)
@@ -191,6 +194,10 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                     Text("Show me the numbers!")
                 }
             }
+
+        }
+        if (!uiState.isMapReady){
+            LoadingScreen()
         }
 
     }

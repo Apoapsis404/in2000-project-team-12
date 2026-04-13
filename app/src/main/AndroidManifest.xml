@@ -35,6 +35,7 @@
 
         <activity
             android:name=".MapsActivity"
+            android:theme="@style/Theme.Splash"
             android:exported="false"
             android:label="@string/title_activity_maps" />
 
