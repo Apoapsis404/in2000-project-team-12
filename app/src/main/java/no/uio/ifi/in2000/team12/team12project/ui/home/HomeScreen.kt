@@ -130,12 +130,15 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                     },
                     placeholder = { Text("Search location...") },
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Search,
+                        //'autoCorrect = false
+                    ),
                     keyboardActions = KeyboardActions(
                         onSearch = {
                             searchLocation(uiState.searchQuery)
                             keyboardController?.hide()
-                            //println(uiState.markerPosition)
+
                         }
                     ),
                     colors = TextFieldDefaults.colors(

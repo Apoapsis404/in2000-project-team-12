@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -105,7 +107,39 @@ fun GraphScreen(
                 )
 
             }
-            ComposeTemperatureAnomalies(modelProducer)
+            when{
+                uiState.isLoading -> {
+                    Column(modifier = Modifier
+                        .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        Text("Laster værdata...")
+                    }
+                }
+                uiState.errorMessage != null ->{
+                    Column(modifier = Modifier
+                        .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "${uiState.errorMessage}",
+                            color = Color.Red,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        Button(onClick =  { graphScreenViewModel.getWeatherObs(0,5)} ){
+                            Text("Prøv igjen")
+                        }
+                    }
+                }
+                else -> {
+                    ComposeTemperatureAnomalies(modelProducer)
+                }
+            }
 
             Spacer(modifier = modifier.height(10.dp))
 

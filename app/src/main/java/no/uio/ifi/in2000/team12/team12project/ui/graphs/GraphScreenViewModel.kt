@@ -3,6 +3,8 @@ package no.uio.ifi.in2000.team12.team12project.ui.graphs
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,7 +21,9 @@ data class GraphScreenUiState(
     val month: Months = Months.JANUARY,
     val obsType: ObsType = ObsType.MEAN_AIR_TEMP,
     val weatherChartData: WeatherChartData = WeatherChartData(emptyList(), emptyList()),
-    val markerPosition : LatLng = LatLng(0.0,0.0)
+    val markerPosition : LatLng = LatLng(0.0,0.0),
+    val isLoading : Boolean = false,
+    val errorMessage : String? = null
 )
 
 
@@ -31,40 +35,63 @@ class GraphScreenViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var graphDataFetchJob : Job? = null
+
+
     init {
         getWeatherObs()
     }
 
-
-
     fun getWeatherObs(minCount : Int = 0, maxCount : Int = 5) {
-        _uiState.update { it.copy(weatherObs = emptyList()) }
-        //if(uiState.value.weatherObs.isNotEmpty()) return
-        viewModelScope.launch {
-            println("position: " + _uiState.value.markerPosition)
-            val nearestStation = obsDataSource.getNearestStation(_uiState.value.markerPosition.latitude,_uiState.value.markerPosition.longitude, maxCount = maxCount)
-            var weatherObs : List<WeatherObs> = emptyList()
+        graphDataFetchJob?.cancel()
 
-            for (station in nearestStation.subList(minCount, maxCount)){
-                try{
-                    weatherObs = weatherDataRepository.getWeatherData(station.id, "mean(air_temperature P1M)", "R10/2016-01-01/2017-01-01")
+        graphDataFetchJob = viewModelScope.launch {
+            //println("position: " + _uiState.value.markerPosition)
+            _uiState.update{it.copy(isLoading = true, errorMessage = null)}
+            try {
+                val nearestStation = obsDataSource.getNearestStation(
+                    _uiState.value.markerPosition.latitude,
+                    _uiState.value.markerPosition.longitude,
+                    maxCount = maxCount
+                )
 
-                }catch (e : Exception){
-                    println(e.message)
-                    continue
+                var weatherObs: List<WeatherObs> = emptyList()
+
+                for (station in nearestStation.subList(minCount, maxCount)) {
+                    try {
+                        weatherObs = weatherDataRepository.getWeatherData(
+                            station.id,
+                            "mean(air_temperature P1M)",
+                            "R10/2016-01-01/2017-01-01"
+                        )
+
+                    } catch (e: Exception) {
+                        println(e.message)
+                        continue
+                    }
+                    if (weatherObs.isNotEmpty()) {
+                        //println(station.name)
+                        break
+                    }
                 }
-                if (weatherObs.isNotEmpty()){
-                    println(station.name)
-                    break
+                if (weatherObs.isEmpty() && (maxCount < 25)) { //FIX
+                    getWeatherObs(maxCount, maxCount + 5)
+                    return@launch
                 }
-            }
-            if (weatherObs.isEmpty() and (maxCount < 25)){ //FIX
-                getWeatherObs(maxCount, maxCount+5)
-            }
+                if (weatherObs.isEmpty()){
+                    _uiState.update { it.copy(isLoading = false, errorMessage = "Fant ingen klimadata i dette området") }
+                    return@launch
+                }
 
 
-            _uiState.update { it.copy(weatherObs = weatherObs) }
-            updateChartData()
+                _uiState.update { it.copy(weatherObs = weatherObs, isLoading = false) }
+                updateChartData()
+            }catch(e : CancellationException) {
+                throw e
+            }catch (e : Exception){
+                e.printStackTrace()
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Noe gikk galt: ${e.message}") }
+            }
         }
     }
 
