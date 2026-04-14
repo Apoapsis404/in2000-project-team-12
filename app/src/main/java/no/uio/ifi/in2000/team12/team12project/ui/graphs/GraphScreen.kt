@@ -21,6 +21,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +44,7 @@ import com.patrykandpatrick.vico.compose.common.Fill
 import com.patrykandpatrick.vico.compose.common.component.LineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
+import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsType
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.BulletedList
@@ -63,7 +65,7 @@ val dummyList = listOf(
 @Composable
 fun GraphScreen(
     modifier: Modifier = Modifier,
-    graphScreenViewModel: GraphScreenViewModel = viewModel(),
+    graphScreenViewModel: GraphScreenViewModel = viewModel()
 ) {
     val modelProducer = remember { CartesianChartModelProducer() }
     val uiState by graphScreenViewModel.uiState.collectAsState()
