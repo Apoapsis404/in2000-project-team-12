@@ -18,8 +18,10 @@ import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.FavoriteCard
 fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(), navHostController: NavHostController){
 
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
-
+    /*
     LaunchedEffect(uiState.favoritesLocationList) {
+
+        //dersom det ikke er noen favoritt, legges til default hardkodet plasser
         if (uiState.favoritesLocationList.isEmpty()) {
             favoritesScreenViewModel.addFavoriteLocation(
                 location = LatLng(1.1, 1.1),
@@ -48,14 +50,39 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
             )
 
         }
-    }
+    */
+        /*
+        //dersom listenseg vil noe legges til som favoritt
+        if (uiState.favoritesLocationList.isEmpty() == false){
+            uiState.favoritesLocationList.forEach{ favorite ->
+                favoritesScreenViewModel.addFavoriteLocation(
+                    location = favorite.coordinates,
+                    name = favorite.name,
+                    address = favorite.address
+                )
+
+            }
+        }*/
+   // }
+        /*
+        //dersom det endrer seg. noe vil legges til som favoritt
+        if (uiState.favoritesLocationList.isEmpty() == false){
+            uiState.favoritesLocationList.forEach{ favorite ->
+                favoritesScreenViewModel.addFavoriteLocation(
+                    location = favorite.coordinates,
+                    name = favorite.name,
+                    address = favorite.address
+                )
+
+            }
+        }*/
 
     LazyColumn(modifier = Modifier ) {
         items(uiState.favoritesLocationList) { favoriteLocation ->
             FavoriteCard(
                 title = favoriteLocation.name,
                 subtitle = favoriteLocation.address,
-                onButtonClick = {navHostController.navigate("home"){popUpTo("home")} }
+                onButtonClick = {navHostController.navigate("graph"){popUpTo("graph")} }
             )
         }
     }

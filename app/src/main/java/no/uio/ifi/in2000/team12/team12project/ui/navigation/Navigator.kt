@@ -32,7 +32,7 @@ fun Navigator(
         composable(
             route = "home"
         ) {
-            HomeScreen(homeViewModel, navController)
+            HomeScreen(homeViewModel, favoritesScreenViewModel = favoritesViewModel,navController)
         }
         composable(
             route = "graph"

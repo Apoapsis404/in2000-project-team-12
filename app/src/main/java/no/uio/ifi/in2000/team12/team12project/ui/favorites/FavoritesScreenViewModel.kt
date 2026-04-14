@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.update
 import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 
 data class FavoritesScreenUiState(
-    val favoritesLocationList: List<FavoriteLocation> = emptyList()
+    val favoritesLocationList : List<FavoriteLocation> = emptyList() //maybe mutablelistof<favoritlocation>()
 )
 
 class FavoritesScreenViewModel : ViewModel() {
