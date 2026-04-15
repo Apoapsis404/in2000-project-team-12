@@ -44,9 +44,9 @@ class GraphScreenViewModel(
 
     init {
         getWeatherObs()
-        plantsRepository.getBestPlants(22).forEach {
-            plantsRepository.printPlant(it)
-        }
+        //plantsRepository.getBestPlants(22).forEach {
+        //    plantsRepository.printPlant(it)
+        //}
 
     }
 
