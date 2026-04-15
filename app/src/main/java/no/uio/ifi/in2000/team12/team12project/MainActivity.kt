@@ -47,9 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
+import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.MintGreen
 import no.uio.ifi.in2000.team12.team12project.ui.navigation.Navigator
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
+import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
 
 class MainActivity : ComponentActivity() {
@@ -58,23 +61,32 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val settingsViewModel : SettingsScreenViewModel = viewModel()
+            val app = applicationContext as Team12Application
+            val settingsViewModel : SettingsScreenViewModel = viewModel(factory = SettingsScreenViewModelFactory(app.database.settingDao()))
+            val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoriteDao()))
             //HomeScreen()
             //GraphScreen()
             Team12ProjectTheme(
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
             ) {
-                MainComp(settingsViewModel)
+                MainComp(settingsViewModel, favoritesViewModel)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val app = applicationContext as Team12Application
+        app.database.close()
     }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainComp(
-    settingsScreenViewModel: SettingsScreenViewModel = viewModel()
+    settingsScreenViewModel: SettingsScreenViewModel,
+    favoriteScreenViewModel: FavoritesScreenViewModel,
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -158,7 +170,7 @@ fun MainComp(
         Scaffold(
             topBar = { Header(onClick = { scope.launch { drawerState.open() } }) },
         ) { innerPadding ->
-            Navigator( settingsViewModel = settingsScreenViewModel,
+            Navigator( settingsViewModel = settingsScreenViewModel, favoritesViewModel = favoriteScreenViewModel,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding), navController = navController
@@ -167,12 +179,6 @@ fun MainComp(
         }
     }
 }
-@Preview
-@Composable
-fun MainCompPreview(){
-    MainComp()
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)     // må vi forsvare denne?
 @Composable
