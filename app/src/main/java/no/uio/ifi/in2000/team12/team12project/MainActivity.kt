@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
@@ -58,6 +59,7 @@ import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -112,7 +114,7 @@ fun MainComp(
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary)
                             .clickable {
-                                navController.navigate("Home")
+                                //navController.navigate("Home")
                                 scope.launch { drawerState.close() }
                             },
                         contentAlignment = Alignment.Center
@@ -185,7 +187,7 @@ fun MainComp(
 fun Header(modifier: Modifier = Modifier, onClick: () -> Unit){
     TopAppBar(
         {
-            Text("App",
+            Text("Almanakken",
             color = MaterialTheme.colorScheme.secondary
             )
         },

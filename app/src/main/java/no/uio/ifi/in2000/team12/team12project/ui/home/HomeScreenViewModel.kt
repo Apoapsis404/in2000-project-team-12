@@ -20,7 +20,8 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 data class HomeScreenUiState(
     val markerPosition : LatLng = LatLng(59.91,10.74),
     val searchQuery : String = "",
-    val markerTitle : String = ""
+    val markerTitle : String = "",
+    val isMapReady : Boolean = false
 )
 
 
@@ -96,6 +97,10 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
                 markerTitle = ""
             )
         }
+    }
+
+    fun onMapReady(){
+        _uiState.update { it.copy(isMapReady = true) }
     }
 }
 

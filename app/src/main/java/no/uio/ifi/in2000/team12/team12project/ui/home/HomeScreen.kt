@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -54,6 +56,8 @@ import java.util.Locale
 fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                navHostController: NavHostController) {
     val uiState by homeScreenViewModel.uiState.collectAsState()
+
+
 
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -98,6 +102,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
+            onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = { latLng ->
                 homeScreenViewModel.onMapClick(latLng)  //updates marker position
                 println(uiState.markerPosition)
@@ -138,11 +143,12 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Row(
+            Box(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                contentAlignment = Alignment.BottomCenter
             ) {
                 OutlinedButton(
+                    modifier = Modifier.align(Alignment.BottomStart),
                     onClick = {
                         val fineLocationGranted =
                             android.content.pm.PackageManager.PERMISSION_GRANTED ==
@@ -169,8 +175,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                         }
                     },
                     contentPadding = PaddingValues(8.dp),
-                    shape = CircleShape,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    shape = CircleShape
                 ) {
                     Image(
                         painter = painterResource(R.drawable.outline_my_location_24),
@@ -183,6 +188,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                 }
 
                 Button(
+                    modifier = Modifier.align(Alignment.BottomCenter),
                     onClick = {
                         navHostController.navigate("graph")
                     },
@@ -191,6 +197,10 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
                     Text("Show me the numbers!")
                 }
             }
+
+        }
+        if (!uiState.isMapReady){
+            LoadingScreen()
         }
 
     }
