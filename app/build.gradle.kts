@@ -42,6 +42,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -75,6 +76,9 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:20.0.0")
     implementation("com.google.maps.android:maps-compose:8.2.2")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // google places
+    implementation("com.google.android.libraries.places:places:5.2.0")
 
     // Room database
     implementation(libs.androidx.room.runtime)
