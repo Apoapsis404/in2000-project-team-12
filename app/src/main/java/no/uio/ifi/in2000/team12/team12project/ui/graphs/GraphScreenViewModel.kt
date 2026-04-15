@@ -1,15 +1,21 @@
 package no.uio.ifi.in2000.team12.team12project.ui.graphs
 
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
 import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherChartData
 import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherDataRepository
+import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsType
 import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
@@ -23,9 +29,14 @@ data class GraphScreenUiState(
 )
 
 
-class GraphScreenViewModel : ViewModel() {
+class GraphScreenViewModel(
+    application: Application
+    //private val plantsRepository: PlantsRepository
+) : AndroidViewModel(application) {
 
+    private val context = getApplication<Application>().applicationContext
     private val weatherDataRepository = WeatherDataRepository()
+    private val plantsRepository = PlantsRepository(context)
     private val obsDataSource = ObsStationsDataSource()
 
     private val _uiState = MutableStateFlow(GraphScreenUiState())
@@ -33,6 +44,10 @@ class GraphScreenViewModel : ViewModel() {
 
     init {
         getWeatherObs()
+        plantsRepository.getBestPlants(22).forEach {
+            plantsRepository.printPlant(it)
+        }
+
     }
 
 
@@ -86,4 +101,6 @@ class GraphScreenViewModel : ViewModel() {
         val chartData = weatherDataRepository.getYearAndData(weatherObs)
         _uiState.update { it.copy(weatherChartData = chartData) }
     }
+
+
 }
