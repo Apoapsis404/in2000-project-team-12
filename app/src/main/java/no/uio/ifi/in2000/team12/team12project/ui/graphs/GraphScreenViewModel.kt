@@ -49,13 +49,13 @@ class GraphScreenViewModel(
     private var graphDataFetchJob : Job? = null
 
 
-    init {
-        getWeatherObs()
-        //plantsRepository.getBestPlants(22).forEach {
-        //    plantsRepository.printPlant(it)
-        //}
-
-    }
+//    init {
+//        getWeatherObs()
+//        //plantsRepository.getBestPlants(22).forEach {
+//        //    plantsRepository.printPlant(it)
+//        //}
+//
+//    }
 
     fun getWeatherObs(minCount : Int = 0, maxCount : Int = 5) {
         graphDataFetchJob?.cancel()

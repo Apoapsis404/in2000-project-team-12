@@ -17,7 +17,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
 
-    // favorites that, when added will call on the addtofavorite location function ...maybee in homescreen, cause the syndeymarker doesnt seem to be the one being used,but the one in oslo thats in homescreen is
+    // favorites that, when added will call on the addtofavorite location function ...maybee in homescreen, cause the syndeymarker doesn't seem to be the one being used,but the one in oslo that's in homescreen is
     //private val listoffavorites = mutableListOf<FavoriteLocation>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
