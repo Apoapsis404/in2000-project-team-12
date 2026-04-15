@@ -75,11 +75,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        val app = applicationContext as Team12Application
-        app.database.close()
-    }
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        val app = applicationContext as Team12Application
+//        app.database.close()
+//    }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
