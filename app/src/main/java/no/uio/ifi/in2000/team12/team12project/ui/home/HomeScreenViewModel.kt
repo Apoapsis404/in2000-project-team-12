@@ -24,8 +24,7 @@ data class HomeScreenUiState(
     val markerPosition : LatLng = LatLng(59.91,10.74),
     val searchQuery : String = "",
     val markerTitle : String = "",
-    val isMapReady : Boolean = false
-    val markerTitle : String = "",
+    val isMapReady : Boolean = false,
     val suggestions: List<String> = emptyList()
 )
 
