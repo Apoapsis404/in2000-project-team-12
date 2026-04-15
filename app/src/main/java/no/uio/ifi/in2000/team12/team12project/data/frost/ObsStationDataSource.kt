@@ -4,15 +4,11 @@ import io.ktor.client.request.basicAuth
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.*
-import io.ktor.client.request.*
-import io.ktor.http.vary
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.BadRequestException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoDataException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.UnauthorizedException
-import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.Point
