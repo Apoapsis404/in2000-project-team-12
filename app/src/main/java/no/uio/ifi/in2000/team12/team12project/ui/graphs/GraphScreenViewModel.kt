@@ -39,9 +39,6 @@ class GraphScreenViewModel(
 
     init {
         getWeatherObs()
-        // val plantsData = plantsRepository.getPlantData()
-        //plantsData.forEach { Log.i("Graph_viewmodel", it.name) }
-        //Log.i("GRAPH_VIEWMODEL", plantsData)
         plantsRepository.getBestPlants(22).forEach {
             plantsRepository.printPlant(it)
         }
@@ -76,6 +73,5 @@ class GraphScreenViewModel(
         _uiState.update { it.copy(weatherChartData = chartData) }
     }
 
-    // Plants
 
 }
