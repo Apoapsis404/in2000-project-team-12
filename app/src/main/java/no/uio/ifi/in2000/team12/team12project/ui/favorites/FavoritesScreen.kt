@@ -51,31 +51,6 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
 
         }
     */
-        /*
-        //dersom listenseg vil noe legges til som favoritt
-        if (uiState.favoritesLocationList.isEmpty() == false){
-            uiState.favoritesLocationList.forEach{ favorite ->
-                favoritesScreenViewModel.addFavoriteLocation(
-                    location = favorite.coordinates,
-                    name = favorite.name,
-                    address = favorite.address
-                )
-
-            }
-        }*/
-   // }
-        /*
-        //dersom det endrer seg. noe vil legges til som favoritt
-        if (uiState.favoritesLocationList.isEmpty() == false){
-            uiState.favoritesLocationList.forEach{ favorite ->
-                favoritesScreenViewModel.addFavoriteLocation(
-                    location = favorite.coordinates,
-                    name = favorite.name,
-                    address = favorite.address
-                )
-
-            }
-        }*/
 
     LazyColumn(modifier = Modifier ) {
         items(uiState.favoritesLocationList) { favoriteLocation ->
