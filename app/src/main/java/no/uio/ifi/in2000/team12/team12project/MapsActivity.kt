@@ -10,11 +10,15 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import no.uio.ifi.in2000.team12.team12project.databinding.ActivityMapsBinding
+import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+
+    // favorites that, when added will call on the addtofavorite location function ...maybee in homescreen, cause the syndeymarker doesnt seem to be the one being used,but the one in oslo thats in homescreen is
+    //private val listoffavorites = mutableListOf<FavoriteLocation>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,5 +48,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        //
+
     }
 }

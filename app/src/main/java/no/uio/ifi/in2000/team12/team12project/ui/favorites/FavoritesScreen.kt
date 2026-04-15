@@ -20,45 +20,46 @@ import kotlin.math.log
 fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(), navHostController: NavHostController){
 
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
+    /*
+    LaunchedEffect(uiState.favoritesLocationList) {
 
-//    LaunchedEffect(uiState.favoritesLocationMap) {
-//        if (uiState.favoritesLocationMap.isEmpty()) {
-//            Log.d("FavoritesScreen", "Favorites are empty")
-//            favoritesScreenViewModel.addFavoriteLocation(
-//                location = LatLng(1.1, 1.1),
-//                "Pappas gård",
-//                "Fadervegen 1"
-//            )
-//            favoritesScreenViewModel.addFavoriteLocation(
-//                location = LatLng(1.1, 1.1),
-//                "Bakgården",
-//                "Bak huset"
-//            )
-//            favoritesScreenViewModel.addFavoriteLocation(
-//                location = LatLng(1.1, 1.1),
-//                "Skjærgården",
-//                "Husmans gate 10"
-//            )
-//            favoritesScreenViewModel.addFavoriteLocation(
-//                location = LatLng(1.1, 1.1),
-//                "Forigården",
-//                "Fortiden"
-//            )
-//            favoritesScreenViewModel.addFavoriteLocation(
-//                location = LatLng(2.2, 2.2),
-//                name = "Stellan Skaarsgården",
-//                address = "Sverige"
-//            )
-//
-//        }
-//    }
+        //dersom det ikke er noen favoritt, legges til default hardkodet plasser
+        if (uiState.favoritesLocationList.isEmpty()) {
+            favoritesScreenViewModel.addFavoriteLocation(
+                location = LatLng(1.1, 1.1),
+                "Pappas gård",
+                "Fadervegen 1"
+            )
+            favoritesScreenViewModel.addFavoriteLocation(
+                location = LatLng(1.1, 1.1),
+                "Bakgården",
+                "Bak huset"
+            )
+            favoritesScreenViewModel.addFavoriteLocation(
+                location = LatLng(1.1, 1.1),
+                "Skjærgården",
+                "Husmans gate 10"
+            )
+            favoritesScreenViewModel.addFavoriteLocation(
+                location = LatLng(1.1, 1.1),
+                "Forigården",
+                "Fortiden"
+            )
+            favoritesScreenViewModel.addFavoriteLocation(
+                location = LatLng(2.2, 2.2),
+                name = "Stellan Skaarsgården",
+                address = "Sverige"
+            )
+
+        }
+    */
 
     LazyColumn(modifier = Modifier ) {
         items(uiState.favoritesLocationMap.toList()) { (key, favoriteLocation) ->
             FavoriteCard(
                 title = favoriteLocation.name,
                 subtitle = favoriteLocation.address,
-                onButtonClick = {navHostController.navigate("home"){popUpTo("home")} }
+                onButtonClick = {navHostController.navigate("graph"){popUpTo("graph")} }
             )
         }
     }

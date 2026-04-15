@@ -34,7 +34,7 @@ fun Navigator(
             route = "home"
         ) {
             homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
-            HomeScreen(homeViewModel, navController)
+            HomeScreen(homeViewModel, favoritesScreenViewModel = favoritesViewModel,navController)
         }
         composable(
             route = "graph"

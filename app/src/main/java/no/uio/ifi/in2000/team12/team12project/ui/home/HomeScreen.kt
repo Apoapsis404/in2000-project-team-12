@@ -20,19 +20,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -53,14 +57,13 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.R
+import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import java.util.Locale
 
 @Composable
-fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
+fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(),
                navHostController: NavHostController) {
     val uiState by homeScreenViewModel.uiState.collectAsState()
-
-
 
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -88,8 +91,13 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
         ))
     }
 
+    //variables with the changed location on the map and to ask if user wants to add location to favorites
+    var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
+    var askforpermission by remember { mutableStateOf(false)}
+
+
     fun searchLocation(query: String) {
-        val geocoder = Geocoder(context, Locale.getDefault())
+        val geocoder = Geocoder(context, Locale.getDefault()) //comment out and have it as a global variable. then have a local variable pointing to it, so it can be used for reverse geocoding
         val results = geocoder.getFromLocationName(query, 1)
         if (!results.isNullOrEmpty()) {
             val location = results[0]
@@ -107,10 +115,55 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),
             cameraPositionState = cameraPositionState,
             onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = { latLng ->
+
+            //val onMapClick:(LatLng) -> Unit = { latlng ->
                 homeScreenViewModel.onMapClick(latLng)  //updates marker position
                 println(uiState.markerPosition)
+
+                askpermissonforlatlng = latLng
+                askforpermission = true
+
+                /*
+                //add as favorite. unsure if i should implement in a way where fscreenviewmodel isnt used here
+                favoritesScreenViewModel.addFavoriteLocation(  //this works but it adds to favorites without asking
+                    location = latLng,
+                    name = "idk",  // gotta fix name of the place
+                    address = " dontknow " //fix adress tooooooo
+                )*/
             }
+           // onMapClick = onMapClick //equals the variable so there wont be a need for onmapclick over, and to comment in val onmapclick
+            //since the other one was over i tried to continue with the same way of implementation/logic used here
+
         ) {
+            //
+            if(askforpermission == true && askpermissonforlatlng != null){
+                AlertDialog(
+                    onDismissRequest = {askforpermission = false},
+                    title = {Text("favorites?")},
+                    text = {Text("do you want this location added to your favorites?")},
+                    confirmButton = {
+                        TextButton( onClick = {
+                            favoritesScreenViewModel.addFavoriteLocation(
+                                location = askpermissonforlatlng !!,
+                                name = "idk" , // gotta fix name of the place tho
+                                address = "unsure" //fix adress tooooooo
+                            )
+
+                            askforpermission = false
+                        }) {
+                            Text("yessssssssssirrrr")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {askforpermission = false}) {
+                            Text("Nosirrrrrrrrrr")
+                        }
+                    }
+                )
+            }
+            //
+
+            //
             Marker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
                 title = uiState.markerTitle
