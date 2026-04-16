@@ -45,11 +45,11 @@ class ObsStationsDataSource {
             }
         }
 
-        println(response.toString())
+        //println(response.toString())
 
         val responseBodyString = response.bodyAsText()
 
-        println(response.status.value)
+        //println(response.status.value)
         return when (response.status.value) {
             in 200..299 -> {
                 //response.body<ObsStation>()

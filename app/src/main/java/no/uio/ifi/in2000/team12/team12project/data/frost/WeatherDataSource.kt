@@ -31,9 +31,9 @@ class WeatherDataSource {
                 parameters.append("fields", fields)
             }
         }
-        println(response.toString())
+        //println(response.toString())
         val responseBodyString = response.bodyAsText()
-        println(response.status.value)
+        //println(response.status.value)
         return when (response.status.value) {
             in 200..299 -> {
                 println("DEBUG: Success branch")

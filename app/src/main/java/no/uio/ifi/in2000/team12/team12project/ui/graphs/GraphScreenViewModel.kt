@@ -50,11 +50,10 @@ class GraphScreenViewModel(
 
 
 //    init {
-//        getWeatherObs()
-//        //plantsRepository.getBestPlants(22).forEach {
-//        //    plantsRepository.printPlant(it)
-//        //}
-//
+//        //getWeatherObs()
+//        plantsRepository.getBestPlants(35, 10).forEach {
+//            plantsRepository.printPlant(it)
+//        }
 //    }
 
     fun getWeatherObs(minCount : Int = 0, maxCount : Int = 5) {
