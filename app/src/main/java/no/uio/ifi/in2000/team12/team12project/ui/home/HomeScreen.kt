@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team12.team12project.ui.home
 
 import android.Manifest
+import android.content.Context
 import android.location.Geocoder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,8 +47,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapsInitializer
+import com.google.android.gms.maps.model.AdvancedMarker
+import com.google.android.gms.maps.model.AdvancedMarkerOptions
+import com.google.android.gms.maps.model.AdvancedMarkerOptions.CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.common.io.Files.map
+import com.google.maps.android.compose.AdvancedMarker
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
@@ -167,6 +177,18 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 onClick = {println("marker clicked at ${uiState.markerPosition}") ; true}
 
             )
+
+            uiState.downpourList.forEach {
+//                AdvancedMarker(
+//                    state = MarkerState(it),
+//                    collisionBehavior = Int : AdvancedMarkerOptions.CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY
+//                )
+               // val marker: Marker = map.addMarker(advancedMarkerOptions) ?: error("Failed to add marker")
+//                Marker(
+//                    MarkerOptions()
+//                        .position(it)
+//                )
+            }
 
         }
 

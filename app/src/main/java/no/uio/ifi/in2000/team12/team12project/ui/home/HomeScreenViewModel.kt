@@ -25,7 +25,20 @@ data class HomeScreenUiState(
     val searchQuery : String = "",
     val markerTitle : String = "",
     val isMapReady : Boolean = false,
-    val suggestions: List<String> = emptyList()
+    val suggestions: List<String> = emptyList(),
+    val downpourList: List<LatLng> = listOf(
+        //Oslo
+        LatLng(59.94, 10.71),
+        LatLng(59.93, 10.73),
+        LatLng(59.92, 10.76),
+        LatLng(59.87, 10.76),
+        LatLng(59.87, 10.81),
+        //Dala
+        LatLng(60.91, 10.78),
+        //Berg
+        LatLng(60.37, 5.33),
+        LatLng(60.33, 5.29)
+        )
 )
 
 
