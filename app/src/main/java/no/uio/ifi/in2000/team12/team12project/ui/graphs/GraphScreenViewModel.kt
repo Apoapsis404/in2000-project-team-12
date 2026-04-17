@@ -49,12 +49,16 @@ class GraphScreenViewModel(
     private var graphDataFetchJob : Job? = null
 
 
-//    init {
-//        //getWeatherObs()
-//        plantsRepository.getBestPlants(35, 10).forEach {
-//            plantsRepository.printPlant(it)
-//        }
-//    }
+    init {
+        //getWeatherObs()
+        plantsRepository.getBestPlants(-2, 3).forEach {
+            plantsRepository.printPlant(it)
+        }
+        val pq = plantsRepository.getBestPlantsPriorityQueue(-2)
+        plantsRepository.printPlant(pq.poll())
+        plantsRepository.printPlant(pq.poll())
+        plantsRepository.printPlant(pq.poll())
+    }
 
     fun getWeatherObs(minCount : Int = 0, maxCount : Int = 5) {
         graphDataFetchJob?.cancel()

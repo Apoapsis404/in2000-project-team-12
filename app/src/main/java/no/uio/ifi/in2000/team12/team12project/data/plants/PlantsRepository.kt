@@ -42,6 +42,14 @@ class PlantsRepository(private val context: Context){
         return bestList
     }
 
+    // does not filter out temperatures outside livable range
+    fun getBestPlantsPriorityQueue(targetTemp: Int): PriorityQueue<Plant>{
+        val pq = PriorityQueue<Plant>(compareBy { kotlin.math.abs(((it.optimal_temp_min+it.optimal_temp_max)/2)-targetTemp) })
+        plantList.forEach { pq.add(it) }
+        pq.filter { targetTemp >= it.temp_min && targetTemp <= it.temp_max }
+        return pq
+    }
+
     fun printPlant(plant: Plant){
         println("${plant.id} (${plant.name}) : " +
                 "optimal_temp: (${plant.optimal_temp_min}-${plant.optimal_temp_max})C, " +

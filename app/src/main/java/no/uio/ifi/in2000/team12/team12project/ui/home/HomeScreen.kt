@@ -167,6 +167,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 onClick = {println("marker clicked at ${uiState.markerPosition}") ; true}
 
             )
+
         }
 
         Column(
