@@ -2,11 +2,16 @@ package no.uio.ifi.in2000.team12.team12project.ui.home
 
 import android.Manifest
 import android.app.Application
+import android.content.Context
+import android.graphics.Bitmap
 import androidx.annotation.RequiresPermission
+import androidx.compose.foundation.Canvas
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
@@ -18,6 +23,8 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
 import no.uio.ifi.in2000.team12.team12project.data.frost.getStationIdsFromList
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
+import androidx.core.graphics.createBitmap
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 // Represent the different states exposed to the UI
 data class HomeScreenUiState(
@@ -38,7 +45,31 @@ data class HomeScreenUiState(
         //Berg
         LatLng(60.37, 5.33),
         LatLng(60.33, 5.29)
-        )
+        ),
+    val extremeWindList: List<LatLng> = listOf(
+        LatLng(59.96, 10.73),
+        LatLng(59.95, 10.75),
+        LatLng(59.94, 10.78),
+        LatLng(59.89, 10.78),
+        LatLng(59.89, 10.83),
+        //Dala
+        LatLng(60.93, 10.80),
+        //Berg
+        LatLng(60.39, 5.35),
+        LatLng(60.35, 5.31)
+    ),
+    val flomList: List<LatLng> = listOf(
+        LatLng(59.98, 10.75),
+        LatLng(59.97, 10.77),
+        LatLng(59.96, 10.80),
+        LatLng(59.91, 10.80),
+        LatLng(59.91, 10.85),
+        //Dala
+        LatLng(60.95, 10.82),
+        //Berg
+        LatLng(60.41, 5.37),
+        LatLng(60.37, 5.33)
+    )
 )
 
 
@@ -151,6 +182,24 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
 
     fun onMapReady(){
         _uiState.update { it.copy(isMapReady = true) }
+    }
+
+
+    fun vectorToBitMap(
+        context : Context,
+        vectorResId : Int,
+        targetWidth : Int = 150,
+        targetHeight : Int = 150
+    ) : BitmapDescriptor?
+    {
+        val drawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
+        drawable.setBounds(0, 0, targetWidth, targetHeight)
+
+        val bitMap = createBitmap(targetWidth, targetHeight)
+        val canvas = android.graphics.Canvas(bitMap)
+        drawable.draw(canvas)
+
+        return BitmapDescriptorFactory.fromBitmap(bitMap)
     }
 }
 

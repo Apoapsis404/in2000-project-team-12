@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,6 +53,7 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.AdvancedMarker
 import com.google.android.gms.maps.model.AdvancedMarkerOptions
 import com.google.android.gms.maps.model.AdvancedMarkerOptions.CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -179,15 +181,31 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             )
 
             uiState.downpourList.forEach {
-//                AdvancedMarker(
-//                    state = MarkerState(it),
-//                    collisionBehavior = Int : AdvancedMarkerOptions.CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY
-//                )
-               // val marker: Marker = map.addMarker(advancedMarkerOptions) ?: error("Failed to add marker")
-//                Marker(
-//                    MarkerOptions()
-//                        .position(it)
-//                )
+                AdvancedMarker(
+                    state = MarkerState(it),
+                    contentDescription = "",
+                    collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                    icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.outline_rainy_24),
+
+
+                )
+            }
+            uiState.extremeWindList.forEach {
+                AdvancedMarker(
+                    state = MarkerState(it),
+                    contentDescription = "",
+                    collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                    icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.baseline_air_24)
+                )
+            }
+            uiState.flomList.forEach {
+                AdvancedMarker(
+                    state = MarkerState(it),
+                    contentDescription = "",
+                    collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                    icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.baseline_water_24),
+                    onClick = {}
+                )
             }
 
         }
@@ -332,3 +350,20 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
 
     }
 }
+
+
+
+/*
+TODO
+- Bedre symboler
+- Collision handling
+- Pop up
+- Clean up, kankje lag egen klasse elns, så alle plasser kan ligge i samme liste
+- API
+- Tegne område rundt?
+
+
+
+
+
+ */
