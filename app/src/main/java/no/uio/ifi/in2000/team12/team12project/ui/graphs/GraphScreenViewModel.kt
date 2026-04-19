@@ -3,20 +3,16 @@ package no.uio.ifi.in2000.team12.team12project.ui.graphs
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.R
-import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
 import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherChartData
 import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherDataRepository
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
@@ -37,7 +33,6 @@ data class GraphScreenUiState(
 
 class GraphScreenViewModel(
     application: Application
-    //private val plantsRepository: PlantsRepository
 ) : AndroidViewModel(application) {
 
     private val context = getApplication<Application>().applicationContext
@@ -50,26 +45,34 @@ class GraphScreenViewModel(
     private var graphDataFetchJob : Job? = null
 
     fun getWeatherObs() {
+        Log.d("GraphScreenViewModel", "Climate type: ${_uiState.value.climateType}")
         graphDataFetchJob?.cancel()
 
-        var obs = listOf<WeatherObs>()
         graphDataFetchJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                obs = weatherDataRepository.getWeatherDataFailing(_uiState.value.markerPosition, _uiState.value.climateType, "R10/2016-01-01/2017-01-01")
+                val obs = weatherDataRepository.getWeatherDataFailing(
+                    _uiState.value.markerPosition,
+                    _uiState.value.climateType,
+                    "R10/2016-01-01/2017-01-01"
+                )
+                _uiState.update { it.copy(weatherObs = obs, isLoading = false) }
+                updateChartData()
             } catch (e: NoAvailableTimeSeriesException) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.no_data_available)) }
-                return@launch
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "An unexpected error occurred") }
             }
         }
-        _uiState.update { it.copy(weatherObs = obs, isLoading = false) }
-        updateChartData()
     }
 
     fun setMonth(month: Months) {
         _uiState.update { it.copy(month = month) }
         updateChartData()
     }
+
     fun setClimateType(climateType: ClimateType) {
         _uiState.update { it.copy(climateType = climateType) }
     }

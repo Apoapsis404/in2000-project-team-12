@@ -139,18 +139,19 @@ fun GraphScreen(
                     }
                 }
                 else -> {
-                    ComposeTemperatureAnomalies(modelProducer)
+                    ComposeTemperatureAnomalies(modelProducer, uiState.climateType.unit)
                 }
             }
 
             Spacer(modifier = modifier.height(10.dp))
 
             Row(modifier = modifier.fillMaxWidth()) {
-                DropDown<Months>(uiState.month.name, modifier = modifier.weight(1f)) {
+                DropDown<Months>(uiState.month.toString(), modifier = modifier.weight(1f)) {
                     graphScreenViewModel.setMonth(it)
                 }
-                DropDown<ClimateType>(uiState.climateType.label, modifier = modifier.weight(1f)) {
+                DropDown<ClimateType>(uiState.climateType.toString(), modifier = modifier.weight(1f)) {
                     graphScreenViewModel.setClimateType(it)
+                    graphScreenViewModel.getWeatherObs()
                 }
             }
         }
@@ -175,10 +176,6 @@ private val RangeProvider =
             -getMinY(minY, maxY, extraStore)
     }
 
-private val StartAxisValueFormatter = CartesianValueFormatter.decimal(suffix = " °C")
-
-
-
 private fun getColumnProvider(positive: LineComponent, negative: LineComponent) =
     object : ColumnCartesianLayer.ColumnProvider {
         override fun getColumn(
@@ -193,8 +190,10 @@ private fun getColumnProvider(positive: LineComponent, negative: LineComponent) 
 @Composable
 private fun ComposeTemperatureAnomalies(
     modelProducer: CartesianChartModelProducer,
+    unit: String,
     modifier: Modifier = Modifier,
 ) {
+    val startAxisValueFormatter = remember(unit) { CartesianValueFormatter.decimal(suffix = " $unit") }
     val positiveColumn =
         rememberLineComponent(
             fill = Fill(Color(0xff0ac285)),
@@ -218,7 +217,7 @@ private fun ComposeTemperatureAnomalies(
                     columnCollectionSpacing = 4.dp,
                     rangeProvider = RangeProvider,
                 ),
-                startAxis = VerticalAxis.rememberStart(valueFormatter = StartAxisValueFormatter),
+                startAxis = VerticalAxis.rememberStart(valueFormatter = startAxisValueFormatter),
                 bottomAxis = HorizontalAxis.rememberBottom(labelRotationDegrees = 45f),
             ),
         modelProducer = modelProducer,

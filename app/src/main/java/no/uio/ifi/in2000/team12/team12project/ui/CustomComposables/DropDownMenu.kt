@@ -50,7 +50,7 @@ inline fun <reified E : Enum<E>> DropDown(defaultName: String, modifier: Modifie
                     text = { Text(text = option.name)},
                     onClick = {
                         onClick(option)
-                        textFieldState.setTextAndPlaceCursorAtEnd(option.name)
+                        textFieldState.setTextAndPlaceCursorAtEnd(option.toString())
                         expanded = false
                     },
 

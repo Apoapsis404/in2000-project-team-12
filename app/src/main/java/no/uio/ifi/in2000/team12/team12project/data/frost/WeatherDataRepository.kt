@@ -40,8 +40,9 @@ class WeatherDataRepository {
                     )
                 )
             } catch (e: NoAvailableTimeSeriesException) {
+                // Skip this source and try the next one
                 continue
-            }
+            } // TODO: Handle other exceptions
             stationRepository.addStationToCache(source, position, climateType)
             break
         }
