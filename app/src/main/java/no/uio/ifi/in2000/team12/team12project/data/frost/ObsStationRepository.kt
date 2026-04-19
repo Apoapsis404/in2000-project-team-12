@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
@@ -12,6 +13,7 @@ class ObsStationRepository {
     suspend fun getNearestStation(latitude: Double, longitude: Double, climateType: ClimateType, maxDist: Double = 5.0, maxCount: Int = 5): List<ObsStation> {
         val key = Pair(LatLng(latitude, longitude), climateType)
         if (cachedStations.containsKey(key)) {
+            Log.d("ObsStationRepository", "Found station in cache. Key: $key")
             return listOf(cachedStations[key]!!)
         } else {
             val nearestStations =

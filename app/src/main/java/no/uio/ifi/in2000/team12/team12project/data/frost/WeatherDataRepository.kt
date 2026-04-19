@@ -19,7 +19,8 @@ class WeatherDataRepository {
 
     suspend fun getWeatherData(position: LatLng, climateType: ClimateType, referenceTime: String, fields: String = "sourceId,referenceTime,elementId,unit,value"): List<WeatherObs> {
         weatherObsList.clear()
-        val source = stationRepository.getNearestStation(position.latitude, position.longitude, climateType)[0].id
+        val stations = stationRepository.getNearestStation(position.latitude, position.longitude, climateType)
+        val source = stations.firstOrNull()?.id ?: throw NoAvailableTimeSeriesException("No nearby stations found")
         weatherObsList.addAll(weatherDataSource.getWeatherData(source, climateType.elementId, referenceTime, fields))
         return weatherObsList
     }
@@ -27,7 +28,8 @@ class WeatherDataRepository {
     suspend fun getWeatherDataFailing(position: LatLng, climateType: ClimateType, referenceTime: String, minCount: Int = 0, maxCount: Int = 5, fields: String = "sourceId,referenceTime,elementId,unit,value"): List<WeatherObs> {
         weatherObsList.clear()
         val sources = stationRepository.getNearestStation(position.latitude, position.longitude, climateType, maxDist = 5.0, maxCount = maxCount)
-        for (source in sources.subList(minCount, maxCount)) {
+        
+        for (source in sources.drop(minCount)) {
             try {
                 weatherObsList.addAll(
                     weatherDataSource.getWeatherData(
@@ -46,7 +48,7 @@ class WeatherDataRepository {
 
         if (weatherObsList.isEmpty()) {
             if (maxCount < 25) {
-                getWeatherDataFailing(position, climateType, referenceTime, minCount = maxCount, maxCount = maxCount + 5)
+                return getWeatherDataFailing(position, climateType, referenceTime, minCount = maxCount, maxCount = maxCount + 5)
             } else {
                 throw NoAvailableTimeSeriesException("No available time series")
             }
