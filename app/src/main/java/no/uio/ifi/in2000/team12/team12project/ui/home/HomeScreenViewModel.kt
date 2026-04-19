@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team12.team12project.ui.home
 
 import android.Manifest
 import android.app.Application
+import android.location.Geocoder
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
@@ -135,7 +136,6 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
             )
         }
     }
-
     fun onMapReady(){
         _uiState.update { it.copy(isMapReady = true) }
     }
