@@ -47,7 +47,7 @@ import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
-import no.uio.ifi.in2000.team12.team12project.model.frost.ObsType
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.BulletedList
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.DropDown
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.RoundCornerButton
@@ -149,8 +149,8 @@ fun GraphScreen(
                 DropDown<Months>(uiState.month.name, modifier = modifier.weight(1f)) {
                     graphScreenViewModel.setMonth(it)
                 }
-                DropDown<ObsType>(uiState.obsType.name, modifier = modifier.weight(1f)) {
-                    graphScreenViewModel.setObsType(it)
+                DropDown<ClimateType>(uiState.climateType.name, modifier = modifier.weight(1f)) {
+                    graphScreenViewModel.setClimateType(it)
                 }
             }
         }

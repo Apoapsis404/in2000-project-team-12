@@ -36,13 +36,11 @@ class WeatherDataSource {
         println(response.status.value)
         return when (response.status.value) {
             in 200..299 -> {
-                println("DEBUG: Success branch")
                 Json { ignoreUnknownKeys = true }.decodeFromString<WeatherObsResponse>(
                     responseBodyString
                 ).data
             }
             400 -> {
-                println("DEBUG: Throwing BadRequestException")
                 throw BadRequestException("Invalid parameter value or malformed request")
             }
             401 -> {
@@ -55,7 +53,6 @@ class WeatherDataSource {
                 throw NoAvailableTimeSeriesException("No available time series")
             }
             else -> {
-                println("DEBUG: Throwing generic Exception")
                 throw Exception("Error getting weather data: ${response.status}")
             }
         }

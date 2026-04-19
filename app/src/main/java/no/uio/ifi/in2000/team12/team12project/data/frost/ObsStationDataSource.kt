@@ -10,7 +10,6 @@ import no.uio.ifi.in2000.team12.team12project.data.exceptions.BadRequestExceptio
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoDataException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.UnauthorizedException
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
-import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.Point
 
