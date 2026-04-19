@@ -6,4 +6,5 @@
     <string name="settingsTitle">Settings</string>
     <string name="darkModeSwitch">Switch to %1$s</string>
     <string name="language">Language</string>
+    <string name="no_data_available">No climatedata found!</string>
 </resources>

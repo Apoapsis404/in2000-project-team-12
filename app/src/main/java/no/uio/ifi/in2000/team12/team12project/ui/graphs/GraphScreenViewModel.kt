@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -42,7 +43,6 @@ class GraphScreenViewModel(
     private val context = getApplication<Application>().applicationContext
     private val weatherDataRepository = WeatherDataRepository()
     private val plantsRepository = PlantsRepository(context)
-    private val obsDataSource = ObsStationsDataSource()
 
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
@@ -50,17 +50,19 @@ class GraphScreenViewModel(
     private var graphDataFetchJob : Job? = null
 
     fun getWeatherObs() {
-        _uiState.update { it.copy(weatherObs = emptyList()) }
+        graphDataFetchJob?.cancel()
 
         var obs = listOf<WeatherObs>()
-        viewModelScope.launch {
+        graphDataFetchJob = viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 obs = weatherDataRepository.getWeatherDataFailing(_uiState.value.markerPosition, _uiState.value.climateType, "R10/2016-01-01/2017-01-01")
             } catch (e: NoAvailableTimeSeriesException) {
-                println("Got error: ${e.message}")
+                _uiState.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.no_data_available)) }
+                return@launch
             }
         }
-        _uiState.update { it.copy(weatherObs = obs) }
+        _uiState.update { it.copy(weatherObs = obs, isLoading = false) }
         updateChartData()
     }
 

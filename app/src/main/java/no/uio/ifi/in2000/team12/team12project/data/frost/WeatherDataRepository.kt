@@ -40,6 +40,8 @@ class WeatherDataRepository {
             } catch (e: NoAvailableTimeSeriesException) {
                 continue
             }
+            stationRepository.addStationToCache(source, position, climateType)
+            break
         }
 
         if (weatherObsList.isEmpty()) {
@@ -49,6 +51,7 @@ class WeatherDataRepository {
                 throw NoAvailableTimeSeriesException("No available time series")
             }
         }
+
 
         return weatherObsList
     }

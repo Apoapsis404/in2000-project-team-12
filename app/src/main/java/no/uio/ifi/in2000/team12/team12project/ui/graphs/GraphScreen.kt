@@ -133,7 +133,7 @@ fun GraphScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.padding(8.dp))
-                        Button(onClick =  { graphScreenViewModel.getWeatherObs(0,5)} ){
+                        Button(onClick =  { graphScreenViewModel.getWeatherObs()} ){
                             Text("Prøv igjen")
                         }
                     }
@@ -149,7 +149,7 @@ fun GraphScreen(
                 DropDown<Months>(uiState.month.name, modifier = modifier.weight(1f)) {
                     graphScreenViewModel.setMonth(it)
                 }
-                DropDown<ClimateType>(uiState.climateType.name, modifier = modifier.weight(1f)) {
+                DropDown<ClimateType>(uiState.climateType.label, modifier = modifier.weight(1f)) {
                     graphScreenViewModel.setClimateType(it)
                 }
             }
