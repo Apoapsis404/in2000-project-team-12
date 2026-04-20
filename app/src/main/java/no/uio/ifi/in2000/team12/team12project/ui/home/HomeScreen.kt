@@ -94,11 +94,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
 
     //variables with the changed location on the map and to ask if user wants to add location to favorites
     var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
-    var askforpermission by remember { mutableStateOf(false)}
-    //adresse og navn
-    //lateinit var name : String
-    //lateinit var address: String
-    //lateinit var addressname: String
+    var askforpermission by remember { mutableStateOf(true)}
+
 
     fun searchLocation(query: String) {
         val geocoder = Geocoder(context, Locale.getDefault())
@@ -122,16 +119,9 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
 
                 homeScreenViewModel.onMapClick(latLng)  //updates marker position
                 println(uiState.markerPosition)
-
-                askpermissonforlatlng = latLng
-                askforpermission = true
-
-
-
             }
-
-        ) {
-            //
+        )
+        {
             if(askforpermission == true && askpermissonforlatlng != null){
                 AlertDialog(
                     onDismissRequest = {askforpermission = false},
@@ -164,13 +154,15 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     }
                 )
             }
-            //
-
-            //
             Marker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
                 title = uiState.markerTitle,
-                onClick = {println("marker clicked at ${uiState.markerPosition}") ; true}
+                onClick = {
+                    askpermissonforlatlng = uiState.markerPosition
+                    askforpermission = true
+                    true
+                    //println("marker clicked at ${uiState.markerPosition}") ; true}
+                }
 
             )
         }
