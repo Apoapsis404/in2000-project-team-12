@@ -49,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.AdvancedMarker
 import com.google.android.gms.maps.model.AdvancedMarkerOptions
@@ -139,9 +140,13 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     name = "idk",  // gotta fix name of the place
                     address = " dontknow " //fix adress tooooooo
                 )*/
-            }
+            },
            // onMapClick = onMapClick //equals the variable so there wont be a need for onmapclick over, and to comment in val onmapclick
             //since the other one was over i tried to continue with the same way of implementation/logic used here
+            googleMapOptionsFactory = {
+                GoogleMapOptions().mapId("48427ab8c098a917274af32e")
+            }
+
 
         ) {
             //
@@ -188,7 +193,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.outline_rainy_24),
 
 
-                )
+                    )
             }
             uiState.extremeWindList.forEach {
                 AdvancedMarker(
@@ -204,7 +209,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     contentDescription = "",
                     collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
                     icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.baseline_water_24),
-                    onClick = {}
+                    //onClick = {}
                 )
             }
 
