@@ -12,7 +12,7 @@ import kotlin.test.assertTrue
 
 class TestWeatherDataRepository {
 
-    private val repository = WeatherDataRepository()
+    private val repository = OWN_WeatherDataRepository()
     private val oslo = LatLng(59.91, 10.75)
 
     @Test
