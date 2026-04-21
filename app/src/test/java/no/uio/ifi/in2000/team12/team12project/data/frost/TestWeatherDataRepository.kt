@@ -12,7 +12,7 @@ import kotlin.test.assertTrue
 
 class TestWeatherDataRepository {
 
-    private val repository = WeatherDataRepository()
+    private val repository = UIO_GPT_WeatherDataRepository()
     private val oslo = LatLng(59.91, 10.75)
 
     @Test
@@ -79,15 +79,15 @@ class TestWeatherDataRepository {
         // Integration test using real Frost API
         val climateType = ClimateType.MEAN_AIR_TEMP
         val referenceTime = "2023-01-01/2023-12-31"
-        
+
         val result = repository.getWeatherDataFailing(oslo, climateType, referenceTime)
-        
+
         assertTrue(result.isNotEmpty(), "Should return weather observations")
-        
+
         // Test getObsFromYear and getObsFromMonth using the populated internal state
         val obs2023 = repository.getObsFromYear(2023)
         assertTrue(obs2023.isNotEmpty(), "Should find observations for 2023")
-        
+
         val janObs = repository.getObsFromMonth(Months.JANUARY)
         janObs.forEach { obs ->
             assertTrue(obs.referenceTime.contains("-01-"), "Observation should be from January")
@@ -99,7 +99,7 @@ class TestWeatherDataRepository {
         // Integration test for the fallback logic
         val climateType = ClimateType.MEAN_AIR_TEMP
         val referenceTime = "2022-01-01/2022-12-31"
-        
+
         val result = repository.getWeatherDataFailing(oslo, climateType, referenceTime)
         assertTrue(result.isNotEmpty(), "Should return observations using fallback logic")
     }
