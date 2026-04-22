@@ -33,6 +33,7 @@ data class GraphScreenUiState(
 
 class GraphScreenViewModel(
     application: Application
+    //private val plantsRepository: PlantsRepository
 ) : AndroidViewModel(application) {
 
     private val context = getApplication<Application>().applicationContext

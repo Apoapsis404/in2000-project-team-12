@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team12.team12project.ui.home
 
 import android.Manifest
+import android.content.Context
 import android.location.Geocoder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,8 +48,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMapOptions
+import com.google.android.gms.maps.MapsInitializer
+import com.google.android.gms.maps.model.AdvancedMarker
+import com.google.android.gms.maps.model.AdvancedMarkerOptions
+import com.google.android.gms.maps.model.AdvancedMarkerOptions.CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.common.io.Files.map
+import com.google.maps.android.compose.AdvancedMarker
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
@@ -127,9 +140,13 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     name = "idk",  // gotta fix name of the place
                     address = " dontknow " //fix adress tooooooo
                 )*/
-            }
+            },
            // onMapClick = onMapClick //equals the variable so there wont be a need for onmapclick over, and to comment in val onmapclick
             //since the other one was over i tried to continue with the same way of implementation/logic used here
+            googleMapOptionsFactory = {
+                GoogleMapOptions().mapId("48427ab8c098a917274af32e")
+            }
+
 
         ) {
             //
@@ -167,6 +184,35 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 onClick = {println("marker clicked at ${uiState.markerPosition}") ; true}
 
             )
+
+            uiState.downpourList.forEach {
+                AdvancedMarker(
+                    state = MarkerState(it),
+                    contentDescription = "",
+                    collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                    icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.outline_rainy_24),
+
+
+                    )
+            }
+            uiState.extremeWindList.forEach {
+                AdvancedMarker(
+                    state = MarkerState(it),
+                    contentDescription = "",
+                    collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                    icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.baseline_air_24)
+                )
+            }
+            uiState.flomList.forEach {
+                AdvancedMarker(
+                    state = MarkerState(it),
+                    contentDescription = "",
+                    collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                    icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.baseline_water_24),
+                    //onClick = {}
+                )
+            }
+
         }
 
         Column(
@@ -309,3 +355,20 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
 
     }
 }
+
+
+
+/*
+TODO
+- Bedre symboler
+- Collision handling - Check!
+- Pop up
+- Clean up, kankje lag egen klasse elns, så alle plasser kan ligge i samme liste
+- API
+- Tegne område rundt?
+
+
+
+
+
+ */

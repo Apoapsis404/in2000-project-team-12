@@ -2,9 +2,11 @@ package no.uio.ifi.in2000.team12.team12project.data.plants
 
 import android.content.Context
 import android.util.Log
+import androidx.navigationevent.NavigationEventDispatcher
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
+import java.util.PriorityQueue
 
 class PlantsRepository(private val context: Context){
 
@@ -23,20 +25,33 @@ class PlantsRepository(private val context: Context){
         return Json.decodeFromString(jsonString)
     }
 
+// Returns a list of <quantity> plants with optimal_temp average closest to <targetTemp>
+    fun getBestPlants(targetTemp: Int, quantity: Int = 3, allowNonOptimal: Boolean = true): List<Plant>{
+        val list = if (!allowNonOptimal){
+            plantList.filter {targetTemp >= it.optimal_temp_min && targetTemp <= it.optimal_temp_max}
+        } else plantList
+        list.filter { targetTemp >= it.temp_min && targetTemp <= it.temp_max }
 
-    fun getBestPlants(temp: Int, quantity: Int = 3, allowNonOptimal: Boolean = true): List<Plant>{
-        val optimalList = mutableListOf<Plant>()
-        plantList.forEach {
-            if (temp >= it.optimal_temp_min && temp <= it.optimal_temp_max) {
-                optimalList.add(it)
-            }
+        val heap = PriorityQueue<Plant>(compareBy { kotlin.math.abs(((it.optimal_temp_min+it.optimal_temp_max)/2)-targetTemp) })
+        list.forEach { heap.add(it) }
+
+        val bestList = mutableListOf<Plant>()
+        for(i in 0 until quantity){
+            if(heap.isNotEmpty()) bestList.add(heap.poll())
         }
-        return optimalList
-        //return listOf<Plant>(plantList[0])
+        return bestList
+    }
+
+    // does not filter out temperatures outside livable range
+    fun getBestPlantsPriorityQueue(targetTemp: Int): PriorityQueue<Plant>{
+        val pq = PriorityQueue<Plant>(compareBy { kotlin.math.abs(((it.optimal_temp_min+it.optimal_temp_max)/2)-targetTemp) })
+        plantList.forEach { pq.add(it) }
+        pq.filter { targetTemp >= it.temp_min && targetTemp <= it.temp_max }
+        return pq
     }
 
     fun printPlant(plant: Plant){
-        println("${plant.id} Best plant: (${plant.name}) : " +
+        println("${plant.id} (${plant.name}) : " +
                 "optimal_temp: (${plant.optimal_temp_min}-${plant.optimal_temp_max})C, " +
                 "livable_temp: (${plant.temp_min}-${plant.temp_max})C")
     }
