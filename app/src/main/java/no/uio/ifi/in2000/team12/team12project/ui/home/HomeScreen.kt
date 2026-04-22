@@ -158,8 +158,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
                 title = uiState.markerTitle,
                 onClick = {
-                    askpermissonforlatlng = uiState.markerPosition
-                    askforpermission = true
+                    //askpermissonforlatlng = uiState.markerPosition
+                    //askforpermission = true
                     true
                     //println("marker clicked at ${uiState.markerPosition}") ; true}
                 }
