@@ -361,7 +361,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
 /*
 TODO
 - Bedre symboler
-- Collision handling
+- Collision handling - Check!
 - Pop up
 - Clean up, kankje lag egen klasse elns, så alle plasser kan ligge i samme liste
 - API
