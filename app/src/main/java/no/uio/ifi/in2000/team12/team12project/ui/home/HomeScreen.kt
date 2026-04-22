@@ -298,6 +298,14 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     ) {
                     Text("Show me the numbers!")
                 }
+
+                Button(
+                    modifier = Modifier.align(Alignment.BottomEnd), //can later on decide the placement of the button
+                    onClick = {
+                        askpermissonforlatlng = uiState.markerPosition
+                        askforpermission = true
+                    }
+                ){Text("<33")}
             }
 
         }
