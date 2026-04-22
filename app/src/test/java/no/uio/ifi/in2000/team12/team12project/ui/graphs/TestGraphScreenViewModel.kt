@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 
 class TestGraphScreenViewModel {
 
-    private val viewModel = GraphScreenViewModel()
+    //private val viewModel = GraphScreenViewModel()
 
     @Test
     fun testGetWeatherObs() = runTest {

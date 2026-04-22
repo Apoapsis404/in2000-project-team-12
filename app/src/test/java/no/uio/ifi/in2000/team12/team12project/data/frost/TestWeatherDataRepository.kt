@@ -1,99 +1,106 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.test.runTest
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
+import no.uio.ifi.in2000.team12.team12project.model.frost.Observation
+import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class TestWeatherDataRepository {
 
+    private val repository = UIO_GPT_WeatherDataRepository()
+    private val oslo = LatLng(59.91, 10.75)
+
     @Test
-    fun testGetWeatherDataFromYear() = runTest {
-        val weatherDataRepository = WeatherDataRepository()
-        weatherDataRepository.getWeatherData(
-            "SN18700,SN18701,SN18703,SN499999010,SN18390",
-            "mean(air_temperature P1M)",
-            "R4/2016-01-01/2017-01-01"
+    fun testFindMeanValue() {
+        val observations = listOf(
+            WeatherObs(
+                sourceId = "SN18700",
+                referenceTime = "2023-01-01",
+                observations = listOf(
+                    Observation("temp", 10.0, "C"),
+                    Observation("temp", 20.0, "C")
+                )
+            ),
+            WeatherObs(
+                sourceId = "SN18701",
+                referenceTime = "2023-02-01",
+                observations = listOf(
+                    Observation("temp", 30.0, "C")
+                )
+            )
         )
-        var testYear = 2016
-        val obsFromYear = weatherDataRepository.getObsFromYear(testYear)
-        var getYear = 0
-        obsFromYear.forEach { obs ->
-            getYear = obs.referenceTime.substring(0, 4).toInt()
-            assertEquals(testYear, getYear)
-        }
-        testYear = 2018
-        val obsFromYear2 = weatherDataRepository.getObsFromYear(testYear)
-        obsFromYear2.forEach { obs ->
-            getYear = obs.referenceTime.substring(0, 4).toInt()
-            assertEquals(testYear, getYear)
+        // Mean of obs1: (10+20)/2 = 15.0
+        // Mean of obs2: 30.0
+        // Total mean: (15+30)/2 = 22.5
+        val result = repository.findMeanValue(observations)
+        assertEquals(22.5, result, 0.001)
+    }
+
+    @Test
+    fun testFindMeanObs() {
+        val obs = WeatherObs(
+            sourceId = "SN18700",
+            referenceTime = "2023-01-01",
+            observations = listOf(
+                Observation("temp", 5.0, "C"),
+                Observation("temp", 15.0, "C")
+            )
+        )
+        val result = repository.findMeanObs(obs)
+        assertEquals(10.0, result, 0.001)
+    }
+
+    @Test
+    fun testGetYearAndData() {
+        val observations = listOf(
+            WeatherObs(
+                sourceId = "SN18700",
+                referenceTime = "2023-01-01",
+                observations = listOf(Observation("temp", 10.0, "C"))
+            ),
+            WeatherObs(
+                sourceId = "SN18701",
+                referenceTime = "2024-01-01",
+                observations = listOf(Observation("temp", 20.0, "C"))
+            )
+        )
+        val result = repository.getYearAndData(observations)
+        assertEquals(listOf(2023.0, 2024.0), result.years)
+        assertEquals(listOf(10.0, 20.0), result.values)
+    }
+
+    @Test
+    fun testGetWeatherDataIntegration() = runTest {
+        // Integration test using real Frost API
+        val climateType = ClimateType.MEAN_AIR_TEMP
+        val referenceTime = "2023-01-01/2023-12-31"
+
+        val result = repository.getWeatherDataFailing(oslo, climateType, referenceTime)
+
+        assertTrue(result.isNotEmpty(), "Should return weather observations")
+
+        // Test getObsFromYear and getObsFromMonth using the populated internal state
+        val obs2023 = repository.getObsFromYear(2023)
+        assertTrue(obs2023.isNotEmpty(), "Should find observations for 2023")
+
+        val janObs = repository.getObsFromMonth(Months.JANUARY)
+        janObs.forEach { obs ->
+            assertTrue(obs.referenceTime.contains("-01-"), "Observation should be from January")
         }
     }
 
     @Test
-    fun testGetWeatherDataFromMonth() = runTest {
-        val weatherDataRepository = WeatherDataRepository()
-        weatherDataRepository.getWeatherData(
-            "SN18700,SN18701,SN18703,SN499999010,SN18390",
-            "mean(air_temperature P1M)",
-            "R4/2016-01-01/2017-01-01"
-        )
+    fun testGetWeatherDataFailingIntegration() = runTest {
+        // Integration test for the fallback logic
+        val climateType = ClimateType.MEAN_AIR_TEMP
+        val referenceTime = "2022-01-01/2022-12-31"
 
-        var testMonth = Months.FEBRUARY
-
-        val obsFromMonth = weatherDataRepository.getObsFromMonth(testMonth)
-        var getMonth = 0
-        obsFromMonth.forEach { obs ->
-            getMonth = obs.referenceTime.substring(5, 7).toInt()
-            assertEquals(testMonth.value, getMonth)
-        }
-
-        testMonth = Months.OCTOBER
-
-        val obsFromMonth2 = weatherDataRepository.getObsFromMonth(testMonth)
-        obsFromMonth2.forEach { obs ->
-            getMonth = obs.referenceTime.substring(5, 7).toInt()
-            assertEquals(testMonth.value, getMonth)
-        }
-    }
-
-    @Test
-    fun testFindMeanValue_FromMonth() = runTest {
-        val weatherDataRepository = WeatherDataRepository()
-        weatherDataRepository.getWeatherData(
-            "SN18700,SN18701,SN18703,SN499999010,SN18390",
-            "mean(air_temperature P1M)",
-            "R4/2016-01-01/2017-01-01"
-        )
-        var testMonth = Months.DECEMBER
-        val obsFromMonth = weatherDataRepository.getObsFromMonth(testMonth)
-        var meanValue = weatherDataRepository.findMeanValue(obsFromMonth)
-
-        val expected = -0.23749999999999996
-        assertEquals(expected, meanValue)
-
-        testMonth = Months.FEBRUARY
-        val obsFromMonth2 = weatherDataRepository.getObsFromMonth(testMonth)
-        meanValue = weatherDataRepository.findMeanValue(obsFromMonth2)
-        val expected2 = -1.40625
-        assertEquals(expected2, meanValue)
-    }
-
-    @Test
-    fun testGetYearAndDate() = runTest {
-        val weatherDataRepository = WeatherDataRepository()
-        weatherDataRepository.getWeatherData(
-            "SN18700",
-            "mean(air_temperature P1M)",
-            "R10/2010-01-01/2011-01-01"
-        )
-        val obsFromMonth = weatherDataRepository.getObsFromMonth(Months.DECEMBER)
-        val weatherChartData = weatherDataRepository.getYearAndData(obsFromMonth)
-
-        // Testing that both years and values are the same size which is required for by the graph
-        assertEquals(weatherChartData.years.size, weatherChartData.values.size)
-
-        val expectedYears: List<Double> = (2010..2019).map { it.toDouble() }
-        assertEquals(expectedYears, weatherChartData.years)
+        val result = repository.getWeatherDataFailing(oslo, climateType, referenceTime)
+        assertTrue(result.isNotEmpty(), "Should return observations using fallback logic")
     }
 }
