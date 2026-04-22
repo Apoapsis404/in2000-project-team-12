@@ -65,7 +65,10 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import java.util.Locale
@@ -107,7 +110,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
 
 
     fun searchLocation(query: String) {
-        val geocoder = Geocoder(context, Locale.getDefault()) //comment out and have it as a global variable. then have a local variable pointing to it, so it can be used for reverse geocoding
+        val geocoder = Geocoder(context, Locale.getDefault())
         val results = geocoder.getFromLocationName(query, 1)
         if (!results.isNullOrEmpty()) {
             val location = results[0]
@@ -126,23 +129,13 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = { latLng ->
 
-            //val onMapClick:(LatLng) -> Unit = { latlng ->
                 homeScreenViewModel.onMapClick(latLng)  //updates marker position
                 println(uiState.markerPosition)
 
                 askpermissonforlatlng = latLng
                 askforpermission = true
 
-                /*
-                //add as favorite. unsure if i should implement in a way where fscreenviewmodel isnt used here
-                favoritesScreenViewModel.addFavoriteLocation(  //this works but it adds to favorites without asking
-                    location = latLng,
-                    name = "idk",  // gotta fix name of the place
-                    address = " dontknow " //fix adress tooooooo
-                )*/
             },
-           // onMapClick = onMapClick //equals the variable so there wont be a need for onmapclick over, and to comment in val onmapclick
-            //since the other one was over i tried to continue with the same way of implementation/logic used here
             googleMapOptionsFactory = {
                 GoogleMapOptions().mapId("48427ab8c098a917274af32e")
             }
@@ -156,13 +149,21 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     title = {Text("favorites?")},
                     text = {Text("do you want this location added to your favorites?")},
                     confirmButton = {
-                        TextButton( onClick = {
-                            favoritesScreenViewModel.addFavoriteLocation(
-                                location = askpermissonforlatlng !!,
-                                name = "idk" , // gotta fix name of the place tho
-                                address = "unsure" //fix adress tooooooo
-                            )
+                        TextButton(
+                            onClick = {
+                            scope.launch {
+                                val (name, address) = getNameandAdress(
+                                    context,
+                                    askpermissonforlatlng!!.latitude,
+                                    askpermissonforlatlng!!.longitude
+                                )
 
+                            favoritesScreenViewModel.addFavoriteLocation(
+                                location = askpermissonforlatlng!!,
+                                name = name.toString(), //add apart of the address. will later on add ability to change the name
+                                address = address.toString()
+                            )
+                        }
                             askforpermission = false
                         }) {
                             Text("yessssssssssirrrr")
@@ -175,13 +176,15 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     }
                 )
             }
-            //
-
-            //
             Marker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
                 title = uiState.markerTitle,
-                onClick = {println("marker clicked at ${uiState.markerPosition}") ; true}
+                onClick = {
+                    //askpermissonforlatlng = uiState.markerPosition
+                    //askforpermission = true
+                    true
+                    //println("marker clicked at ${uiState.markerPosition}") ; true}
+                }
 
             )
 
@@ -346,6 +349,14 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     ) {
                     Text("Show me the numbers!")
                 }
+
+                Button(
+                    modifier = Modifier.align(Alignment.BottomEnd), //can later on decide the placement of the button
+                    onClick = {
+                        askpermissonforlatlng = uiState.markerPosition
+                        askforpermission = true
+                    }
+                ){Text("<33")}
             }
 
         }
@@ -354,6 +365,28 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
         }
 
     }
+}
+
+suspend fun getNameandAdress(
+    context: android.content.Context,
+    //geocoder: Geocoder,
+    lat: Double,
+    long: Double
+): Pair<String?,String?> = withContext(Dispatchers.IO){
+    try {
+        val geocoder = Geocoder(context,Locale.getDefault())
+        val locationdetails = geocoder.getFromLocation(lat,long,1)
+        if(!locationdetails.isNullOrEmpty()){
+            val locationobject = locationdetails[0]
+            val name = locationobject.featureName
+            val address = locationobject.getAddressLine(0)
+            return@withContext name to address
+        }
+    }catch (e : Exception){
+        e.printStackTrace()
+    }
+    null to null
+
 }
 
 

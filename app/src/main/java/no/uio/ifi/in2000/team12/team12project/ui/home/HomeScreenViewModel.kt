@@ -179,7 +179,6 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
             )
         }
     }
-
     fun onMapReady(){
         _uiState.update { it.copy(isMapReady = true) }
     }

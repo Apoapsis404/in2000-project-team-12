@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.favorites
 
+import android.location.Geocoder
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
