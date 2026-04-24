@@ -166,7 +166,8 @@ fun GraphScreen(
             text = stringResource(R.string.climate_summary),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            modifier = modifier.padding(top = 5.dp, bottom = 16.dp)
+            modifier = modifier.padding(top = 5.dp, bottom = 16.dp),
+            color = MaterialTheme.colorScheme.onBackground
         )
         BulletedList(summaryList, modifier)
     }

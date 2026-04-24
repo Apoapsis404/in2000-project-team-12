@@ -13,20 +13,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Green_bonde,
-    secondary = White_nearly,
-    tertiary = Pink80,
-
+    primary = dark_green, // Header and button backgrounds etc
+    secondary = yellow, // Symbols and lines
+    tertiary = red, // Negative graph
+    onPrimary = light_green, // Text on buttons etc
+    background = Black_almost, // Background on graph, favorite and settings screen
+    onBackground = White_nearly, // Text on background
     )
 
 private val LightColorScheme = lightColorScheme(
     primary = light_green, // Header and button backgrounds etc
-    secondary = yellow, // Header and menu text etc
-    tertiary = orange, // Marker Color etc
-
-    // OVERRIDES:
+    secondary = yellow, // Symbols and lines
+    tertiary = red, // Negative graph
     onPrimary = dark_green, // Text on buttons etc
     background = White_nearly, // Background on graph, favorite and settings screen
+    onBackground = Black_almost, // Text on background
+
 
 
 
@@ -34,7 +36,6 @@ private val LightColorScheme = lightColorScheme(
     surface = Color(0xFFFFFBFE),
     onSecondary = Color.White,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
 )

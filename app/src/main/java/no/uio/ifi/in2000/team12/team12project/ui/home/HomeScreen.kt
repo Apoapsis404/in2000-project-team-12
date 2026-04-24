@@ -23,6 +23,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -177,7 +178,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     }
                 )
             }
-            Marker(
+            AdvancedMarker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
                 title = uiState.markerTitle,
                 onClick = {
@@ -185,8 +186,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     //askforpermission = true
                     true
                     //println("marker clicked at ${uiState.markerPosition}") ; true}
-                }
-
+                },
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
             )
 
             uiState.downpourList.forEach {
@@ -301,7 +302,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                OutlinedButton(
+                Button(
                     modifier = Modifier.align(Alignment.BottomStart),
                     onClick = {
                         val fineLocationGranted =
@@ -328,6 +329,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                             )
                         }
                     },
+                    //colors = MaterialTheme.colorScheme.primary,
                     contentPadding = PaddingValues(8.dp),
                     shape = CircleShape
                 ) {
@@ -337,7 +339,6 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-
                     )
                 }
 
