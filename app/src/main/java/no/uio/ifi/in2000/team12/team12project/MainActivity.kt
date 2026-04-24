@@ -134,7 +134,9 @@ fun MainComp(
                     }
 
                 }
-                HorizontalDivider()
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.tertiary
+                )
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.home)) },
                     selected = false,
