@@ -1,12 +1,20 @@
 package no.uio.ifi.in2000.team12.team12project.ui.notes
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -26,14 +35,16 @@ fun NotesScreen(notesScreenViewModel: NotesScreenViewModel, navHostController: N
 
     NotesScreenContent(
         notes = uiState,
-        onAddNote = { notesScreenViewModel.addNote(it) }
+        onAddNote = { notesScreenViewModel.addNote(it) },
+        onRemoveNote = { notesScreenViewModel.deleteNote(it) }
     )
 }
 
 @Composable
 fun NotesScreenContent(
     notes: List<Note>,
-    onAddNote: (Note) -> Unit
+    onAddNote: (Note) -> Unit,
+    onRemoveNote: (Note) -> Unit
 ) {
     var editing by remember { mutableStateOf(false) }
     var selectedNote by remember { mutableStateOf<Note?>(null) }
@@ -52,14 +63,50 @@ fun NotesScreenContent(
             )
         } else {
             LazyColumn(modifier = Modifier.weight(1f)) {
-                items(notes) { note ->
-                    NoteItem(
-                        note,
-                        onClick = {
-                            editing = true
-                            selectedNote = note
+                items(
+                    notes,
+                    key = { it.id ?: it.hashCode() }
+                ) { note ->
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { state ->
+                            if (state == SwipeToDismissBoxValue.EndToStart) {
+                                onRemoveNote(note)
+                                true
+                            } else {
+                                false
+                            }
                         }
                     )
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        enableDismissFromStartToEnd = false,
+                        backgroundContent = {
+                            val color = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                                Color.Red.copy(alpha = 0.8f)
+                            } else Color.Transparent
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(color)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    tint = Color.White
+
+                                )
+                            }
+                        }
+                    ) {
+                        NoteItem(
+                            note,
+                            onClick = {
+                                editing = true
+                                selectedNote = note
+                            }
+                        )
+                    }
                 }
             }
             Button(
@@ -86,6 +133,7 @@ fun NotesScreenPreview() {
 
     NotesScreenContent(
         notes = mockNotes,
-        onAddNote = {}
+        onAddNote = {},
+        onRemoveNote = {}
     )
 }

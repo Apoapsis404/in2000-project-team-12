@@ -9,5 +9,16 @@ data class Note (
     val content: String
 ) {
     val title: String
-        get() = content.lineSequence().firstOrNull() ?: ""
+        get() {
+            val sentenceEndings = charArrayOf('.', '!', '?', ':', ';', '\n')
+            val index = content.indexOfAny(sentenceEndings)
+
+            return if (index != -1) {
+                // Return everything up to and including the first punctuation mark
+                content.substring(0, index + 1).trim()
+            } else {
+                // If no sentence ending is found, return the whole content (or first line)
+                content.lineSequence().firstOrNull()?.trim() ?: ""
+            }
+        }
 }
