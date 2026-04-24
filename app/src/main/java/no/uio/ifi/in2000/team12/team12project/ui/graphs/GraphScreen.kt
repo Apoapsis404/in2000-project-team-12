@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,6 +46,7 @@ import com.patrykandpatrick.vico.compose.common.Fill
 import com.patrykandpatrick.vico.compose.common.component.LineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
+import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
@@ -97,13 +99,13 @@ fun GraphScreen(
 
             ) {
                 RoundCornerButton(
-                    label = " Sammenlign år ",
+                    label = stringResource(R.string.compare_year),
                     selected = yearSelected,
                     onClick = { yearSelected = true },
                 )
 
                 RoundCornerButton(
-                    label = " Sammenlign måned ",
+                    label = stringResource(R.string.compare_month),
                     selected = !yearSelected,
                     onClick = { yearSelected = false }
                 )
@@ -118,7 +120,7 @@ fun GraphScreen(
                     ) {
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.padding(8.dp))
-                        Text("Laster værdata...")
+                        Text(stringResource(R.string.loading_climate_data))
                     }
                 }
                 uiState.errorMessage != null ->{
@@ -134,7 +136,7 @@ fun GraphScreen(
                         )
                         Spacer(modifier = Modifier.padding(8.dp))
                         Button(onClick =  { graphScreenViewModel.getWeatherObs()} ){
-                            Text("Prøv igjen")
+                            Text(stringResource(R.string.try_again))
                         }
                     }
                 }
@@ -156,7 +158,7 @@ fun GraphScreen(
             }
         }
         Text(
-            text = "Innsiktsoppsummering:",
+            text = stringResource(R.string.climate_summary),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             modifier = modifier.padding(top = 5.dp, bottom = 16.dp)

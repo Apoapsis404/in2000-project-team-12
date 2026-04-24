@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -106,7 +107,7 @@ fun MainComp(
                 drawerContentColor = MaterialTheme.colorScheme.secondary,
             ) {
                 Row {
-                    Text("Menu", modifier = Modifier.padding(16.dp))
+                    Text(stringResource(R.string.menu), modifier = Modifier.padding(16.dp))
 
                     //spacer
                     Spacer(modifier = Modifier.weight(1f))
@@ -124,7 +125,7 @@ fun MainComp(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Exit",
+                            contentDescription = stringResource(R.string.cont_desc_exit),
                             tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.size(18.dp)
                         )
@@ -133,7 +134,7 @@ fun MainComp(
                 }
                 HorizontalDivider()
                 NavigationDrawerItem(
-                    label = { Text("Home") },
+                    label = { Text(stringResource(R.string.home)) },
                     selected = false,
                     onClick = {
                         navController.navigate("home")
@@ -145,7 +146,7 @@ fun MainComp(
                     )
                 )
                 NavigationDrawerItem(
-                    label = { Text("Favorites") },
+                    label = { Text(stringResource(R.string.favorites)) },
                     selected = false,
                     onClick = {
                         navController.navigate("favorites")
@@ -157,7 +158,7 @@ fun MainComp(
                     )
                 )
                 NavigationDrawerItem(
-                    label = { Text("Settings") },
+                    label = { Text(stringResource(R.string.settings)) },
                     selected = false,
                     onClick = {
                         navController.navigate("settings")
@@ -190,7 +191,8 @@ fun MainComp(
 fun Header(modifier: Modifier = Modifier, onClick: () -> Unit){
     TopAppBar(
         {
-            Text("Almanakken",
+            Text(
+                stringResource(R.string.app_title),
             color = MaterialTheme.colorScheme.secondary
             )
         },
@@ -200,7 +202,7 @@ fun Header(modifier: Modifier = Modifier, onClick: () -> Unit){
             IconButton(onClick = onClick) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu"
+                    contentDescription = stringResource(R.string.cont_desc_menu)
                 )
             }
         },

@@ -64,7 +64,9 @@ class GraphScreenViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "An unexpected error occurred") }
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: context.getString(
+                    R.string.unexpected_error
+                )) }
             }
         }
     }
