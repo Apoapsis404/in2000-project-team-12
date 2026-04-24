@@ -70,8 +70,7 @@ class MainActivity : ComponentActivity() {
             val app = applicationContext as Team12Application
             val settingsViewModel : SettingsScreenViewModel = viewModel(factory = SettingsScreenViewModelFactory(app.database.settingDao()))
             val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoriteDao()))
-            //HomeScreen()
-            //GraphScreen()
+
             Team12ProjectTheme(
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
@@ -97,6 +96,10 @@ fun MainComp(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
+    val drawerItemColors = NavigationDrawerItemDefaults.colors(
+        unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
+        selectedTextColor = MaterialTheme.colorScheme.onPrimary
+    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -104,7 +107,7 @@ fun MainComp(
         drawerContent = {
             ModalDrawerSheet(
                 drawerContainerColor = MaterialTheme.colorScheme.primary,
-                drawerContentColor = MaterialTheme.colorScheme.secondary,
+                drawerContentColor = MaterialTheme.colorScheme.onPrimary,
             ) {
                 Row {
                     Text(stringResource(R.string.menu), modifier = Modifier.padding(16.dp))
@@ -118,7 +121,6 @@ fun MainComp(
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary)
                             .clickable {
-                                //navController.navigate("Home")
                                 scope.launch { drawerState.close() }
                             },
                         contentAlignment = Alignment.Center
@@ -140,10 +142,7 @@ fun MainComp(
                         navController.navigate("home")
                         scope.launch { drawerState.close() }
                     },
-                    colors = NavigationDrawerItemDefaults.colors(
-                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
-                        selectedTextColor = MaterialTheme.colorScheme.tertiary
-                    )
+                    colors = drawerItemColors
                 )
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.favorites)) },
@@ -152,10 +151,7 @@ fun MainComp(
                         navController.navigate("favorites")
                         scope.launch { drawerState.close() }
                     },
-                    colors = NavigationDrawerItemDefaults.colors(
-                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
-                        selectedTextColor = MaterialTheme.colorScheme.tertiary
-                    )
+                    colors = drawerItemColors
                 )
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.settings)) },
@@ -164,10 +160,7 @@ fun MainComp(
                         navController.navigate("settings")
                         scope.launch { drawerState.close() }
                     },
-                    colors = NavigationDrawerItemDefaults.colors(
-                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
-                        selectedTextColor = MaterialTheme.colorScheme.tertiary
-                    )
+                    colors = drawerItemColors
 
                 )
             }
@@ -189,11 +182,12 @@ fun MainComp(
 @OptIn(ExperimentalMaterial3Api::class)     // må vi forsvare denne?
 @Composable
 fun Header(modifier: Modifier = Modifier, onClick: () -> Unit){
+    val titleColors = MaterialTheme.colorScheme.onPrimary
     TopAppBar(
         {
             Text(
                 stringResource(R.string.app_title),
-            color = MaterialTheme.colorScheme.secondary
+            color = titleColors
             )
         },
         modifier = modifier

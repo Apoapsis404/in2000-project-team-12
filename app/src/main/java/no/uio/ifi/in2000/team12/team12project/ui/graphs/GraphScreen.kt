@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,9 +23,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -102,6 +105,8 @@ fun GraphScreen(
                     label = stringResource(R.string.compare_year),
                     selected = yearSelected,
                     onClick = { yearSelected = true },
+
+
                 )
 
                 RoundCornerButton(
@@ -196,15 +201,18 @@ private fun ComposeTemperatureAnomalies(
     modifier: Modifier = Modifier,
 ) {
     val startAxisValueFormatter = remember(unit) { CartesianValueFormatter.decimal(suffix = " $unit") }
+    val axisLabelStyle = rememberTextComponent(
+        TextStyle(color = MaterialTheme.colorScheme.primary)
+    )
     val positiveColumn =
         rememberLineComponent(
-            fill = Fill(Color(0xff0ac285)),
+            fill = Fill(MaterialTheme.colorScheme.primary),
             thickness = 8.dp,
             shape = RoundedCornerShape(topStartPercent = 40, topEndPercent = 40),
         )
     val negativeColumn =
         rememberLineComponent(
-            fill = Fill(Color(0xffe8304f)),
+            fill = Fill(MaterialTheme.colorScheme.tertiary),
             thickness = 8.dp,
             shape = RoundedCornerShape(bottomStartPercent = 40, bottomEndPercent = 40),
         )
@@ -219,8 +227,14 @@ private fun ComposeTemperatureAnomalies(
                     columnCollectionSpacing = 4.dp,
                     rangeProvider = RangeProvider,
                 ),
-                startAxis = VerticalAxis.rememberStart(valueFormatter = startAxisValueFormatter),
-                bottomAxis = HorizontalAxis.rememberBottom(labelRotationDegrees = 45f),
+                startAxis = VerticalAxis.rememberStart(
+                    valueFormatter = startAxisValueFormatter,
+                    label = axisLabelStyle
+                ),
+                bottomAxis = HorizontalAxis.rememberBottom(
+                    labelRotationDegrees = 45f,
+                    label = axisLabelStyle
+                ),
             ),
         modelProducer = modelProducer,
         modifier = modifier.height(234.dp),

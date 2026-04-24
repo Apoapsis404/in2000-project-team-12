@@ -26,16 +26,17 @@ fun RoundCornerButton(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
-            .background(if (selected) MaterialTheme.colorScheme.primary else Color.LightGray)
+            .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary)
             .clickable(onClick = onClick)
             .padding(vertical = 10.dp),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text       = label,
             fontSize   = 15.sp,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-            color      = if (selected) Color.White else MaterialTheme.colorScheme.secondary
+            color      = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp)
         )
     }
 }
