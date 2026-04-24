@@ -44,8 +44,9 @@ fun NotesScreenContent(
         if (editing) {
             NoteEntryField(
                 note = selectedNote,
-                onSave = {
-                    onAddNote(selectedNote!!)
+                onSave = { updatedText ->
+                    val noteToSave = selectedNote?.copy(content = updatedText) ?: Note(content = updatedText)
+                    onAddNote(noteToSave)
                     editing = false
                 }
             )

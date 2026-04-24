@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 
 @Composable
-fun NoteEntryField(modifier: Modifier = Modifier, maxChars: Int = 200, note: Note? = null, onSave: () -> Unit) {
+fun NoteEntryField(modifier: Modifier = Modifier, maxChars: Int = 200, note: Note? = null, onSave: (String) -> Unit) {
     var text by remember { mutableStateOf(note?.content ?: "") }
 
     Column {
@@ -43,7 +43,7 @@ fun NoteEntryField(modifier: Modifier = Modifier, maxChars: Int = 200, note: Not
         )
         Button(
             modifier = Modifier.padding(top = 8.dp),
-            onClick = onSave,
+            onClick = { onSave(text) },
         ) {
             Text("Save")
         }
