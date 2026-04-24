@@ -1,5 +1,8 @@
 package no.uio.ifi.in2000.team12.team12project.model.nve
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class FloodWarning(
     val EventId: Int,           //id for hendelsen
     val ActivityLevel: Int,     //faregrad
@@ -9,7 +12,3 @@ data class FloodWarning(
     val MunicipalityList: List<Municipality>        //Liste over komuner som påvirkes av varselet
 )
 
-data class Municipality(
-    val Id: Int,
-    val Name: String
-)
