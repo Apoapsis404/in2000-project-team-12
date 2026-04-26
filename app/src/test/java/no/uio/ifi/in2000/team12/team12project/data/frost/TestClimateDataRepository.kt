@@ -5,20 +5,20 @@ import kotlinx.coroutines.test.runTest
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.Observation
-import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class TestWeatherDataRepository {
+class TestClimateDataRepository {
 
-    private val repository = UIO_GPT_WeatherDataRepository()
+    private val repository = ClimateDataRepository()
     private val oslo = LatLng(59.91, 10.75)
 
     @Test
     fun testFindMeanValue() {
         val observations = listOf(
-            WeatherObs(
+            ClimateObs(
                 sourceId = "SN18700",
                 referenceTime = "2023-01-01",
                 observations = listOf(
@@ -26,7 +26,7 @@ class TestWeatherDataRepository {
                     Observation("temp", 20.0, "C")
                 )
             ),
-            WeatherObs(
+            ClimateObs(
                 sourceId = "SN18701",
                 referenceTime = "2023-02-01",
                 observations = listOf(
@@ -43,7 +43,7 @@ class TestWeatherDataRepository {
 
     @Test
     fun testFindMeanObs() {
-        val obs = WeatherObs(
+        val obs = ClimateObs(
             sourceId = "SN18700",
             referenceTime = "2023-01-01",
             observations = listOf(
@@ -58,12 +58,12 @@ class TestWeatherDataRepository {
     @Test
     fun testGetYearAndData() {
         val observations = listOf(
-            WeatherObs(
+            ClimateObs(
                 sourceId = "SN18700",
                 referenceTime = "2023-01-01",
                 observations = listOf(Observation("temp", 10.0, "C"))
             ),
-            WeatherObs(
+            ClimateObs(
                 sourceId = "SN18701",
                 referenceTime = "2024-01-01",
                 observations = listOf(Observation("temp", 20.0, "C"))
@@ -80,15 +80,15 @@ class TestWeatherDataRepository {
         val climateType = ClimateType.MEAN_AIR_TEMP
         val referenceTime = "2023-01-01/2023-12-31"
 
-        val result = repository.getWeatherDataFailing(oslo, climateType, referenceTime)
+        val result = repository.getClimateDataFailing(oslo, climateType, referenceTime)
 
         assertTrue(result.isNotEmpty(), "Should return weather observations")
 
         // Test getObsFromYear and getObsFromMonth using the populated internal state
-        val obs2023 = repository.getObsFromYear(2023)
+        val obs2023 = repository.getObsFromYear(2023, result)
         assertTrue(obs2023.isNotEmpty(), "Should find observations for 2023")
 
-        val janObs = repository.getObsFromMonth(Months.JANUARY)
+        val janObs = repository.getObsFromMonth(Months.JANUARY, result)
         janObs.forEach { obs ->
             assertTrue(obs.referenceTime.contains("-01-"), "Observation should be from January")
         }
@@ -100,7 +100,7 @@ class TestWeatherDataRepository {
         val climateType = ClimateType.MEAN_AIR_TEMP
         val referenceTime = "2022-01-01/2022-12-31"
 
-        val result = repository.getWeatherDataFailing(oslo, climateType, referenceTime)
+        val result = repository.getClimateDataFailing(oslo, climateType, referenceTime)
         assertTrue(result.isNotEmpty(), "Should return observations using fallback logic")
     }
 }

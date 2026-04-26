@@ -1,7 +1,7 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
-import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import kotlin.collections.forEach
 
 fun constructTimeSeries(from: String, to: String, repeat: String = "", period: String = ""): String {
@@ -39,13 +39,13 @@ fun getStationIdsFromList(stationList: List<ObsStation>): String {
     return stationIds
 }
 
-fun printWeatherObservations(weatherObsList: List<WeatherObs>) {
-    if (weatherObsList.isEmpty()) {
-        println("No weather observations found.")
+fun printClimateObsList(climateObsList: List<ClimateObs>) {
+    if (climateObsList.isEmpty()) {
+        println("No climate observations found.")
         return
     }
 
-    weatherObsList.forEach { obs ->
+    climateObsList.forEach { obs ->
         println("-------------------------------------------")
         println("Source ID: ${obs.sourceId}")
         println("Time: ${obs.referenceTime}")

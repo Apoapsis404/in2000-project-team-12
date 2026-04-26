@@ -1,23 +1,20 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
-import kotlinx.coroutines.launch
 import org.junit.Test
 import kotlinx.coroutines.test.runTest
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.BadRequestException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoDataException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.UnauthorizedException
-import org.junit.Assert.*
-import org.junit.experimental.theories.suppliers.TestedOn
 import kotlin.test.assertFailsWith
 
 class TestAPIExceptionHandling {
 
     @Test
     fun testBadRequestException() = runTest {
-        val dataSource = WeatherDataSource()
+        val dataSource = ClimateDataSource()
         assertFailsWith<BadRequestException> {
-            dataSource.getWeatherData("IN18701", "med(air_temperature P1M)", "1981-01-01")
+            dataSource.getClimateData("IN18701", "med(air_temperature P1M)", "1981-01-01")
         }
     }
 
@@ -39,9 +36,9 @@ class TestAPIExceptionHandling {
 
     @Test
     fun testNoAvailableTimeSeriesException() = runTest {
-        val dataSource = WeatherDataSource()
+        val dataSource = ClimateDataSource()
         assertFailsWith<NoAvailableTimeSeriesException> {
-            dataSource.getWeatherData("SN18701", "mean(air_temperature P1M)", "1982-01-01/1983-01-01");
+            dataSource.getClimateData("SN18701", "mean(air_temperature P1M)", "1982-01-01/1983-01-01");
         }
     }
 }

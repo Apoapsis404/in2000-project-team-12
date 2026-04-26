@@ -7,5 +7,5 @@ data class ClimateDataSearch(
     val position: LatLng,
     val climateType: ClimateType,
     val referenceTime: String,
-    val climateObs: List<WeatherObs>,
+    val climateObs: List<ClimateObs>,
 )
