@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -34,24 +33,16 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
-import com.patrykandpatrick.vico.compose.cartesian.data.ColumnCartesianLayerModel
-import com.patrykandpatrick.vico.compose.cartesian.data.columnSeries
-import com.patrykandpatrick.vico.compose.cartesian.layer.ColumnCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.common.Fill
-import com.patrykandpatrick.vico.compose.common.component.LineComponent
-import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.BulletedList
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.DropDown
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.RoundCornerButton
-import kotlin.math.abs
-import kotlin.math.ceil
-import kotlin.math.max
 
 // Graph library used:
 // https://github.com/patrykandpatrick/vico
@@ -75,7 +66,7 @@ fun GraphScreen(
     LaunchedEffect(uiState.climateChartData) {
         if (uiState.climateChartData.years.isNotEmpty() && uiState.climateChartData.values.isNotEmpty()) {
             modelProducer.runTransaction {
-                columnSeries { series(uiState.climateChartData.years, uiState.climateChartData.values) }
+                lineSeries { series(uiState.climateChartData.years, uiState.climateChartData.values) }
             }
         }
     }
@@ -163,26 +154,11 @@ fun GraphScreen(
     }
 }
 
-private const val RANGE_PROVIDER_BASE = 0.1
-
 private val RangeProvider =
     object : CartesianLayerRangeProvider {
-        override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore) =
-            -RANGE_PROVIDER_BASE * ceil(max(abs(minY), maxY) / RANGE_PROVIDER_BASE)
+        override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore) = minY
 
-        override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) =
-            -getMinY(minY, maxY, extraStore)
-    }
-
-private fun getColumnProvider(positive: LineComponent, negative: LineComponent) =
-    object : ColumnCartesianLayer.ColumnProvider {
-        override fun getColumn(
-            entry: ColumnCartesianLayerModel.Entry,
-            seriesIndex: Int,
-            extraStore: ExtraStore,
-        ) = if (entry.y >= 0) positive else negative
-
-        override fun getWidestSeriesColumn(seriesIndex: Int, extraStore: ExtraStore) = positive
+        override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) = maxY
     }
 
 @Composable
@@ -192,27 +168,10 @@ private fun ComposeTemperatureAnomalies(
     modifier: Modifier = Modifier,
 ) {
     val startAxisValueFormatter = remember(unit) { CartesianValueFormatter.decimal(suffix = " $unit") }
-    val positiveColumn =
-        rememberLineComponent(
-            fill = Fill(Color(0xff0ac285)),
-            thickness = 8.dp,
-            shape = RoundedCornerShape(topStartPercent = 40, topEndPercent = 40),
-        )
-    val negativeColumn =
-        rememberLineComponent(
-            fill = Fill(Color(0xffe8304f)),
-            thickness = 8.dp,
-            shape = RoundedCornerShape(bottomStartPercent = 40, bottomEndPercent = 40),
-        )
     CartesianChartHost(
         chart =
             rememberCartesianChart(
-                rememberColumnCartesianLayer(
-                    columnProvider =
-                        remember(positiveColumn, negativeColumn) {
-                            getColumnProvider(positiveColumn, negativeColumn)
-                        },
-                    columnCollectionSpacing = 4.dp,
+                rememberLineCartesianLayer(
                     rangeProvider = RangeProvider,
                 ),
                 startAxis = VerticalAxis.rememberStart(valueFormatter = startAxisValueFormatter),
