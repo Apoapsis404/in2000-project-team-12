@@ -128,7 +128,7 @@ fun GraphScreen(
                     }
                 }
                 else -> {
-                    ComposeTemperatureAnomalies(modelProducer, uiState.climateType.unit)
+                    ComposeClimateGraph(modelProducer, uiState.climateType.unit)
                 }
             }
 
@@ -162,7 +162,7 @@ private val RangeProvider =
     }
 
 @Composable
-private fun ComposeTemperatureAnomalies(
+private fun ComposeClimateGraph(
     modelProducer: CartesianChartModelProducer,
     unit: String,
     modifier: Modifier = Modifier,

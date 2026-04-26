@@ -84,8 +84,8 @@ class GraphScreenViewModel(
     }
 
     private fun updateChartData(climateObsList: List<ClimateObs> = _uiState.value.climateObs) {
-        val weatherObs = climateDataRepository.getObsFromMonth(_uiState.value.month, climateObsList)
-        val chartData = climateDataRepository.getYearAndData(weatherObs)
+        val climateObs = climateDataRepository.getObsFromMonth(_uiState.value.month, climateObsList)
+        val chartData = climateDataRepository.getYearAndData(climateObs)
         _uiState.update { it.copy(climateChartData = chartData) }
     }
 }
