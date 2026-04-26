@@ -28,6 +28,7 @@ data class GraphScreenUiState(
     val markerPosition : LatLng = LatLng(0.0,0.0),
     val isLoading : Boolean = false,
     val errorMessage : String? = null,
+    val showMean: Boolean = false,
 )
 
 
@@ -80,6 +81,10 @@ class GraphScreenViewModel(
 
     fun setMarkerPosition(position : LatLng){
         _uiState.update { it.copy(markerPosition = position) }
+    }
+
+    fun toggleMean(show: Boolean) {
+        _uiState.update { it.copy(showMean = show) }
     }
 
     private fun updateChartData(climateObsList: List<ClimateObs> = _uiState.value.climateObs) {

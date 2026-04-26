@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,11 +72,16 @@ fun GraphScreen(
     var yearSelected by remember { mutableStateOf(true) }
     val summaryList = remember {dummyList.toMutableStateList()}
 
-    LaunchedEffect(uiState.climateChartData) {
+    LaunchedEffect(uiState.climateChartData, uiState.showMean) {
         if (uiState.climateChartData.years.isNotEmpty() && uiState.climateChartData.values.isNotEmpty()) {
             modelProducer.runTransaction {
-                //lineSeries { series(uiState.climateChartData.years, uiState.climateChartData.values) }
-                columnSeries { series(uiState.climateChartData.years, uiState.climateChartData.values) }
+                lineSeries {
+                    series(uiState.climateChartData.years, uiState.climateChartData.values)
+                    if (uiState.showMean) {
+                        val meanValue = uiState.climateChartData.values.average()
+                        series(uiState.climateChartData.years, List(uiState.climateChartData.years.size) { meanValue })
+                    }
+                }
             }
         }
     }
@@ -152,6 +158,17 @@ fun GraphScreen(
                     graphScreenViewModel.getClimateObs()
                 }
             }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            ) {
+                Checkbox(
+                    checked = uiState.showMean,
+                    onCheckedChange = { graphScreenViewModel.toggleMean(it) }
+                )
+                Text(text = "Vis gjennomsnitt")
+            }
         }
         Text(
             text = "Innsiktsoppsummering:",
@@ -206,16 +223,16 @@ private fun ComposeClimateGraph(
     CartesianChartHost(
         chart =
             rememberCartesianChart(
-//                rememberLineCartesianLayer(
-//                    rangeProvider = RangeProvider,
-//                ),
-                rememberColumnCartesianLayer(
-                    columnProvider = remember(positiveColumn, negativeColumn) {
-                        getColumnProvider(positiveColumn, negativeColumn)
-                    },
-                    columnCollectionSpacing = 4.dp,
+                rememberLineCartesianLayer(
                     rangeProvider = RangeProvider,
                 ),
+//                rememberColumnCartesianLayer(
+//                    columnProvider = remember(positiveColumn, negativeColumn) {
+//                        getColumnProvider(positiveColumn, negativeColumn)
+//                    },
+//                    columnCollectionSpacing = 4.dp,
+//                    rangeProvider = RangeProvider,
+//                ),
                 startAxis = VerticalAxis.rememberStart(valueFormatter = startAxisValueFormatter),
                 bottomAxis = HorizontalAxis.rememberBottom(labelRotationDegrees = 45f),
             ),
