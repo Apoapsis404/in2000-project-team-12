@@ -108,6 +108,10 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
     var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
     var askforpermission by remember { mutableStateOf(false)}
 
+    //navigates to favoritescreen if they wish to add as a favorite, later on add to change name, might not need you tho
+    var navigatetofavonsave  by remember { mutableStateOf(false) } //turns true when yesssirr is added
+
+
 
     fun searchLocation(query: String) {
         val geocoder = Geocoder(context, Locale.getDefault())
@@ -133,7 +137,6 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 println(uiState.markerPosition)
 
                 askpermissonforlatlng = latLng
-                askforpermission = true
 
             },
             googleMapOptionsFactory = {
@@ -157,8 +160,11 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                                     askpermissonforlatlng!!.latitude,
                                     askpermissonforlatlng!!.longitude
                                 )
+                                //navigates to favorite screen
+                                navHostController.navigate("favorites")
+                                //add name to address.fix keyboard or some way of typing to add to name. should be in favoritescreen, but we'll see how to fix this
 
-                            favoritesScreenViewModel.addFavoriteLocation(
+                                favoritesScreenViewModel.addFavoriteLocation(
                                 location = askpermissonforlatlng!!,
                                 name = name.toString(), //add apart of the address. will later on add ability to change the name
                                 address = address.toString()
@@ -178,12 +184,9 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             }
             Marker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
-                title = uiState.markerTitle,
+                title = uiState.markerTitle ,
                 onClick = {
-                    //askpermissonforlatlng = uiState.markerPosition
-                    //askforpermission = true
                     true
-                    //println("marker clicked at ${uiState.markerPosition}") ; true}
                 }
 
             )

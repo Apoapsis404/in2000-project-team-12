@@ -52,7 +52,8 @@ fun FavoriteCard(
     title: String,
     subtitle: String,
     buttonIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowForward,
-    onButtonClick: () -> Unit = {}
+    onButtonClick: () -> Unit = {},
+
 ) {
     Row(
         modifier = Modifier
@@ -82,21 +83,21 @@ fun FavoriteCard(
         Spacer(modifier = Modifier.width(16.dp))
 
         // Text block
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = DarkText
-            )
-            Spacer(modifier = Modifier.height(3.dp))
-            Text(
-                text = subtitle,
-                fontSize = 13.sp,
-                color = SubtleText
-            )
-        }
+                Column(modifier = Modifier.weight(1f)) {
+                Text( //name
+                    text = title,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = DarkText
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                Text( //address
+                    text = subtitle,
+                    fontSize = 13.sp,
+                    color = SubtleText
+                )
 
+        }
         Spacer(modifier = Modifier.width(12.dp))
 
         // Circular button
