@@ -27,7 +27,7 @@ data class GraphScreenUiState(
     val climateChartData: ClimateChartData = ClimateChartData(emptyList(), emptyList()),
     val markerPosition : LatLng = LatLng(0.0,0.0),
     val isLoading : Boolean = false,
-    val errorMessage : String? = null
+    val errorMessage : String? = null,
 )
 
 
@@ -77,7 +77,6 @@ class GraphScreenViewModel(
     fun setClimateType(climateType: ClimateType) {
         _uiState.update { it.copy(climateType = climateType) }
     }
-
 
     fun setMarkerPosition(position : LatLng){
         _uiState.update { it.copy(markerPosition = position) }
