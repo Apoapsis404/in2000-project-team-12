@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
@@ -37,7 +38,9 @@ inline fun <reified E : Enum<E>> DropDown(defaultName: String, modifier: Modifie
         modifier = modifier.heightIn(max = 280.dp),
     ) {
         TextField(
-            modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            modifier = modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            shape = RoundedCornerShape(16.dp),
             state = textFieldState,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(

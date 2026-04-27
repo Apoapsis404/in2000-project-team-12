@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.team12.team12project
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -54,9 +56,24 @@ import no.uio.ifi.in2000.team12.team12project.ui.navigation.Navigator
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
+import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
+
+    // For local language change
+    override fun attachBaseContext(newBase: Context) {
+        // Read saved language from SharedPreferences (Room is async, can't use it here)
+        val prefs = newBase.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val langCode = prefs.getString("language", "en") ?: "en"
+        val locale = Locale(langCode)
+        Locale.setDefault(locale)
+        val config = Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
+
+
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()

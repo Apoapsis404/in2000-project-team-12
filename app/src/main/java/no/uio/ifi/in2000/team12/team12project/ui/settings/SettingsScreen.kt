@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.team12.team12project.ui.settings
 
+import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +37,9 @@ fun SettingsScreen(
             .fillMaxWidth()
             .padding(start = 36.dp, end = 36.dp)
     ){
+        val activity = LocalActivity.current as Activity
+        val darkmodeBool = settingsScreenViewModel.uiState.collectAsState().value.lightmode
+
         Text(
             stringResource(R.string.settingsTitle),
             fontSize = 36.sp,
@@ -41,7 +47,6 @@ fun SettingsScreen(
                 .padding(top = 16.dp, bottom = 16.dp)
         )
 
-        val darkmodeBool = settingsScreenViewModel.uiState.collectAsState().value.lightmode
         ToggleSetting(
             stringResource(R.string.darkModeSwitch, if (darkmodeBool) "dark" else "light"),
             checked = darkmodeBool,
@@ -60,7 +65,7 @@ fun SettingsScreen(
                 uiState.collectAsState().value.language.name,
                 modifier = Modifier.width(180.dp)
             )  {
-                settingsScreenViewModel.switchLanguage(it)
+                settingsScreenViewModel.switchLanguage(it, activity)
             }
         }
 

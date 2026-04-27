@@ -1,5 +1,9 @@
 package no.uio.ifi.in2000.team12.team12project.ui.settings
 
+import android.app.Activity
+import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,10 +45,21 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
         }
     }
 
-    fun switchLanguage(newLanguage: Languages){
+    fun switchLanguage(newLanguage: Languages, activity: Activity){
+        val localeCode = when (newLanguage) {
+            Languages.ENGLISH -> "en"
+            Languages.NORSK -> "nb"
+            Languages.中國人 -> "zh"
+        }
+
+        val prefs = activity.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        prefs.edit().putString("language", localeCode).apply()
         updateConfig {
             it.copy(language = newLanguage)
         }
+
+        // To see changes in the app instant
+        activity.recreate()
     }
 
 }
