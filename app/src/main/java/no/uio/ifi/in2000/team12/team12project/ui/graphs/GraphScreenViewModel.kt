@@ -15,6 +15,7 @@ import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSer
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateChartData
+import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
@@ -56,9 +57,10 @@ class GraphScreenViewModel(
                 val obs = climateDataRepository.getClimateDataFailing(
                     _uiState.value.markerPosition,
                     _uiState.value.climateType,
-                    "R10/2016-01-01/2017-01-01"
+                    constructTimeSeries(120u)
                 )
                 _uiState.update { it.copy(climateObs = obs, isLoading = false) }
+                Log.d("GraphScreenViewModel", "Time series: ${constructTimeSeries(120u)}")
                 updateChartData()
             } catch (e: NoAvailableTimeSeriesException) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.no_data_available)) }
