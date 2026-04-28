@@ -15,8 +15,10 @@ import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSer
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateChartData
+import no.uio.ifi.in2000.team12.team12project.data.frost.Round
 import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateDataSearch
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
@@ -45,22 +47,39 @@ class GraphScreenViewModel(
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
 
+    val climateObsMap = mutableMapOf<Pair<LatLng, ClimateType>, ClimateDataSearch>()
+
     private var graphDataFetchJob : Job? = null
 
     fun getClimateObs() {
         Log.d("GraphScreenViewModel", "Climate type: ${_uiState.value.climateType}")
         graphDataFetchJob?.cancel()
 
+        if (climateObsMap.containsKey(_uiState.value.markerPosition.Round(3) to _uiState.value.climateType)){
+            Log.d("GraphScreenViewModel", "Found in map")
+            val climateDataSearch = climateObsMap[_uiState.value.markerPosition.Round(3) to _uiState.value.climateType]!!
+            _uiState.update { it.copy(climateObs = climateDataSearch.climateObs) }
+            updateChartData()
+            return
+        }
+
         graphDataFetchJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
+                val refTime = constructTimeSeries(120u)
                 val obs = climateDataRepository.getClimateDataFailing(
                     _uiState.value.markerPosition,
                     _uiState.value.climateType,
-                    constructTimeSeries(120u)
+                    refTime
                 )
                 _uiState.update { it.copy(climateObs = obs, isLoading = false) }
-                Log.d("GraphScreenViewModel", "Time series: ${constructTimeSeries(120u)}")
+                val climateDataSearch = ClimateDataSearch(
+                    _uiState.value.markerPosition.Round(3),
+                    _uiState.value.climateType,
+                    refTime,
+                    obs,
+                )
+                climateObsMap[_uiState.value.markerPosition.Round(3) to _uiState.value.climateType] = climateDataSearch
                 updateChartData()
             } catch (e: NoAvailableTimeSeriesException) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.no_data_available)) }

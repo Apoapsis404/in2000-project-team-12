@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team12.team12project.data.frost
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import java.text.SimpleDateFormat
@@ -67,6 +68,16 @@ fun isFromYear(referencetime: String, year: Int): Boolean {
     return referencetime.split("-")[0].toInt() == year
 }
 
+/*
+ * Rounds LatLng to n decimals
+ */
+fun LatLng.Round(decimals: Int = 2): LatLng {
+    var multiplier = 1.0
+    repeat(decimals) { multiplier *= 10 }
+    val lat = (latitude * multiplier).toInt() / multiplier
+    val lng = (longitude * multiplier).toInt() / multiplier
+    return LatLng(lat, lng)
+}
 
 fun getStationIdsFromList(stationList: List<ObsStation>): String {
     var stationIds: String = ""
