@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.annotation.RequiresPermission
-import androidx.compose.foundation.Canvas
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
@@ -25,6 +24,8 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.getStationIdsFromList
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import androidx.core.graphics.createBitmap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
+import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
 
 // Represent the different states exposed to the UI
 data class HomeScreenUiState(
@@ -58,24 +59,28 @@ data class HomeScreenUiState(
         LatLng(60.39, 5.35),
         LatLng(60.35, 5.31)
     ),
-    val flomList: List<LatLng> = listOf(
-        LatLng(59.98, 10.75),
-        LatLng(59.97, 10.77),
-        LatLng(59.96, 10.80),
-        LatLng(59.91, 10.80),
-        LatLng(59.91, 10.85),
-        //Dala
-        LatLng(60.95, 10.82),
-        //Berg
-        LatLng(60.41, 5.37),
-        LatLng(60.37, 5.33)
-    )
+
+    val flomList: List<LatLng> = emptyList()
+
+//    val flomList: List<LatLng> = listOf(
+//        LatLng(59.98, 10.75),
+//        LatLng(59.97, 10.77),
+//        LatLng(59.96, 10.80),
+//        LatLng(59.91, 10.80),
+//        LatLng(59.91, 10.85),
+//        //Dala
+//        LatLng(60.95, 10.82),
+//        //Berg
+//        LatLng(60.41, 5.37),
+//        LatLng(60.37, 5.33)
+//    )
 )
 
 
 
 class HomeScreenViewModel(application : Application) : AndroidViewModel(application){
     private val obsStationsDataSource : ObsStationsDataSource = ObsStationsDataSource()
+    private val nveRepository : NVERepository = NVERepository(NVEDataSource(application))
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -136,6 +141,28 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
                 }
             }
     }
+
+
+
+    private fun fetchFloodWarnings() {
+        viewModelScope.launch {
+            try {
+                val warnings = nveRepository.getFloodWarnings()
+//                val latLngs = warnings.flatMap { warning ->
+//                    warning.MunicipalityList.map {
+//                        println("flood warning at ${it.lat}, ${it.lon}")
+//                        LatLng(it.lat, it.lon)
+//                    }
+//                }
+                val latLngs = warnings.map { LatLng(it.first, it.second) }
+                _uiState.update { it.copy(flomList = latLngs) }
+            } catch (e: Exception) {
+                println("Error fetching flood warnings: ${e.message}")
+                e.printStackTrace()
+            }
+        }
+    }
+
 
     fun getNearestStations(){    // Gets the nearest weather stations based on marker position values in _uiState and prints them to Log
         viewModelScope.launch{
@@ -199,6 +226,10 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
         drawable.draw(canvas)
 
         return BitmapDescriptorFactory.fromBitmap(bitMap)
+    }
+
+    init {
+        fetchFloodWarnings()
     }
 }
 
