@@ -12,7 +12,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.FavoriteCard
 import no.uio.ifi.in2000.team12.team12project.ui.home.getNameandAdress
 
@@ -37,6 +40,11 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
     //string that will be added to removefavoritefunction
     var deleteplacebyname by remember { mutableStateOf<String?>(null) }
     var deleterequest by remember { mutableStateOf<Boolean>(false) }
+    //check if the name whants to be changed
+    var changename by remember { mutableStateOf<Boolean>(false) }
+    var changenameto by remember { mutableStateOf("") }
+    var changenameof by remember { mutableStateOf<FavoriteLocation?>(null) }
+
 
     /*
     LaunchedEffect(uiState.favoritesLocationList) {
@@ -71,6 +79,21 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
 
         }
     */
+    //check for newly added to favorites
+    LaunchedEffect(favoritesScreenViewModel.lastfavoriteadded,uiState.favoritesLocationMap) {
+        val newname = favoritesScreenViewModel.lastfavoriteadded
+        if(newname != null){
+            val item = uiState.favoritesLocationMap.values.find{it.name == newname}//uiState.favoritesLocationMap[newname]//[deleteplacebyname]//[newname]
+            if(item == null) return@LaunchedEffect
+            //if(item != null){
+                changenameof = item
+                deleteplacebyname = item.name
+                changename = true
+            //}
+            favoritesScreenViewModel.lastfavoriteadded = null
+        }
+    }
+
     Box(modifier = Modifier){
     LazyColumn(
         modifier = Modifier
@@ -79,11 +102,12 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
 
         items(uiState.favoritesLocationMap.toList()) { (key, favoriteLocation) ->
 
-            var selectedbox = deleteplacebyname == favoriteLocation.name //using var because it will modify
-
+            //var selectedbox = deleteplacebyname == favoriteLocation.name //using var because it will modify
+            var selectedbox = changenameof?.name == favoriteLocation.name
             Box(
                 modifier = Modifier.clickable{
                     deleteplacebyname =favoriteLocation.name
+                    changenameof =favoriteLocation
                 }
                     .padding(6.dp)
                     .border(
@@ -104,15 +128,28 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
         Button(
             modifier = Modifier.align(Alignment.BottomEnd),
             onClick = {
-                deleterequest = true
+                if(changenameof != null) {
+                    deleterequest = true
+                }
         }
         ) {
             Text("delete")
         }
 
+        Button(
+            modifier = Modifier.align(Alignment.BottomStart),
+            onClick = {
+                if(changenameof != null) {
+                    changename = true
+                }
+            }
+        ) {
+            Text("add/change name")
+        }
+
     }
 
-    if(deleterequest == true){
+    if(deleterequest == true && changenameof !=null){
         AlertDialog(
             onDismissRequest = {deleterequest= false},
             title = {Text("delete?")},
@@ -124,6 +161,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                            favoritesScreenViewModel.removeFavoriteLocation(name)
                        }
                         deleterequest = false
+                        changenameof =null
                     }) {
                     Text("yessssssssssirrrr")
                 }
@@ -131,6 +169,48 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
             dismissButton = {
                 TextButton(onClick = {deleterequest = false}) {
                     Text("Nosirrrrrrrrrr")
+                }
+            }
+        )
+    }
+
+    if (changename && changenameof !=null) {
+
+            AlertDialog(
+            onDismissRequest = {
+                changename = false
+                changenameto = ""
+
+            },
+            title = { Text("Enter new name") },
+            text = {
+                TextField(
+                    value = changenameto,
+                    onValueChange = { changenameto = it },
+                    placeholder = { Text("New name") }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    //changenameof?.let {
+                        favoritesScreenViewModel.changeFavoriteLocationName(
+                            prevname = changenameof!!.name,//it.name,
+                            changenameto = changenameto
+                        )
+                    //}
+                    changenameto = ""
+                    changename = false
+
+                }) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    changename = false
+
+                }) {
+                    Text("Cancel")
                 }
             }
         )
