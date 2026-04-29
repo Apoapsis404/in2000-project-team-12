@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.graphs
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
