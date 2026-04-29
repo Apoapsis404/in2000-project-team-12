@@ -13,21 +13,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.R
-import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherChartData
-import no.uio.ifi.in2000.team12.team12project.data.frost.WeatherDataRepository
+import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
+import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateChartData
+import no.uio.ifi.in2000.team12.team12project.data.frost.Round
+import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateDataSearch
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
-import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 
 data class GraphScreenUiState(
-    val weatherObs: List<WeatherObs> = emptyList(),
+    val climateObs: List<ClimateObs> = emptyList(),
     val month: Months = Months.JANUARY,
     val climateType: ClimateType = ClimateType.MEAN_AIR_TEMP,
-    val weatherChartData: WeatherChartData = WeatherChartData(emptyList(), emptyList()),
+    val climateChartData: ClimateChartData = ClimateChartData(emptyList(), emptyList()),
     val markerPosition : LatLng = LatLng(0.0,0.0),
     val isLoading : Boolean = false,
-    val errorMessage : String? = null
+    val errorMessage : String? = null,
+    val showMean: Boolean = false,
 )
 
 
@@ -37,27 +41,45 @@ class GraphScreenViewModel(
 ) : AndroidViewModel(application) {
 
     private val context = getApplication<Application>().applicationContext
-    private val weatherDataRepository = WeatherDataRepository()
+    private val climateDataRepository = ClimateDataRepository()
     private val plantsRepository = PlantsRepository(context)
 
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
 
+    val climateObsMap = mutableMapOf<Pair<LatLng, ClimateType>, ClimateDataSearch>()
+
     private var graphDataFetchJob : Job? = null
 
-    fun getWeatherObs() {
+    fun getClimateObs() {
         Log.d("GraphScreenViewModel", "Climate type: ${_uiState.value.climateType}")
         graphDataFetchJob?.cancel()
+
+        if (climateObsMap.containsKey(_uiState.value.markerPosition.Round(3) to _uiState.value.climateType)){
+            Log.d("GraphScreenViewModel", "Found in map")
+            val climateDataSearch = climateObsMap[_uiState.value.markerPosition.Round(3) to _uiState.value.climateType]!!
+            _uiState.update { it.copy(climateObs = climateDataSearch.climateObs) }
+            updateChartData()
+            return
+        }
 
         graphDataFetchJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val obs = weatherDataRepository.getWeatherDataFailing(
+                val refTime = constructTimeSeries(120u)
+                val obs = climateDataRepository.getClimateDataFailing(
                     _uiState.value.markerPosition,
                     _uiState.value.climateType,
-                    "R10/2016-01-01/2017-01-01"
+                    refTime
                 )
-                _uiState.update { it.copy(weatherObs = obs, isLoading = false) }
+                _uiState.update { it.copy(climateObs = obs, isLoading = false) }
+                val climateDataSearch = ClimateDataSearch(
+                    _uiState.value.markerPosition.Round(3),
+                    _uiState.value.climateType,
+                    refTime,
+                    obs,
+                )
+                climateObsMap[_uiState.value.markerPosition.Round(3) to _uiState.value.climateType] = climateDataSearch
                 updateChartData()
             } catch (e: NoAvailableTimeSeriesException) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.no_data_available)) }
@@ -78,14 +100,17 @@ class GraphScreenViewModel(
         _uiState.update { it.copy(climateType = climateType) }
     }
 
-
     fun setMarkerPosition(position : LatLng){
         _uiState.update { it.copy(markerPosition = position) }
     }
 
-    private fun updateChartData() {
-        val weatherObs = weatherDataRepository.getObsFromMonth(_uiState.value.month)
-        val chartData = weatherDataRepository.getYearAndData(weatherObs)
-        _uiState.update { it.copy(weatherChartData = chartData) }
+    fun toggleMean(show: Boolean) {
+        _uiState.update { it.copy(showMean = show) }
+    }
+
+    private fun updateChartData(climateObsList: List<ClimateObs> = _uiState.value.climateObs) {
+        val climateObs = climateDataRepository.getObsFromMonth(_uiState.value.month, climateObsList)
+        val chartData = climateDataRepository.getYearAndData(climateObs)
+        _uiState.update { it.copy(climateChartData = chartData) }
     }
 }

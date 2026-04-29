@@ -1,23 +1,64 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
+import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
-import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 import kotlin.collections.forEach
 
-fun constructTimeSeries(from: String, to: String, repeat: String = "", period: String = ""): String {
-    var timeSeries = repeat
-
-    if (timeSeries != "") {
-        timeSeries += "/"
-    }
-
-    timeSeries += "$from/$to"
-    if (period != "") {
-        timeSeries += "/$period"
-    }
-
-    return timeSeries
+fun constructTimeSeries(n: UInt, currentDate: String = getCurrentDate()): String {
+    val start = getStartOfDate(currentDate)
+    return "${lastNMonths(n, start)}/$start"
 }
+
+
+/*
+ * Gets current date as string for time series
+ * Because of the need to target API 24+
+ * Have to use old version of getting date
+ */
+fun getCurrentDate(): String {
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return sdf.format(Date())
+}
+
+fun getStartOfDate(date: String): String {
+    val year = date.split("-")[0]
+    val month = date.split("-")[1]
+    return "$year-$month-01"
+}
+
+
+
+/*
+ * Returns TimeSeries for last N months from beginning of current month
+ * N can be more than a year
+ * Example: Last 5 months from 2023-03-01 -> 2022-10-01
+ */
+fun lastNMonths(n: UInt, currentDate: String): String {
+    val currentMonth = currentDate.split("-")[1].toInt()
+    var fromMonth: Int = (currentMonth - n.toInt()).mod(12)
+    if (fromMonth == 0) {
+        fromMonth = 12
+    }
+
+    var years: Int = (n / 12u).toInt()
+    if (currentMonth - fromMonth < 0) {
+        years += 1
+    }
+
+    val fromYear = currentDate.split("-")[0].toInt() - years
+    //println("fromYear: $fromYear, fromMonth: $fromMonth")
+    return "$fromYear-${fromMonth.toString().padStart(2, '0')}-01"
+}
+
 
 fun isFromMonth(referencetime: String, month: Int): Boolean {
     return referencetime.split("-")[1].toInt() == month
@@ -27,6 +68,16 @@ fun isFromYear(referencetime: String, year: Int): Boolean {
     return referencetime.split("-")[0].toInt() == year
 }
 
+/*
+ * Rounds LatLng to n decimals
+ */
+fun LatLng.Round(decimals: Int = 2): LatLng {
+    var multiplier = 1.0
+    repeat(decimals) { multiplier *= 10 }
+    val lat = (latitude * multiplier).toInt() / multiplier
+    val lng = (longitude * multiplier).toInt() / multiplier
+    return LatLng(lat, lng)
+}
 
 fun getStationIdsFromList(stationList: List<ObsStation>): String {
     var stationIds: String = ""
@@ -39,13 +90,13 @@ fun getStationIdsFromList(stationList: List<ObsStation>): String {
     return stationIds
 }
 
-fun printWeatherObservations(weatherObsList: List<WeatherObs>) {
-    if (weatherObsList.isEmpty()) {
-        println("No weather observations found.")
+fun printClimateObsList(climateObsList: List<ClimateObs>) {
+    if (climateObsList.isEmpty()) {
+        println("No climate observations found.")
         return
     }
 
-    weatherObsList.forEach { obs ->
+    climateObsList.forEach { obs ->
         println("-------------------------------------------")
         println("Source ID: ${obs.sourceId}")
         println("Time: ${obs.referenceTime}")

@@ -8,9 +8,58 @@ class TestAPIHelper {
 
     @Test
     fun testConstructTimeSeries() {
-        val timeSeries = constructTimeSeries("2016-01-01", "2017-01-01", "R2")
-        val expected = "R2/2016-01-01/2017-01-01"
+        val currentDate = "2023-03-01"
+        val timeSeries = constructTimeSeries(5u, currentDate)
+        val expected = "2022-10-01/${getStartOfDate(currentDate)}"
         assertEquals(expected, timeSeries)
+
+        val currentDate2 = "2022-03-28"
+        val timeSeries2 = constructTimeSeries(21u, currentDate2)
+        val expected2 = "2020-06-01/${getStartOfDate(currentDate2)}"
+        assertEquals(expected2, timeSeries2)
+
+        println("Time series from current date: ${constructTimeSeries(17u)}")
+    }
+
+    @Test
+    fun testGetCurrentDate() {
+        val currentDate = getCurrentDate()
+        println(currentDate)
+    }
+
+    @Test
+    fun testGetStartOfDate() {
+        val currentDate = "2023-03-02"
+        val startOfDate = getStartOfDate(currentDate)
+        val expected = "2023-03-01"
+        assertEquals(expected, startOfDate)
+
+        val currentDate2 = "2022-07-28"
+        val startOfDate2 = getStartOfDate(currentDate2)
+        val expected2 = "2022-07-01"
+        assertEquals(expected2, startOfDate2)
+    }
+
+    @Test
+    fun testLastNMonths() {
+        val currentDate = "2023-03-01"
+        val last5Months = lastNMonths(5u, currentDate)
+        val expected = "2022-10-01"
+        assertEquals(expected, last5Months)
+
+        val last2Months = lastNMonths(2u, currentDate)
+        val expected2 = "2023-01-01"
+        assertEquals(expected2, last2Months)
+
+        val last12Months = lastNMonths(12u, currentDate)
+        val expected3 = "2022-03-01"
+        assertEquals(expected3, last12Months)
+
+        val last15Months = lastNMonths(15u, currentDate)
+        val expected4 = "2021-12-01"
+        assertEquals(expected4, last15Months)
+
+        println(lastNMonths(5u, getCurrentDate()))
     }
 
     @Test

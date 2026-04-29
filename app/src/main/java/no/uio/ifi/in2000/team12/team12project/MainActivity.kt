@@ -50,6 +50,8 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.navigation.Navigator
+import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModel
+import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
@@ -69,13 +71,14 @@ class MainActivity : ComponentActivity() {
             val app = applicationContext as Team12Application
             val settingsViewModel : SettingsScreenViewModel = viewModel(factory = SettingsScreenViewModelFactory(app.database.settingDao()))
             val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoriteDao()))
+            val notesScreenViewModel : NotesScreenViewModel = viewModel(factory = NotesScreenViewModelFactory(app.database.notesDao()))
             //HomeScreen()
             //GraphScreen()
             Team12ProjectTheme(
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
             ) {
-                MainComp(settingsViewModel, favoritesViewModel)
+                MainComp(settingsViewModel, favoritesViewModel, notesScreenViewModel)
             }
         }
     }
@@ -92,6 +95,7 @@ class MainActivity : ComponentActivity() {
 fun MainComp(
     settingsScreenViewModel: SettingsScreenViewModel,
     favoriteScreenViewModel: FavoritesScreenViewModel,
+    notesScreenViewModel: NotesScreenViewModel,
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -157,6 +161,18 @@ fun MainComp(
                     )
                 )
                 NavigationDrawerItem(
+                    label = { Text("Notes") },
+                    selected = false,
+                    onClick = {
+                        navController.navigate("notes")
+                        scope.launch { drawerState.close() }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
+                        selectedTextColor = MaterialTheme.colorScheme.tertiary
+                    )
+                )
+                NavigationDrawerItem(
                     label = { Text("Settings") },
                     selected = false,
                     onClick = {
@@ -167,7 +183,6 @@ fun MainComp(
                         unselectedTextColor = MaterialTheme.colorScheme.secondary,
                         selectedTextColor = MaterialTheme.colorScheme.tertiary
                     )
-
                 )
             }
         }
@@ -175,7 +190,10 @@ fun MainComp(
         Scaffold(
             topBar = { Header(onClick = { scope.launch { drawerState.open() } }) },
         ) { innerPadding ->
-            Navigator( settingsViewModel = settingsScreenViewModel, favoritesViewModel = favoriteScreenViewModel,
+            Navigator(
+                settingsViewModel = settingsScreenViewModel,
+                favoritesViewModel = favoriteScreenViewModel,
+                notesScreenViewModel = notesScreenViewModel,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding), navController = navController

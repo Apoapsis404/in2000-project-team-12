@@ -4,16 +4,17 @@ import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
-import no.uio.ifi.in2000.team12.team12project.model.frost.WeatherObs
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 
 
-/**
- * Repository used by TestWeatherDataRepository.
- * Keeps an internal cache of the last fetched observations (weatherObsList)
- * so that getObsFromYear/getObsFromMonth work as expected in tests.
- */
-class UIO_GPT_WeatherDataRepository(
-    private val weatherDataSource: WeatherDataSource = WeatherDataSource(),
+data class ClimateChartData(
+    val years: List<Double>,
+    val values: List<Double>
+)
+
+
+class ClimateDataRepository(
+    private val climateDataSource: ClimateDataSource = ClimateDataSource(),
     private val stationRepository: ObsStationRepository = ObsStationRepository()
 ) {
 
@@ -27,23 +28,15 @@ class UIO_GPT_WeatherDataRepository(
     }
 
     /**
-     * Internal state used by getObsFromYear/getObsFromMonth tests.
-     * It is always overwritten on each successful data fetch.
-     */
-    private val weatherObsList = mutableListOf<WeatherObs>()
-
-    /**
-     * Fetch weather data for the nearest station to the given position.
+     * Fetch climate data for the nearest station to the given position.
      * Also updates internal weatherObsList cache.
      */
-    suspend fun getWeatherData(
+    suspend fun getClimateData(
         position: LatLng,
         climateType: ClimateType,
         referenceTime: String,
         fields: String = DEFAULT_FIELDS
-    ): List<WeatherObs> {
-        weatherObsList.clear()
-
+    ): List<ClimateObs> {
         val stations = stationRepository.getNearestStation(
             position.latitude,
             position.longitude,
@@ -53,32 +46,26 @@ class UIO_GPT_WeatherDataRepository(
         val sourceId = stations.firstOrNull()?.id
             ?: throw NoAvailableTimeSeriesException("No nearby stations found")
 
-        val result = weatherDataSource.getWeatherData(
+        val result = climateDataSource.getClimateData(
             sourceId,
             climateType.elementId,
             referenceTime,
             fields
         )
-
-        weatherObsList.addAll(result)
         return result
     }
 
     /**
      * Try multiple nearby stations until data is found, optionally widening the search.
-     * Mirrors the behavior of the original getWeatherDataFailing but avoids recursion.
-     * Also updates internal weatherObsList cache on success.
      */
-    suspend fun getWeatherDataFailing(
+    suspend fun getClimateDataFailing(
         position: LatLng,
         climateType: ClimateType,
         referenceTime: String,
         minCount: Int = 0,
         maxCount: Int = 5,
         fields: String = DEFAULT_FIELDS
-    ): List<WeatherObs> {
-        weatherObsList.clear()
-
+    ): List<ClimateObs> {
         var currentMin = minCount
         var currentMax = maxCount
 
@@ -93,7 +80,7 @@ class UIO_GPT_WeatherDataRepository(
 
             for (source in sources.drop(currentMin)) {
                 val result = try {
-                    weatherDataSource.getWeatherData(
+                    climateDataSource.getClimateData(
                         source.id,
                         climateType.elementId,
                         referenceTime,
@@ -106,8 +93,6 @@ class UIO_GPT_WeatherDataRepository(
 
                 if (result.isNotEmpty()) {
                     stationRepository.addStationToCache(source, position, climateType)
-                    weatherObsList.clear()
-                    weatherObsList.addAll(result)
                     return result
                 }
             }
@@ -121,14 +106,10 @@ class UIO_GPT_WeatherDataRepository(
         )
     }
 
-    /**
-     * Returns observations from the internally cached list whose referenceTime is in the given year.
-     * Used by the integration tests after getWeatherDataFailing has populated weatherObsList.
-     */
-    fun getObsFromYear(year: Int): List<WeatherObs> {
-        if (weatherObsList.isEmpty()) return emptyList()
+    fun getObsFromYear(year: Int, climateObsList: List<ClimateObs>): List<ClimateObs> {
+        if (climateObsList.isEmpty()) return emptyList()
 
-        return weatherObsList.filter { obs ->
+        return climateObsList.filter { obs ->
             extractYear(obs.referenceTime) == year
         }
     }
@@ -137,10 +118,10 @@ class UIO_GPT_WeatherDataRepository(
      * Returns observations from the internally cached list whose referenceTime is in the given month.
      * Used by the integration tests after getWeatherDataFailing has populated weatherObsList.
      */
-    fun getObsFromMonth(month: Months): List<WeatherObs> {
-        if (weatherObsList.isEmpty()) return emptyList()
+    fun getObsFromMonth(month: Months, climateObsList: List<ClimateObs>): List<ClimateObs> {
+        if (climateObsList.isEmpty()) return emptyList()
 
-        return weatherObsList.filter { obs ->
+        return climateObsList.filter { obs ->
             extractMonth(obs.referenceTime) == month.value
         }
     }
@@ -149,13 +130,13 @@ class UIO_GPT_WeatherDataRepository(
      * Compute the mean of the per-observation means.
      * Tests assume the list is non-empty, so we keep the non-null Double return type.
      */
-    fun findMeanValue(weatherObsList: List<WeatherObs>): Double {
-        require(weatherObsList.isNotEmpty()) {
+    fun findMeanValue(climateObsList: List<ClimateObs>): Double {
+        require(climateObsList.isNotEmpty()) {
             "Cannot compute mean value of an empty list"
         }
 
         // Mean of each WeatherObs
-        val obsMeans = weatherObsList.map { obs ->
+        val obsMeans = climateObsList.map { obs ->
             findMeanObs(obs)
         }
 
@@ -167,8 +148,8 @@ class UIO_GPT_WeatherDataRepository(
      * Compute the mean value of a single WeatherObs.
      * Tests assume observations is non-empty.
      */
-    fun findMeanObs(weatherObs: WeatherObs): Double {
-        val observations = weatherObs.observations
+    fun findMeanObs(climateObs: ClimateObs): Double {
+        val observations = climateObs.observations
         require(observations.isNotEmpty()) {
             "Cannot compute mean of WeatherObs with no observations"
         }
@@ -181,11 +162,11 @@ class UIO_GPT_WeatherDataRepository(
      * Convert a list of WeatherObs into WeatherChartData.
      * Years are returned as Double to match existing tests (2023.0, 2024.0).
      */
-    fun getYearAndData(weatherObsList: List<WeatherObs>): WeatherChartData {
+    fun getYearAndData(climateObsList: List<ClimateObs>): ClimateChartData {
         val years = mutableListOf<Double>()
         val values = mutableListOf<Double>()
 
-        weatherObsList.forEach { obs ->
+        climateObsList.forEach { obs ->
             val year = extractYear(obs.referenceTime)
             if (year != null) {
                 years += year.toDouble()
@@ -193,7 +174,7 @@ class UIO_GPT_WeatherDataRepository(
             }
         }
 
-        return WeatherChartData(
+        return ClimateChartData(
             years = years,
             values = values
         )

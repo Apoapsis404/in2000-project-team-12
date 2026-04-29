@@ -3,7 +3,7 @@ package no.uio.ifi.in2000.team12.team12project.model.frost
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class WeatherObs(
+data class ClimateObs(
     val sourceId: String,
     val referenceTime: String,
     val observations: List<Observation>
@@ -17,6 +17,6 @@ data class Observation(
 )
 
 @Serializable
-data class WeatherObsResponse(
-    val data: List<WeatherObs>
+data class ClimateObsResponse(
+    val data: List<ClimateObs>
 )
