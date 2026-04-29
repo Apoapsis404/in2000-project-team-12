@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -86,8 +87,7 @@ fun GraphScreen(
                 lineSeries {
                     series(uiState.climateChartData.years, uiState.climateChartData.values)
                     if (uiState.showMean) {
-                        val meanValue = uiState.climateChartData.values.average()
-                        series(uiState.climateChartData.years, List(uiState.climateChartData.years.size) { meanValue })
+                        series(uiState.climateChartData.years, List(uiState.climateChartData.years.size) { uiState.climateChartData.mean })
                     }
                 }
             }
@@ -151,7 +151,9 @@ fun GraphScreen(
                     }
                 }
                 else -> {
-                    ComposeClimateGraph(modelProducer, uiState.climateType.unit)
+                    key(uiState.climateType) {
+                        ComposeClimateGraph(modelProducer, uiState.climateType.unit)
+                    }
                 }
             }
 
@@ -178,14 +180,50 @@ fun GraphScreen(
                 Text(text = "Vis gjennomsnitt")
             }
         }
-        Text(
-            text = stringResource(R.string.climate_summary),
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = modifier.padding(top = 5.dp, bottom = 16.dp),
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        BulletedList(summaryList, modifier)
+//        Text(
+//            text = stringResource(R.string.climate_summary),
+//            fontSize = 22.sp,
+//            fontWeight = FontWeight.Bold,
+//            modifier = modifier.padding(top = 5.dp, bottom = 16.dp),
+//            color = MaterialTheme.colorScheme.onBackground
+//        )
+        //BulletedList(summaryList, modifier)
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(16.dp)
+            ) {
+                GraphCard(
+                    modifier = Modifier.weight(1f),
+                    climateType = ClimateType.RELATIVE_HUMIDITY,
+                    meanValue = 39.0,
+                    onClick = {}
+                )
+                GraphCard(
+                    modifier = Modifier.weight(1f),
+                    climateType = ClimateType.MEAN_AIR_TEMP,
+                    meanValue = 22.0,
+                    onClick = {}
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(16.dp)
+            ) {
+                GraphCard(
+                    modifier = Modifier.weight(1f),
+                    climateType = ClimateType.DURATION_OF_SUN,
+                    meanValue = 39.0,
+                    onClick = {}
+                )
+                GraphCard(
+                    modifier = Modifier.weight(1f),
+                    climateType = ClimateType.PRECIPITATION,
+                    meanValue = 22.0,
+                    onClick = {}
+                )
+            }
+        }
     }
 }
 

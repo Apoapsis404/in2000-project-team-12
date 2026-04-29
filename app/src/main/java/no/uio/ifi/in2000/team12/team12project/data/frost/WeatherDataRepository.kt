@@ -113,6 +113,6 @@ class WeatherDataRepository {
             years.add(year)
             data.add(mean)
         }
-        return ClimateChartData(years, data)
+        return ClimateChartData(years, data, data.average())
     }
 }

@@ -17,6 +17,8 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateChartData
 import no.uio.ifi.in2000.team12.team12project.data.frost.Round
 import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
+import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
+import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateData
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
@@ -27,7 +29,7 @@ data class GraphScreenUiState(
     val climateObs: List<ClimateObs> = emptyList(),
     val month: Months = Months.JANUARY,
     val climateType: ClimateType = ClimateType.MEAN_AIR_TEMP,
-    val climateChartData: ClimateChartData = ClimateChartData(emptyList(), emptyList()),
+    val climateChartData: ClimateChartData = ClimateChartData(emptyList(), emptyList(), 0.0),
     val markerPosition : LatLng = LatLng(0.0,0.0),
     val isLoading : Boolean = false,
     val errorMessage : String? = null,
@@ -110,9 +112,9 @@ class GraphScreenViewModel(
         _uiState.update { it.copy(showMean = show) }
     }
 
-    private fun updateChartData(climateObsList: List<ClimateObs> = _uiState.value.climateObs) {
-        val climateObs = climateDataRepository.getObsFromMonth(_uiState.value.month, climateObsList)
-        val chartData = climateDataRepository.getYearAndData(climateObs)
+    private fun updateChartData(climateType: ClimateType = _uiState.value.climateType) {
+        val climateObs = getObsFromMonth(_uiState.value.month, graphScreenData.getClimateData(climateType)!!.climateObs)
+        val chartData = getYearAndData(climateObs)
         _uiState.update { it.copy(climateChartData = chartData) }
     }
 }
