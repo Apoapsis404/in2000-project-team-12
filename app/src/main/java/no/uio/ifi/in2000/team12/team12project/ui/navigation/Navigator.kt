@@ -29,6 +29,7 @@ fun Navigator(
     notesScreenViewModel: NotesScreenViewModel,
     navController: NavHostController,
 ){
+    homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
     NavHost(
         navController = navController,
         startDestination = "home",
@@ -37,7 +38,6 @@ fun Navigator(
         composable(
             route = "home"
         ) {
-            homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
             HomeScreen(homeViewModel, favoritesScreenViewModel = favoritesViewModel,navController)
         }
         composable(
