@@ -129,7 +129,7 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
                     _uiState.update { state ->
                         state.copy(
                             searchQuery = "",
-                            markerTitle = "Din posisjon"
+                            markerTitle = "Your position"
                         )
                     }
                     onLocationFound(userPosition)

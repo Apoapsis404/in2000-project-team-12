@@ -23,6 +23,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -136,7 +138,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
 
             },
             googleMapOptionsFactory = {
-                GoogleMapOptions().mapId("48427ab8c098a917274af32e")
+                GoogleMapOptions().mapId( "48427ab8c098a917274af32e")
             }
 
 
@@ -145,8 +147,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             if(askforpermission == true && askpermissonforlatlng != null){
                 AlertDialog(
                     onDismissRequest = {askforpermission = false},
-                    title = {Text("favorites?")},
-                    text = {Text("do you want this location added to your favorites?")},
+                    title = {Text(stringResource(R.string.favorites_popup_title))},
+                    text = {Text(stringResource(R.string.favorites_popup_question))},
                     confirmButton = {
                         TextButton(
                             onClick = {
@@ -169,24 +171,25 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
 
                             }
                             askforpermission = false
-                            }) {
-                            Text("yessssssssssirrrr")
+                        }) {
+                            Text(stringResource(R.string.yes))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = {askforpermission = false}) {
-                            Text("Nosirrrrrrrrrr")
+                            Text(stringResource(R.string.no))
                         }
                     }
                 )
             }
-            Marker(
+            AdvancedMarker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
                 title = uiState.markerTitle ,
                 onClick = {
                     true
-                }
-
+                    //println("marker clicked at ${uiState.markerPosition}") ; true}
+                },
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
             )
 
             uiState.downpourList.forEach {
@@ -235,7 +238,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                         //DENNE MÅ REAKTIVERES FOR Å FÅ FORSLAG PÅ SØK
                         //homeScreenViewModel.fetchSuggestions(it)
                     },
-                    placeholder = { Text("Search location...") },
+                    placeholder = { Text(stringResource(R.string.search_location)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Search,
@@ -287,7 +290,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
 
                     ) {
                         Text(
-                            text = "Søket ga ingen treff",
+                            text = stringResource(R.string.no_result),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(12.dp)
@@ -301,7 +304,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                OutlinedButton(
+                Button(
                     modifier = Modifier.align(Alignment.BottomStart),
                     onClick = {
                         val fineLocationGranted =
@@ -333,11 +336,10 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 ) {
                     Image(
                         painter = painterResource(R.drawable.outline_my_location_24),
-                        contentDescription = "return to current position",
+                        contentDescription = stringResource(R.string.cont_desc_return_to_current_position),
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-
                     )
                 }
 
@@ -348,7 +350,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     },
 
                     ) {
-                    Text("Show me the numbers!")
+                    Text(stringResource(R.string.navigate_to_graph_screen))
                 }
 
                 Button(

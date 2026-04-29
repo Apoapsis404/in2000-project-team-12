@@ -1,10 +1,44 @@
 <resources>
-    <string name="app_name">team12 project</string>
-    <string name="title_activity_maps">MapsActivity</string>
+    <string name="app_name" translatable="false">team12 project</string>
+    <string name="title_activity_maps" translatable="false">MapsActivity</string>
 
     <!-- SETTINGS -->
     <string name="settingsTitle">Settings</string>
     <string name="darkModeSwitch">Switch to %1$s</string>
     <string name="language">Language</string>
-    <string name="no_data_available">No climatedata found!</string>
+
+    <!-- LOADING SCREEN -->
+    <string name="loading_map">Loading map…</string>
+    <string name="content_desc_wallpaper">Wallpaper</string>
+    <string name="content_desc_logo">Logo</string>
+
+    <!-- GRAPH -->
+    <string name="no_data_available">No climate data found!</string>
+    <string name="compare_year">Compare by year</string>
+    <string name="compare_month">Compare by month</string>
+    <string name="loading_climate_data">loading climate data…</string>
+    <string name="try_again">Try again</string>
+    <string name="climate_summary">insights summary:</string>
+    <string name="unexpected_error">An unexpected error occurred</string>
+
+    <!-- HOME -->
+    <string name="favorites_popup_title">favorites?</string>
+    <string name="favorites_popup_question">do you want this location added to your favorites?</string>
+    <string name="yes">yessssssssssirrrr</string>
+    <string name="no">Nosirrrrrrrrrr</string>
+    <string name="search_location">Search location...</string>
+    <string name="no_result">No results</string>
+    <string name="cont_desc_return_to_current_position">return to current position</string>
+    <string name="navigate_to_graph_screen">Show me the numbers!</string>
+
+
+    <!-- HEADER AND MENU -->
+    <string name="menu">Menu</string>
+    <string name="cont_desc_exit">Exit</string>
+    <string name="home">Home</string>
+    <string name="favorites">Favorites</string>
+    <string name="settings">Settings</string>
+    <string name="app_title" translatable="false">Almanakken</string>
+    <string name="cont_desc_menu">Menu</string>
+
 </resources>

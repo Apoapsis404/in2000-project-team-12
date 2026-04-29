@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,7 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +52,8 @@ import com.patrykandpatrick.vico.compose.common.Fill
 import com.patrykandpatrick.vico.compose.common.component.LineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
+import no.uio.ifi.in2000.team12.team12project.R
+import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.BulletedList
@@ -101,13 +108,13 @@ fun GraphScreen(
 
             ) {
                 RoundCornerButton(
-                    label = " Sammenlign år ",
+                    label = stringResource(R.string.compare_year),
                     selected = yearSelected,
                     onClick = { yearSelected = true },
                 )
 
                 RoundCornerButton(
-                    label = " Sammenlign måned ",
+                    label = stringResource(R.string.compare_month),
                     selected = !yearSelected,
                     onClick = { yearSelected = false }
                 )
@@ -122,7 +129,7 @@ fun GraphScreen(
                     ) {
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.padding(8.dp))
-                        Text("Laster klimadata...")
+                        Text(stringResource(R.string.loading_climate_data))
                     }
                 }
                 uiState.errorMessage != null ->{
@@ -138,7 +145,7 @@ fun GraphScreen(
                         )
                         Spacer(modifier = Modifier.padding(8.dp))
                         Button(onClick =  { graphScreenViewModel.getClimateObs()} ){
-                            Text("Prøv igjen")
+                            Text(stringResource(R.string.try_again))
                         }
                     }
                 }
@@ -171,10 +178,11 @@ fun GraphScreen(
             }
         }
         Text(
-            text = "Innsiktsoppsummering:",
+            text = stringResource(R.string.climate_summary),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            modifier = modifier.padding(top = 5.dp, bottom = 16.dp)
+            modifier = modifier.padding(top = 5.dp, bottom = 16.dp),
+            color = MaterialTheme.colorScheme.onBackground
         )
         BulletedList(summaryList, modifier)
     }
@@ -205,21 +213,21 @@ private fun ComposeClimateGraph(
     modifier: Modifier = Modifier,
 ) {
     val startAxisValueFormatter = remember(unit) { CartesianValueFormatter.decimal(suffix = " $unit") }
-
-    val positiveColumn = rememberLineComponent(
-        fill = Fill(Color(0xff0ac285)),
-        thickness = 8.dp,
-        shape = RoundedCornerShape(topStartPercent = 40, topEndPercent = 40)
+    val axisLabelStyle = rememberTextComponent(
+        TextStyle(color = MaterialTheme.colorScheme.primary)
     )
-
-    val negativeColumn = rememberLineComponent(
-        fill = Fill(Color(0xffe8304f)),
-        thickness = 8.dp,
-        shape = RoundedCornerShape(bottomStartPercent = 40, bottomEndPercent = 40)
-    )
-
-
-
+    val positiveColumn =
+        rememberLineComponent(
+            fill = Fill(MaterialTheme.colorScheme.primary),
+            thickness = 8.dp,
+            shape = RoundedCornerShape(topStartPercent = 40, topEndPercent = 40),
+        )
+    val negativeColumn =
+        rememberLineComponent(
+            fill = Fill(MaterialTheme.colorScheme.tertiary),
+            thickness = 8.dp,
+            shape = RoundedCornerShape(bottomStartPercent = 40, bottomEndPercent = 40),
+        )
     CartesianChartHost(
         chart =
             rememberCartesianChart(

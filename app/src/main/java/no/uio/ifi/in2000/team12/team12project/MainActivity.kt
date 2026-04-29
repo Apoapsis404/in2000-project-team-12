@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.team12.team12project
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,6 +42,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -55,9 +59,24 @@ import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModelFacto
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
+import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
+
+    // For local language change
+    override fun attachBaseContext(newBase: Context) {
+        // Read saved language from SharedPreferences (Room is async, can't use it here)
+        val prefs = newBase.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val langCode = prefs.getString("language", "en") ?: "en"
+        val locale = Locale(langCode)
+        Locale.setDefault(locale)
+        val config = Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
+
+
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -100,6 +119,10 @@ fun MainComp(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
+    val drawerItemColors = NavigationDrawerItemDefaults.colors(
+        unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
+        selectedTextColor = MaterialTheme.colorScheme.onPrimary
+    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -107,10 +130,10 @@ fun MainComp(
         drawerContent = {
             ModalDrawerSheet(
                 drawerContainerColor = MaterialTheme.colorScheme.primary,
-                drawerContentColor = MaterialTheme.colorScheme.secondary,
+                drawerContentColor = MaterialTheme.colorScheme.onPrimary,
             ) {
                 Row {
-                    Text("Menu", modifier = Modifier.padding(16.dp))
+                    Text(stringResource(R.string.menu), modifier = Modifier.padding(16.dp))
 
                     //spacer
                     Spacer(modifier = Modifier.weight(1f))
@@ -121,44 +144,39 @@ fun MainComp(
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary)
                             .clickable {
-                                //navController.navigate("Home")
                                 scope.launch { drawerState.close() }
                             },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Exit",
+                            contentDescription = stringResource(R.string.cont_desc_exit),
                             tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
 
                 }
-                HorizontalDivider()
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.secondary
+                )
                 NavigationDrawerItem(
-                    label = { Text("Home") },
+                    label = { Text(stringResource(R.string.home)) },
                     selected = false,
                     onClick = {
                         navController.navigate("home")
                         scope.launch { drawerState.close() }
                     },
-                    colors = NavigationDrawerItemDefaults.colors(
-                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
-                        selectedTextColor = MaterialTheme.colorScheme.tertiary
-                    )
+                    colors = drawerItemColors
                 )
                 NavigationDrawerItem(
-                    label = { Text("Favorites") },
+                    label = { Text(stringResource(R.string.favorites)) },
                     selected = false,
                     onClick = {
                         navController.navigate("favorites")
                         scope.launch { drawerState.close() }
                     },
-                    colors = NavigationDrawerItemDefaults.colors(
-                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
-                        selectedTextColor = MaterialTheme.colorScheme.tertiary
-                    )
+                    colors = drawerItemColors
                 )
                 NavigationDrawerItem(
                     label = { Text("Notes") },
@@ -167,22 +185,17 @@ fun MainComp(
                         navController.navigate("notes")
                         scope.launch { drawerState.close() }
                     },
-                    colors = NavigationDrawerItemDefaults.colors(
-                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
-                        selectedTextColor = MaterialTheme.colorScheme.tertiary
-                    )
+                    colors = drawerItemColors
                 )
                 NavigationDrawerItem(
-                    label = { Text("Settings") },
+                    label = { Text(stringResource(R.string.settings)) },
                     selected = false,
                     onClick = {
                         navController.navigate("settings")
                         scope.launch { drawerState.close() }
                     },
-                    colors = NavigationDrawerItemDefaults.colors(
-                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
-                        selectedTextColor = MaterialTheme.colorScheme.tertiary
-                    )
+                    colors = drawerItemColors
+
                 )
             }
         }
@@ -206,10 +219,12 @@ fun MainComp(
 @OptIn(ExperimentalMaterial3Api::class)     // må vi forsvare denne?
 @Composable
 fun Header(modifier: Modifier = Modifier, onClick: () -> Unit){
+    val titleColors = MaterialTheme.colorScheme.onPrimary
     TopAppBar(
         {
-            Text("Almanakken",
-            color = MaterialTheme.colorScheme.secondary
+            Text(
+                stringResource(R.string.app_title),
+            color = titleColors
             )
         },
         modifier = modifier
@@ -218,7 +233,7 @@ fun Header(modifier: Modifier = Modifier, onClick: () -> Unit){
             IconButton(onClick = onClick) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu"
+                    contentDescription = stringResource(R.string.cont_desc_menu)
                 )
             }
         },

@@ -17,12 +17,14 @@ package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
 //}
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.Agriculture
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Grass
@@ -48,7 +50,7 @@ val SubtleText = Color(0xFF8A9BB0)
 
 @Composable
 fun FavoriteCard(
-    icon: ImageVector = Icons.Default.Grass,
+    icon: ImageVector = Icons.Default.AddLocation,
     title: String,
     subtitle: String,
     buttonIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -58,9 +60,10 @@ fun FavoriteCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(top = 4.dp, start = 4.dp, end = 4.dp)
             .shadow(elevation = 6.dp, shape = RoundedCornerShape(20.dp), spotColor = Color(0x1A000000))
             .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.primary)
             .padding(horizontal = 20.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -69,13 +72,13 @@ fun FavoriteCard(
             modifier = Modifier
                 .size(52.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(LightMint),
+                .background(MaterialTheme.colorScheme.onPrimary),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MintGreen,
+                tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(26.dp)
             )
         }
@@ -83,21 +86,21 @@ fun FavoriteCard(
         Spacer(modifier = Modifier.width(16.dp))
 
         // Text block
-                Column(modifier = Modifier.weight(1f)) {
-                Text( //name
-                    text = title,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = DarkText
-                )
-                Spacer(modifier = Modifier.height(3.dp))
-                Text( //address
-                    text = subtitle,
-                    fontSize = 13.sp,
-                    color = SubtleText
-                )
-
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Spacer(modifier = Modifier.height(3.dp))
+            Text(
+                text = subtitle,
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
         }
+
         Spacer(modifier = Modifier.width(12.dp))
 
         // Circular button
@@ -105,14 +108,14 @@ fun FavoriteCard(
             modifier = Modifier
                 .size(42.dp)
                 .clip(CircleShape)
-                .background(MintGreen)
+                .background(MaterialTheme.colorScheme.onPrimary)
                 .clickable { onButtonClick() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = buttonIcon,
                 contentDescription = "Action",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(18.dp)
             )
         }
