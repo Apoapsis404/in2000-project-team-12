@@ -13,56 +13,56 @@ import android.content.Context
 import no.uio.ifi.in2000.team12.team12project.ui.home.getNameandAdress
 
 class NVEDataSource(val context: Context){
-    val url: String = "https://api01.nve.no/hydrology/forecast/flood/v1.0.10/Warning/1"     //legge inn data for en dato hvis det ikke er noen varseler med /startdato på slutten
+    val url: String = "https://api01.nve.no/hydrology/forecast/flood/v1.0.10/api/Warning/1/2016-01-01/2026-01-01"     //legge inn data for en dato hvis det ikke er noen varseler med /startdato på slutten
 
-    suspend fun getFloodWarning(): List<Pair<Double, Double>> {    //<FloodWarning> {
-//        val response: HttpResponse = KtorClient.client.get(url)
-//        val responseBodyString = response.bodyAsText()
-//
-//        if (response.status.value in 200..299) {
-//            val allWarnings = Json { ignoreUnknownKeys = true }
-//                .decodeFromString<List<FloodWarning>>(responseBodyString)
+    suspend fun getFloodWarning(): List<FloodWarning> {
+        val response: HttpResponse = KtorClient.client.get(url)
+        val responseBodyString = response.bodyAsText()
 
-            //println("total warnings = ${allWarnings.size}")
+        if (response.status.value in 200..299) {
+            val allWarnings = Json { ignoreUnknownKeys = true }
+                .decodeFromString<List<FloodWarning>>(responseBodyString)
+
+            println("total warnings = ${allWarnings.size}")
 
             val coordinateMap = loadCoordinates()
 
             // vil sortere etter de som har hatt flom med farenivå som 2 eller mer hvertfall 2 ganger. Den henter bare fra siste 16 år
-//            val relevantEventIds = allWarnings
-//                .filter { it.ActivityLevel >= 2 }
-//                .groupBy { it.EventId }
-//                .filter { it.value.size >= 2 }
-//                .keys
-//
-//            return allWarnings.filter { it.EventId in relevantEventIds }
-//                .map { warning ->
-//                    warning.copy(
-//                        MunicipalityList = warning.MunicipalityList.mapNotNull { municipality ->
-//                            val coordinates = coordinateMap[municipality.Id]
-//                            coordinates?.let {
-//                                println("${municipality.Name} has coordinates: $coordinates")
-//                                municipality.copy(lat = coordinates.first, lon = coordinates.second)
-//                            }
-//                        }
-//                    )
-//                }
+            val relevantEventIds = allWarnings
+                .filter { it.ActivityLevel >= 2 }
+                .groupBy { it.EventId }
+                .filter { it.value.size >= 2 }
+                .keys
 
-        val warnings = listOf("Nord-Fron", "Sør-Fron", "Ringebu",
-            "Lillehammer", "Gjøvik", "Gol", "Ål", "Flå", "Aurland", "Evje", "Stryn"
-        )
+            return allWarnings.filter { it.EventId in relevantEventIds }
+                .map { warning ->
+                    warning.copy(
+                        MunicipalityList = warning.MunicipalityList.map { municipality ->
+                            val coordinates = coordinateMap[municipality.Id]
+                                ?: throw IllegalStateException("No coordinates found for municipality ${municipality.Name}")
+                            municipality.copy(
+                                lat = coordinates.first,
+                                lon = coordinates.second
+                            )
+                        }
+                    )
+                }
 
-        return warnings.mapNotNull { name ->
-            coordinateMap[name]
-        }
-
-
-//        } else {
-//            throw Exception("Error getting flood warnings: ${response.status}")
+//        val warnings = listOf("Nord-Fron", "Sør-Fron", "Ringebu",
+//            "Lillehammer", "Gjøvik", "Gol", "Ål", "Flå", "Aurland", "Evje", "Stryn"
+//        )
+//        return warnings.mapNotNull { name ->
+//            coordinateMap[name]
 //        }
+
+
+        } else {
+            throw Exception("Error getting flood warnings: ${response.status}")
+        }
     }
 
-    fun loadCoordinates(): Map<String, Pair<Double, Double>> {  //endret fra int til string for denne testen
-        val coordinateMap = mutableMapOf<String, Pair<Double, Double>>()
+    fun loadCoordinates(): Map<Int, Pair<Double, Double>> {  //endret fra int til string for denne testen
+        val coordinateMap = mutableMapOf<Int, Pair<Double, Double>>()
         try {
             val inputStream = context.assets.open("kommuner.csv")
             BufferedReader(InputStreamReader(inputStream)).use { reader ->
@@ -74,8 +74,8 @@ class NVEDataSource(val context: Context){
                         val lat = part[2].toDouble()
                         val lon = part[3].toDouble()
 
-                        //coordinateMap[id] = Pair(lat, lon)
-                        coordinateMap[name] = Pair(lat, lon)
+                        coordinateMap[id] = Pair(lat, lon)
+                        //coordinateMap[name] = Pair(lat, lon)
                     }
                 }
             }

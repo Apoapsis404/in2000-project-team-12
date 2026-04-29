@@ -148,13 +148,13 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
         viewModelScope.launch {
             try {
                 val warnings = nveRepository.getFloodWarnings()
-//                val latLngs = warnings.flatMap { warning ->
-//                    warning.MunicipalityList.map {
-//                        println("flood warning at ${it.lat}, ${it.lon}")
-//                        LatLng(it.lat, it.lon)
-//                    }
-//                }
-                val latLngs = warnings.map { LatLng(it.first, it.second) }
+                val latLngs = warnings.flatMap { warning ->
+                    warning.MunicipalityList.map {
+                        //println("flood warning at ${it.lat}, ${it.lon}")
+                        LatLng(it.lat!!, it.lon!!)
+                    }
+                }
+                //val latLngs = warnings.map { LatLng(it.first, it.second) }
                 _uiState.update { it.copy(flomList = latLngs) }
             } catch (e: Exception) {
                 println("Error fetching flood warnings: ${e.message}")

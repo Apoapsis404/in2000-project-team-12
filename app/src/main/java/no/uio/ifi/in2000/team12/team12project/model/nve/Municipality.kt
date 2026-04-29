@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class Municipality(
     val Id: Int,
     val Name: String,
-    val lat: Double,
-    val lon: Double
+    val lat: Double? = null,   //sendes ikke inn med kordinater så må kunne være null
+    val lon: Double? = null
 )
