@@ -133,7 +133,6 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 println(uiState.markerPosition)
 
                 askpermissonforlatlng = latLng
-                askforpermission = true
 
             },
             googleMapOptionsFactory = {
@@ -152,20 +151,25 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                         TextButton(
                             onClick = {
                             scope.launch {
-                                val (name, address) = getNameandAdress(
+                                val tempname = "temp_${System.currentTimeMillis()}" //temporary name so it is easier to tell apart the diffrent adresses in order to rename
+
+                                val (name, address) = getNameandAdress( //name is no longer used
                                     context,
                                     askpermissonforlatlng!!.latitude,
                                     askpermissonforlatlng!!.longitude
                                 )
+                                //navigates to favorite screen
+                                navHostController.navigate("favorites")
 
-                            favoritesScreenViewModel.addFavoriteLocation(
+                                favoritesScreenViewModel.addFavoriteLocation(
                                 location = askpermissonforlatlng!!,
-                                name = name.toString(), //add apart of the address. will later on add ability to change the name
+                                name = tempname , //"add name",//name.toString(), //add apart of the address. will later on add ability to change the name
                                 address = address.toString()
                             )
-                        }
+
+                            }
                             askforpermission = false
-                        }) {
+                            }) {
                             Text("yessssssssssirrrr")
                         }
                     },
@@ -178,12 +182,9 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             }
             Marker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
-                title = uiState.markerTitle,
+                title = uiState.markerTitle ,
                 onClick = {
-                    //askpermissonforlatlng = uiState.markerPosition
-                    //askforpermission = true
                     true
-                    //println("marker clicked at ${uiState.markerPosition}") ; true}
                 }
 
             )
