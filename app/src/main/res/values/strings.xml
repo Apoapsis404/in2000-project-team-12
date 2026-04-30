@@ -42,5 +42,6 @@
     <string name="cont_desc_menu">Menu</string>
     <string name="plant_prognosis_button">Plant prognosis</string>
     <string name="show_avg">Show average</string>
+    <string name="plant_popup_header">Plant prognosis</string>
 
 </resources>

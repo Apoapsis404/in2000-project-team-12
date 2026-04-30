@@ -13,7 +13,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,11 +62,13 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.BulletedList
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.DropDown
+import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.PlantPopup
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.RoundCornerButton
 
 // Graph library used:
 // https://github.com/patrykandpatrick/vico
 
+@OptIn(ExperimentalMaterial3Api::class) // For ModalBottomSheet (Plant popup)
 @Composable
 fun GraphScreen(
     modifier: Modifier = Modifier,
@@ -193,11 +197,18 @@ fun GraphScreen(
                 )
             }
             Button(
-                onClick = {},
+                onClick = { graphScreenViewModel.openPopup() },
                 modifier = Modifier
                     .fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.plant_prognosis_button))
+            }
+            if(uiState.showPopup) {
+                ModalBottomSheet(
+                    onDismissRequest = { graphScreenViewModel.closePopup() },
+                ){
+                    PlantPopup(graphScreenViewModel, uiState)
+                }
             }
         }
     }

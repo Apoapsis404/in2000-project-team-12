@@ -37,6 +37,7 @@ data class GraphScreenUiState(
     val isLoading : Boolean = false,
     val errorMessage : String? = null,
     val showMean: Boolean = false,
+    val showPopup: Boolean = true, // sett til false
 )
 
 
@@ -133,4 +134,13 @@ class GraphScreenViewModel(
         }
         _uiState.update { it.copy(climateChartData = chartData) }
     }
+
+    fun openPopup() {
+        _uiState.update { it.copy(showPopup = true) }
+    }
+    fun closePopup(){
+        _uiState.update { it.copy(showPopup = false) }
+    }
+
+
 }
