@@ -44,7 +44,7 @@ fun Navigator(
             route = "graph"
         ) {
             graphViewModel.setMarkerPosition(homeViewModel.getMarkerPosition())
-            graphViewModel.getClimateObs()
+            graphViewModel.fetchAllClimateData()
             GraphScreen(graphScreenViewModel = graphViewModel)
 
         }
