@@ -27,4 +27,5 @@
     <string name="home">Home</string>
     <string name="favorites_popup_title">favorites?</string>
     <string name="compare_year">Compare by year</string>
+    <string name="plant_prognosis_button">Plant prognosis</string>
 </resources>

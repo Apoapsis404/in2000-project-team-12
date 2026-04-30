@@ -95,26 +95,6 @@ fun GraphScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 16.dp, bottom = 12.dp),
-                horizontalArrangement = Arrangement.Center
-
-            ) {
-                RoundCornerButton(
-                    label = stringResource(R.string.compare_year),
-                    selected = yearSelected,
-                    onClick = { yearSelected = true },
-                )
-
-                RoundCornerButton(
-                    label = stringResource(R.string.compare_month),
-                    selected = !yearSelected,
-                    onClick = { yearSelected = false }
-                )
-
-            }
             when{
                 uiState.isLoading -> {
                     Column(modifier = Modifier
@@ -165,13 +145,15 @@ fun GraphScreen(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             ) {
                 Checkbox(
                     checked = uiState.showMean,
                     onCheckedChange = { graphScreenViewModel.toggleMean(it) }
                 )
-                Text(text = "Vis gjennomsnitt")
+                Text(text = stringResource(R.string.show_avg))
             }
         }
 
@@ -209,6 +191,13 @@ fun GraphScreen(
                     meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.PRECIPITATION, uiState.month) ?: 0.0,
                     onClick = {}
                 )
+            }
+            Button(
+                onClick = {},
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.plant_prognosis_button))
             }
         }
     }

@@ -40,5 +40,7 @@
     <string name="settings">Settings</string>
     <string name="app_title" translatable="false">Almanakken</string>
     <string name="cont_desc_menu">Menu</string>
+    <string name="plant_prognosis_button">Plant prognosis</string>
+    <string name="show_avg">Show average</string>
 
 </resources>
