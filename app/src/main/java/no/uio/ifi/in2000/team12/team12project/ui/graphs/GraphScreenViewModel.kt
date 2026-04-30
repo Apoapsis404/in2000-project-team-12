@@ -58,7 +58,6 @@ class GraphScreenViewModel(
 
     fun fetchAllClimateData() {
         val position = _uiState.value.markerPosition
-        val month = _uiState.value.month
         graphDataFetchJob?.cancel()
 
         graphDataFetchJob = viewModelScope.launch {
@@ -66,18 +65,13 @@ class GraphScreenViewModel(
             try {
                 val refTime = constructTimeSeries(120u)
 
-                // Fetch all types in parallel
+                // Fetches all climate types in parallel
                 val deferreds = ClimateType.entries.map { type ->
                     async {
                         try {
                             val obs = climateDataRepository.getClimateDataFailing(position, type, refTime)
                             val climateData = ClimateData(refTime, obs, type)
                             graphScreenData.setClimateData(type, climateData)
-
-                            // Pre-calculate mean for current month
-                            val obsFromMonth = getObsFromMonth(month, obs)
-                            val mean = findMeanValue(obsFromMonth)
-                            graphScreenData.setMean(type, month, mean)
                         } catch (e: CancellationException) {
                             throw e
                         } catch (e: Exception) {
@@ -87,7 +81,6 @@ class GraphScreenViewModel(
                 }
                 deferreds.awaitAll()
 
-                // Update UI with the currently selected type's data
                 updateChartData()
                 _uiState.update { it.copy(isLoading = false) }
             } catch (e: CancellationException) {
