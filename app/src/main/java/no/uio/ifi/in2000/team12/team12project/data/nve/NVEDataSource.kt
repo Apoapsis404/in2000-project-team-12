@@ -3,6 +3,8 @@ package no.uio.ifi.in2000.team12.team12project.data.nve
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
 import no.uio.ifi.in2000.team12.team12project.model.nve.FloodWarning
@@ -25,37 +27,40 @@ class NVEDataSource(val context: Context){
 
             println("total warnings = ${allWarnings.size}")
 
-            val coordinateMap = loadCoordinates()
+            // Move heavy processing to background thread
+            return withContext(Dispatchers.Default) {
+                val coordinateMap = loadCoordinates()
+                println("loaded ${coordinateMap.size} coordinates from CSV")
 
-            // vil sortere etter de som har hatt flom med farenivå som 2 eller mer hvertfall 2 ganger. Den henter bare fra siste 16 år
-            val relevantEventIds = allWarnings
-                .filter { it.ActivityLevel >= 2 }
-                .groupBy { it.EventId }
-                .filter { it.value.size >= 2 }
-                .keys
+                // vil sortere etter de som har hatt flom med farenivå som 2 eller mer hvertfall 2 ganger. Den henter bare fra siste 16 år
+                val relevantEventIds = allWarnings
+                    .filter { it.ActivityLevel >= 3 }
+                    .groupBy { it.EventId }
+                    .filter { it.value.size >= 2 }
+                    .keys
 
-            return allWarnings.filter { it.EventId in relevantEventIds }
-                .map { warning ->
-                    warning.copy(
-                        MunicipalityList = warning.MunicipalityList.map { municipality ->
-                            val coordinates = coordinateMap[municipality.Id]
-                                ?: throw IllegalStateException("No coordinates found for municipality ${municipality.Name}")
-                            municipality.copy(
-                                lat = coordinates.first,
-                                lon = coordinates.second
-                            )
-                        }
-                    )
-                }
+                println("filtered to ${relevantEventIds.size} relevant event IDs")
 
-//        val warnings = listOf("Nord-Fron", "Sør-Fron", "Ringebu",
-//            "Lillehammer", "Gjøvik", "Gol", "Ål", "Flå", "Aurland", "Evje", "Stryn"
-//        )
-//        return warnings.mapNotNull { name ->
-//            coordinateMap[name]
-//        }
+                val filtered = allWarnings.filter { it.EventId in relevantEventIds }
+                println("filtered warnings: ${filtered.size}")
 
-
+                filtered
+                    .map { warning ->
+                        warning.copy(
+                            MunicipalityList = warning.MunicipalityList.mapNotNull { municipality ->
+                                val coordinates = coordinateMap[municipality.Id]
+                                if (coordinates != null) {
+                                    municipality.copy(
+                                        lat = coordinates.first,
+                                        lon = coordinates.second
+                                    )
+                                } else {
+                                    null
+                                }
+                            }
+                        )
+                    }
+            }
         } else {
             throw Exception("Error getting flood warnings: ${response.status}")
         }
@@ -69,12 +74,16 @@ class NVEDataSource(val context: Context){
                 reader.forEachLine { line ->
                     val part = line.split("\t")
                     if (part.size >= 4) {
-                        val id = part[0].toInt()
-                        val name = part[1].trim()
-                        val lat = part[2].toDouble()
-                        val lon = part[3].toDouble()
+                        try {
+                            val id = part[0].toInt()
+                            val name = part[1].trim()
+                            val lat = part[2].toDouble()
+                            val lon = part[3].toDouble()
 
-                        coordinateMap[id] = Pair(lat, lon)
+                            coordinateMap[id] = Pair(lat, lon)
+                        } catch (e: Exception) {
+                            // Skip malformed lines
+                        }
                         //coordinateMap[name] = Pair(lat, lon)
                     }
                 }

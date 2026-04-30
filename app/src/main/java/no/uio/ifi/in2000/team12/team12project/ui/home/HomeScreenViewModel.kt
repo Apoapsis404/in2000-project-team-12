@@ -61,7 +61,6 @@ data class HomeScreenUiState(
     ),
 
     val flomList: List<LatLng> = emptyList()
-
 //    val flomList: List<LatLng> = listOf(
 //        LatLng(59.98, 10.75),
 //        LatLng(59.97, 10.77),
@@ -148,12 +147,14 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
         viewModelScope.launch {
             try {
                 val warnings = nveRepository.getFloodWarnings()
+                println("Fetched ${warnings.size} flood warnings")
                 val latLngs = warnings.flatMap { warning ->
                     warning.MunicipalityList.map {
-                        //println("flood warning at ${it.lat}, ${it.lon}")
+                        println("flood warning at ${it.lat}, ${it.lon}")
                         LatLng(it.lat!!, it.lon!!)
                     }
                 }
+                println("Converted to ${latLngs.size} LatLng markers")
                 //val latLngs = warnings.map { LatLng(it.first, it.second) }
                 _uiState.update { it.copy(flomList = latLngs) }
             } catch (e: Exception) {
