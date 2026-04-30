@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team12.team12project.data.frost
 
 import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
+import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
@@ -113,6 +114,6 @@ class WeatherDataRepository {
             years.add(year)
             data.add(mean)
         }
-        return ClimateChartData(years, data, data.average())
+        return ClimateChartData(years, data)
     }
 }

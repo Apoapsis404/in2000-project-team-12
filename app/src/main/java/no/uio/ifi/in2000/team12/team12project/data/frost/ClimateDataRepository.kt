@@ -7,12 +7,6 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 
 
-data class ClimateChartData(
-    val years: List<Double>,
-    val values: List<Double>,
-    val mean: Double,
-)
-
 
 class ClimateDataRepository(
     private val climateDataSource: ClimateDataSource = ClimateDataSource(),

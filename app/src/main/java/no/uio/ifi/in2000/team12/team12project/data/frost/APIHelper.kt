@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.google.android.gms.maps.model.LatLng
+import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
@@ -125,7 +126,6 @@ fun getYearAndData(climateObsList: List<ClimateObs>): ClimateChartData {
     return ClimateChartData(
         years = years,
         values = values,
-        mean = values.average()
     )
 }
 

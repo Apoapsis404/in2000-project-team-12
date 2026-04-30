@@ -87,7 +87,7 @@ fun GraphScreen(
                 lineSeries {
                     series(uiState.climateChartData.years, uiState.climateChartData.values)
                     if (uiState.showMean) {
-                        series(uiState.climateChartData.years, List(uiState.climateChartData.years.size) { uiState.climateChartData.mean })
+                        series(uiState.climateChartData.years, List(uiState.climateChartData.years.size) { uiState.climateChartData.values.average() })
                     }
                 }
             }
