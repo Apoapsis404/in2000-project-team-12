@@ -56,6 +56,11 @@ class GraphScreenViewModel(
 
     private var graphDataFetchJob : Job? = null
 
+    fun getClimateObs(){
+        _uiState.update{
+            it.copy(climateObs = graphScreenData.getClimateData(_uiState.value.climateType)!!.climateObs)
+        }
+    }
     fun fetchAllClimateData() {
         val position = _uiState.value.markerPosition
         graphDataFetchJob?.cancel()
