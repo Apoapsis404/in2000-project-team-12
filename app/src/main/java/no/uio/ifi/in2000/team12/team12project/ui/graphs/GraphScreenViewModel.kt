@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -14,11 +16,14 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
-import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateChartData
 import no.uio.ifi.in2000.team12.team12project.data.frost.Round
 import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
+import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
+import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
+import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
-import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateDataSearch
+import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateData
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
@@ -47,51 +52,50 @@ class GraphScreenViewModel(
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    val climateObsMap = mutableMapOf<Pair<LatLng, ClimateType>, ClimateDataSearch>()
+    val graphScreenData = GraphScreenData(_uiState.value.markerPosition)
 
     private var graphDataFetchJob : Job? = null
 
-    fun getClimateObs() {
-        Log.d("GraphScreenViewModel", "Climate type: ${_uiState.value.climateType}")
-        graphDataFetchJob?.cancel()
-
-        if (climateObsMap.containsKey(_uiState.value.markerPosition.Round(3) to _uiState.value.climateType)){
-            Log.d("GraphScreenViewModel", "Found in map")
-            val climateDataSearch = climateObsMap[_uiState.value.markerPosition.Round(3) to _uiState.value.climateType]!!
-            _uiState.update { it.copy(climateObs = climateDataSearch.climateObs) }
-            updateChartData()
-            return
+    fun getClimateObs(){
+        _uiState.update{
+            it.copy(climateObs = graphScreenData.getClimateData(_uiState.value.climateType)!!.climateObs)
         }
+    }
+    fun fetchAllClimateData() {
+        val position = _uiState.value.markerPosition
+        graphDataFetchJob?.cancel()
 
         graphDataFetchJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 val refTime = constructTimeSeries(120u)
-                val obs = climateDataRepository.getClimateDataFailing(
-                    _uiState.value.markerPosition,
-                    _uiState.value.climateType,
-                    refTime
-                )
-                _uiState.update { it.copy(climateObs = obs, isLoading = false) }
-                val climateDataSearch = ClimateDataSearch(
-                    _uiState.value.markerPosition.Round(3),
-                    _uiState.value.climateType,
-                    refTime,
-                    obs,
-                )
-                climateObsMap[_uiState.value.markerPosition.Round(3) to _uiState.value.climateType] = climateDataSearch
+
+                // Fetches all climate types in parallel
+                val deferreds = ClimateType.entries.map { type ->
+                    async {
+                        try {
+                            val obs = climateDataRepository.getClimateDataFailing(position, type, refTime)
+                            val climateData = ClimateData(refTime, obs, type)
+                            graphScreenData.setClimateData(type, climateData)
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            Log.e("GraphViewModel", "Failed to fetch $type", e)
+                        }
+                    }
+                }
+                deferreds.awaitAll()
+
                 updateChartData()
-            } catch (e: NoAvailableTimeSeriesException) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.no_data_available)) }
+                _uiState.update { it.copy(isLoading = false) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: context.getString(
-                    R.string.unexpected_error
-                )) }
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Error loading data") }
             }
         }
     }
+
 
     fun setMonth(month: Months) {
         _uiState.update { it.copy(month = month) }
@@ -110,9 +114,23 @@ class GraphScreenViewModel(
         _uiState.update { it.copy(showMean = show) }
     }
 
-    private fun updateChartData(climateObsList: List<ClimateObs> = _uiState.value.climateObs) {
-        val climateObs = climateDataRepository.getObsFromMonth(_uiState.value.month, climateObsList)
-        val chartData = climateDataRepository.getYearAndData(climateObs)
+    fun getMean(climateType: ClimateType, month: Months): Double? {
+        if (!graphScreenData.containsKey(climateType, month)) {
+            // Calculate mean and store it in the map
+            val obsFromMonth = getObsFromMonth(month, graphScreenData.getClimateData(climateType)!!.climateObs)
+            val mean = findMeanValue(obsFromMonth)
+            graphScreenData.setMean(climateType, month, mean)
+            return mean
+        }
+        return graphScreenData.getMean(climateType, month)
+    }
+
+    private fun updateChartData(climateType: ClimateType = _uiState.value.climateType) {
+        val chartData: ClimateChartData? = graphScreenData.getClimateChartData(climateType, _uiState.value.month)
+        if (chartData == null) {
+            _uiState.update { it.copy(climateChartData = ClimateChartData(emptyList(), emptyList())) }
+            return
+        }
         _uiState.update { it.copy(climateChartData = chartData) }
     }
 }
