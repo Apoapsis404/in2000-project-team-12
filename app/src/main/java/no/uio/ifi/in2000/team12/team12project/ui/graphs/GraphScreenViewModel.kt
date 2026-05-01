@@ -23,10 +23,12 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
 import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
+import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateData
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
+import java.util.PriorityQueue
 
 data class GraphScreenUiState(
     val climateObs: List<ClimateObs> = emptyList(),
@@ -38,6 +40,8 @@ data class GraphScreenUiState(
     val errorMessage : String? = null,
     val showMean: Boolean = false,
     val showPopup: Boolean = true, // sett til false
+    val yearSelected: Float = 2026f,
+    val predictedTemperature: Float = 0f,
 )
 
 
@@ -135,11 +139,22 @@ class GraphScreenViewModel(
         _uiState.update { it.copy(climateChartData = chartData) }
     }
 
+    // REPLACE THIS FUNCTION
+    fun updatePredictedTemperature(){
+        _uiState.update { it.copy(predictedTemperature = (it.yearSelected - 2026) * 0.2f +10)}
+    }
+
     fun openPopup() {
         _uiState.update { it.copy(showPopup = true) }
     }
     fun closePopup(){
         _uiState.update { it.copy(showPopup = false) }
+    }
+    fun updateSelectedYear(year: Float) {
+        _uiState.update { it.copy(yearSelected = year) }
+    }
+    fun getBestPlants(targetTemp: Float): PriorityQueue<Plant>{
+        return plantsRepository.getBestPlantsPriorityQueue(targetTemp.toInt())
     }
 
 

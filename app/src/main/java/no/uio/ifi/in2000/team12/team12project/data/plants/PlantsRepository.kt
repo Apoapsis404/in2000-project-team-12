@@ -37,7 +37,7 @@ class PlantsRepository(private val context: Context){
 
         val bestList = mutableListOf<Plant>()
         for(i in 0 until quantity){
-            if(heap.isNotEmpty()) bestList.add(heap.poll())
+            if(heap.isNotEmpty()) bestList.add(heap.poll()!!)
         }
         return bestList
     }

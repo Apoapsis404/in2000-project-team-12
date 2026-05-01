@@ -236,7 +236,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     onValueChange = {
                         homeScreenViewModel.setSearchQuery(it)
                         //DENNE MÅ REAKTIVERES FOR Å FÅ FORSLAG PÅ SØK
-                        //homeScreenViewModel.fetchSuggestions(it)
+                        // homeScreenViewModel.fetchSuggestions(it)
                     },
                     placeholder = { Text(stringResource(R.string.search_location)) },
                     singleLine = true,
