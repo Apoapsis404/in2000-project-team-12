@@ -21,7 +21,7 @@ class PlantsRepository(private val context: Context){
     }
 
     private fun getPlantData(): List<Plant>{
-        val jsonString = getTextFromResources(R.raw.plants_data)
+        val jsonString = getTextFromResources(R.raw.plants_datav2)
         return Json.decodeFromString(jsonString)
     }
 

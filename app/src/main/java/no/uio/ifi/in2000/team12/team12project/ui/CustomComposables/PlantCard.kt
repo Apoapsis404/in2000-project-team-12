@@ -1,8 +1,11 @@
 package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,8 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.sqlite.throwSQLiteException
 import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
 
 @Composable
@@ -34,7 +40,7 @@ fun PlantCard(
             .shadow(elevation = 6.dp, shape = RoundedCornerShape(20.dp), spotColor = Color(0x1A000000))
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.primary)
-            .padding(horizontal = 20.dp, vertical = 18.dp),
+            .padding(horizontal = 18.dp, vertical = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -45,18 +51,67 @@ fun PlantCard(
             imageVector = Icons.Default.Nature,
             contentDescription = plant.category,
             tint = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(80.dp)
         )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = spacedBy(2.dp)
+        ) {
+            PlantInfoRow(
+                "Ideal temp",
+                "${plant.optimal_temp_min.toInt()}°C - ${plant.optimal_temp_max.toInt()}°C",
+            )
+            PlantInfoRow(
+                "Tolerance range: ",
+                "${plant.temp_min.toInt()}°C - ${plant.temp_max.toInt()}°C"
+            )
+            PlantInfoRow(
+                "Humidity:",
+                "${plant.humidity_min.toInt()}? - ${plant.humidity_max.toInt()}?"
+            )
+            PlantInfoRow(
+                "Sunshine:",
+                "${plant.sunshine_min.toInt()}? - ${plant.sunshine_max.toInt()}?"
+            )
+            PlantInfoRow(
+                "Precipitation:",
+                "${plant.precipitation_min.toInt()}mm - ${plant.precipitation_max.toInt()}mm"
+            )
+        }
+
+    }
+}
+
+@Composable
+fun PlantInfoRow(
+    text: String,
+    value: String,
+){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        //verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Text(
-            text = "Optimal range: ${plant.optimal_temp_min}°C - ${plant.optimal_temp_max}°C"
+            text = text,
+            fontSize = 10.sp,
+            lineHeight = 6.sp
         )
-        Text("Sol: afsaff")
-        Text("Fukt: sakfjaksfj")
+        //Spacer(modifier = Modifier.size(2.dp))
+        Text(
+            text = value,
+            fontSize = 14.sp,
+            lineHeight = 8.sp
+
+        )
     }
 }
 
 @Preview
 @Composable
 fun PreviewPlantCard(){
-    PlantCard(plant = Plant(0, "Epletre", "Tre", 10, 20, 0, 30))
+    PlantCard(plant = Plant(0, "Epletre", "Tre", 10f, 20f, 0f, 30f, 0f, 100f, 0f, 30f, 0f, 10f))
 }

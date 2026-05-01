@@ -1,6 +1,9 @@
 package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -24,11 +27,12 @@ fun PlantPopup(
     uiState: GraphScreenUiState,
     modifier: Modifier = Modifier
 ){
-    var plantPq = graphScreenViewModel.getBestPlants(uiState.predictedTemperature)
+    val plantPq = graphScreenViewModel.getBestPlants(uiState.predictedTemperature)
     Column(
        modifier =  Modifier
            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(stringResource(R.string.plant_popup_header))
         DropDown<Months>(
@@ -42,11 +46,10 @@ fun PlantPopup(
             steps = 100,
             onValueChange = {
                 graphScreenViewModel.updateSelectedYear(it)
-                //plantPq = graphScreenViewModel.getBestPlants(uiState.predictedTemperature)
                 graphScreenViewModel.updatePredictedTemperature()
             } ,
             modifier = Modifier
-                .padding(start = 12.dp, end = 12.dp)
+                .padding(start = 24.dp, end = 24.dp)
                 .fillMaxWidth(),
 
             )
@@ -55,15 +58,25 @@ fun PlantPopup(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         Text(
-                "predicted temp: ${uiState.predictedTemperature}",
+                "predicted temp: ${uiState.predictedTemperature}C",
         modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        LazyRow(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-        ) {
+            verticalArrangement = Arrangement.Center
+        ){
             val plantCount = if (plantPq.size > 3) 3 else plantPq.size
-            items(plantCount) {
-                PlantCard(plantPq.poll()!!)
+            if(plantCount <= 0){
+                Text("No plants found")
+            }else {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    items(plantCount) {
+                        PlantCard(plantPq.poll()!!)
+                    }
+                }
             }
         }
     }
