@@ -125,7 +125,7 @@ class GraphScreenViewModel(
         return graphScreenData.getMean(climateType, month)
     }
 
-    private fun updateChartData(climateType: ClimateType = _uiState.value.climateType) {
+    fun updateChartData(climateType: ClimateType = _uiState.value.climateType) {
         val chartData: ClimateChartData? = graphScreenData.getClimateChartData(climateType, _uiState.value.month)
         if (chartData == null) {
             _uiState.update { it.copy(climateChartData = ClimateChartData(emptyList(), emptyList())) }
