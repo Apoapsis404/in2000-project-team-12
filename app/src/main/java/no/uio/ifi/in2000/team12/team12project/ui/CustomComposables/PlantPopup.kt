@@ -1,10 +1,8 @@
 package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -14,15 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team12.team12project.R
-import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenUiState
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
-import java.util.PriorityQueue
 
 @Composable
 fun PlantPopup(
@@ -30,7 +24,12 @@ fun PlantPopup(
     uiState: GraphScreenUiState,
     modifier: Modifier = Modifier
 ){
-    val plantPq = graphScreenViewModel.getBestPlants(uiState.predictedTemperature)
+    val plantPq = graphScreenViewModel.getBestPlants(
+        uiState.predictedTemperature,
+        targetHumidity = uiState.predictedHumidity,
+        targetSunshine = uiState.predictedSunshine,
+        targetPrecipitation = uiState.predictedPrecipitation,
+    )
     Column(
        modifier =  Modifier
            .fillMaxWidth(),
@@ -51,7 +50,7 @@ fun PlantPopup(
             steps = 100,
             onValueChange = {
                 graphScreenViewModel.updateSelectedYear(it)
-                graphScreenViewModel.updatePredictedTemperature()
+                graphScreenViewModel.updatePredictedClimate()
             } ,
             modifier = Modifier
                 .padding(start = 24.dp, end = 24.dp)
@@ -61,10 +60,26 @@ fun PlantPopup(
             "Selected year: ${uiState.yearSelected.toInt()}",
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        Text(
+        Column(
+            verticalArrangement = spacedBy(1.dp)
+        ) {
+            Text(
                 "predicted temp: ${uiState.predictedTemperature}C",
-        modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Text(
+                "predicted humidity: ${uiState.predictedHumidity}?",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Text(
+                "predicted sunshine: ${uiState.predictedSunshine}?",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Text(
+                "predicted precipitation: ${uiState.predictedPrecipitation}mm",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.Center

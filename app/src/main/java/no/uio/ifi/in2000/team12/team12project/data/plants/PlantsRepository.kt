@@ -43,12 +43,12 @@ class PlantsRepository(private val context: Context){
     }
 
 
-    fun getBestPlantsPriorityQueue(targetTemp: Float): PriorityQueue<Plant>{
+    fun getBestPlantsPriorityQueue(targetTemp: Float, targetHumidity: Float, targetSunshine: Float, targetPrecipitation: Float): PriorityQueue<Plant>{
         val pq = PriorityQueue<Plant>(
             compareBy<Plant> { kotlin.math.abs(((it.optimal_temp_min+it.optimal_temp_max)/2.0)-targetTemp) }
-                .thenBy { it.humidity_max - it.humidity_min }
-                .thenBy { it.sunshine_max - it.sunshine_min }
-                .thenBy { it.precipitation_max - it.precipitation_min }
+                .thenBy {kotlin.math.abs(((it.humidity_min+it.humidity_max)/2.0)-targetHumidity)}
+                .thenBy { kotlin.math.abs(((it.sunshine_min+it.sunshine_max)/2.0)-targetSunshine)}
+                .thenBy { kotlin.math.abs(((it.precipitation_min+it.precipitation_max)/2.0)-targetPrecipitation) }
         )
         plantList
             .filter { targetTemp >= it.temp_min && targetTemp <= it.temp_max }

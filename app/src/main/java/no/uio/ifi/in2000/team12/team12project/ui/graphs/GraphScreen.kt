@@ -197,7 +197,10 @@ fun GraphScreen(
                 )
             }
             Button(
-                onClick = { graphScreenViewModel.openPopup() },
+                onClick = {
+                    graphScreenViewModel.openPopup()
+                    graphScreenViewModel.updatePredictedClimate()
+                    },
                 modifier = Modifier
                     .fillMaxWidth(),
             ) {
