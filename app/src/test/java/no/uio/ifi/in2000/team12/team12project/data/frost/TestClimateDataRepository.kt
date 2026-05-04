@@ -37,7 +37,7 @@ class TestClimateDataRepository {
         // Mean of obs1: (10+20)/2 = 15.0
         // Mean of obs2: 30.0
         // Total mean: (15+30)/2 = 22.5
-        val result = repository.findMeanValue(observations)
+        val result = findMeanValue(observations)
         assertEquals(22.5, result, 0.001)
     }
 
@@ -51,7 +51,7 @@ class TestClimateDataRepository {
                 Observation("temp", 15.0, "C")
             )
         )
-        val result = repository.findMeanObs(obs)
+        val result = findMeanObs(obs)
         assertEquals(10.0, result, 0.001)
     }
 
@@ -69,7 +69,7 @@ class TestClimateDataRepository {
                 observations = listOf(Observation("temp", 20.0, "C"))
             )
         )
-        val result = repository.getYearAndData(observations)
+        val result = getYearAndData(observations)
         assertEquals(listOf(2023.0, 2024.0), result.years)
         assertEquals(listOf(10.0, 20.0), result.values)
     }
@@ -85,10 +85,10 @@ class TestClimateDataRepository {
         assertTrue(result.isNotEmpty(), "Should return weather observations")
 
         // Test getObsFromYear and getObsFromMonth using the populated internal state
-        val obs2023 = repository.getObsFromYear(2023, result)
+        val obs2023 = getObsFromYear(2023, result)
         assertTrue(obs2023.isNotEmpty(), "Should find observations for 2023")
 
-        val janObs = repository.getObsFromMonth(Months.JANUARY, result)
+        val janObs = getObsFromMonth(Months.JANUARY, result)
         janObs.forEach { obs ->
             assertTrue(obs.referenceTime.contains("-01-"), "Observation should be from January")
         }
