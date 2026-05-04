@@ -35,6 +35,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
@@ -47,14 +48,16 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,6 +71,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.InfoPopup
+import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.PlantPopup
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
@@ -261,6 +266,8 @@ fun Header(
     val navStackBackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navStackBackEntry?.destination?.route
 
+    // Put inside a viewModel?
+    var showPopup by remember { mutableStateOf(false) }
 
 
     scope.launch {
@@ -323,11 +330,18 @@ fun Header(
                 TopBarIcon({ navHostController.navigate("graph") }, Icons.Outlined.DataThresholding, "menu")
             }
             //Information symbol
-            TopBarIcon({}, Icons.Outlined.Info, "Information")
+            TopBarIcon({showPopup = true}, Icons.Outlined.Info, "Information")
 
         }
 
     )
+    if(showPopup) {
+        ModalBottomSheet(
+            onDismissRequest = {showPopup = false},
+        ){
+            InfoPopup(if (currentRoute == "graph") "graph" else "home")
+        }
+    }
 }
 
 @Composable
@@ -344,6 +358,8 @@ fun TopBarIcon(
         )
     }
 }
+
+
 
 @Preview
 @Composable
