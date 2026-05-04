@@ -196,6 +196,15 @@ fun MainComp(
                     colors = drawerItemColors
                 )
                 NavigationDrawerItem(
+                    label = { Text(stringResource(R.string.climate_graph)) },
+                    selected = false,
+                    onClick = {
+                        navController.navigate("graph")
+                        scope.launch { drawerState.close() }
+                    },
+                    colors = drawerItemColors
+                )
+                NavigationDrawerItem(
                     label = { Text(stringResource(R.string.favorites)) },
                     selected = false,
                     onClick = {

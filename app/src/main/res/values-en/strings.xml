@@ -24,7 +24,7 @@
     <string name="menu">Menu</string>
     <string name="cont_desc_menu">Menu</string>
     <string name="cont_desc_exit">Exit</string>
-    <string name="home">Home</string>
+    <string name="home">Home/Map</string>
     <string name="favorites_popup_title">favorites?</string>
     <string name="compare_year">Compare by year</string>
     <string name="plant_prognosis_button">Plant prognosis</string>
