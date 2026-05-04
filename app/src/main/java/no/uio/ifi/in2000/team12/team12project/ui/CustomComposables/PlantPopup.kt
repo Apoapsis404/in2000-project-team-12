@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
@@ -34,7 +37,9 @@ fun PlantPopup(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(stringResource(R.string.plant_popup_header))
+        Text(
+            stringResource(R.string.plant_popup_header),
+        )
         DropDown<Months>(
             uiState.month.toString(),
             onClick = {graphScreenViewModel.setMonth(it)},
@@ -51,7 +56,6 @@ fun PlantPopup(
             modifier = Modifier
                 .padding(start = 24.dp, end = 24.dp)
                 .fillMaxWidth(),
-
             )
         Text(
             "Selected year: ${uiState.yearSelected.toInt()}",
@@ -81,3 +85,5 @@ fun PlantPopup(
         }
     }
 }
+
+

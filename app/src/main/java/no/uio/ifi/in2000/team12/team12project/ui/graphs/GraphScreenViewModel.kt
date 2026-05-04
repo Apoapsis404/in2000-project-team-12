@@ -154,7 +154,7 @@ class GraphScreenViewModel(
         _uiState.update { it.copy(yearSelected = year) }
     }
     fun getBestPlants(targetTemp: Float): PriorityQueue<Plant>{
-        return plantsRepository.getBestPlantsPriorityQueue(targetTemp.toInt())
+        return plantsRepository.getBestPlantsPriorityQueue(targetTemp)
     }
 
 
