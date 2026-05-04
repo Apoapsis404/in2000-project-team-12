@@ -157,10 +157,10 @@ fun GraphScreen(
                 DropDown<Months>(uiState.month.toString(), modifier = modifier.weight(1f)) {
                     graphScreenViewModel.setMonth(it)
                 }
-                DropDown<ClimateType>(uiState.climateType.toString(), modifier = modifier.weight(1f)) {
-                    graphScreenViewModel.setClimateType(it)
-                    graphScreenViewModel.getClimateObs()
-                }
+//                DropDown<ClimateType>(uiState.climateType.toString(), modifier = modifier.weight(1f)) {
+//                    graphScreenViewModel.setClimateType(it)
+//                    graphScreenViewModel.getClimateObs()
+//                }
             }
 
             Row(
