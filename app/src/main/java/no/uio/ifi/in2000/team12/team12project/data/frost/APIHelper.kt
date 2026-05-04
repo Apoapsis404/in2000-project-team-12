@@ -198,3 +198,11 @@ fun findMeanObs(climateObs: ClimateObs): Double {
     val sum = observations.sumOf { it.value }
     return sum / observations.size
 }
+
+fun findMaxObs(climateObs: ClimateObs): Double {
+    val observations = climateObs.observations
+    require(observations.isNotEmpty()) {
+        "Cannot compute max of ClimateObs with no observations"
+    }
+    return observations.maxOf { it.value }
+}
