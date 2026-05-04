@@ -3,6 +3,9 @@ package no.uio.ifi.in2000.team12.team12project.data.frost
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 
+const val durationElement = "sum(duration_of_precipitation PT1H)"
+const val amountElement = "sum(precipitation_amount P1D)"
+
 class TorrentialRain(
     private val climateDataRepository: ClimateDataRepository = ClimateDataRepository()
 ) {
@@ -12,20 +15,20 @@ class TorrentialRain(
      * Amount precipitation in a day / sum of minutes it has rained that day
      * sum of minutes is found by adding up the duration in minutes individual hours of the day (annoying!)
      */
-    private val torrentialRainRate = 7.5 // mm/hr
+    private val torrentialRainRate = 7.5 // mm/hr (source: Gemini)
+
+    /**
+     * Found that some observation where the duration of precipitation
+     * where really low, especially compared to the precipitation amount
+     * so limits the minimum duration of precipitation to 30 minutes
+     */
     private val minPrecipitationDuration = 30 // minutes
 
-    suspend fun getPrecipitationDuration(sourceId: String, monthsBack: UInt): List<ClimateObs> {
-        val elementId = "sum(duration_of_precipitation PT1H)"
+    suspend fun getClimateData(sourceId: String, monthsBack: UInt, elementId: String): List<ClimateObs> {
         val obs = climateDataRepository.getClimateData(sourceId, elementId,constructTimeSeries(monthsBack))
         return obs
     }
 
-    suspend fun getPrecipitationAmount(sourceId: String, monthsBack: UInt): List<ClimateObs> {
-        val elementId = "sum(precipitation_amount P1D)"
-        val obs = climateDataRepository.getClimateData(sourceId, elementId,constructTimeSeries(monthsBack))
-        return obs
-    }
 
     fun calculateTorrentialRain(duration: List<ClimateObs>, amount: List<ClimateObs>): Int {
         var res = 0

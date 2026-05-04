@@ -10,21 +10,21 @@ class TestTorrentialRain {
 
     @Test
     fun testGetTorrentialRain() = runTest {
-        val obs = torrentialRain.getPrecipitationDuration("SN18700", 1u)
+        val obs = torrentialRain.getClimateData("SN18700", 1u, durationElement)
         printClimateObsList(obs)
     }
 
     @Test
     fun testGetPrecipitationAmount() = runTest {
-        val obs = torrentialRain.getPrecipitationAmount("SN18700", 1u)
+        val obs = torrentialRain.getClimateData("SN18700", 1u, amountElement)
         printClimateObsList(obs)
     }
 
     @Test
     fun testCalculateTorrentialRain() = runTest {
         val monthsBack = 120u
-        val duration = torrentialRain.getPrecipitationDuration("SN18700", monthsBack)
-        val amount = torrentialRain.getPrecipitationAmount("SN18700", monthsBack)
+        val duration = torrentialRain.getClimateData("SN18700", monthsBack, durationElement)
+        val amount = torrentialRain.getClimateData("SN18700", monthsBack, amountElement)
         val map = torrentialRain.calculateTorrentialRain(duration, amount)
         println(map)
     }
