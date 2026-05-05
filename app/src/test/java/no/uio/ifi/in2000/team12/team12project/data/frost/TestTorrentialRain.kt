@@ -28,4 +28,12 @@ class TestTorrentialRain {
         val map = torrentialRain.calculateTorrentialRain(duration, amount)
         println(map)
     }
+
+    @Test
+    fun testNeedName() = runTest {
+        val sourceId = "SN18700"
+        val res = torrentialRain.needsName(sourceId)
+        println(res)
+        assertTrue(res)
+    }
 }

@@ -40,6 +40,15 @@ class ClimateDataRepository(
         return result
     }
 
+    suspend fun getClimateTimeSeries(sourceId: String, elementId: String, fields: String = "validFrom"): String {
+        try {
+            val result = climateDataSource.getClimateTimeSeries(sourceId, elementId, fields)
+            return result
+        } catch (e: Exception) { //TODO handle specific exceptions
+            throw e
+        }
+    }
+
     /**
      * Try multiple nearby stations until data is found, optionally widening the search.
      */

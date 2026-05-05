@@ -1,16 +1,11 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
-import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import kotlin.collections.forEach
@@ -59,6 +54,27 @@ fun lastNMonths(n: UInt, currentDate: String): String {
     val fromYear = currentDate.split("-")[0].toInt() - years
     //println("fromYear: $fromYear, fromMonth: $fromMonth")
     return "$fromYear-${fromMonth.toString().padStart(2, '0')}-01"
+}
+
+fun monthsSince(date: String, currentDate: String = getCurrentDate()): Int {
+
+    println("Date: $date, Current Date: $currentDate")
+
+    val currentYear = currentDate.split("-")[0].toInt()
+    val currentMonth = currentDate.split("-")[1].toInt()
+
+    val year = date.split("-")[0].toInt()
+    val month = date.split("-")[1].toInt()
+
+    println("Year: $year, Month: $month")
+
+    return (currentYear - year) * 12 + (currentMonth - month)
+}
+
+fun yearsSince(date: String, currentDate: String = getCurrentDate()): Int {
+    val currentYear = currentDate.split("-")[0].toInt()
+    val year = date.split("-")[0].toInt()
+    return currentYear - year
 }
 
 
