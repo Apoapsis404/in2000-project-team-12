@@ -25,48 +25,37 @@ class NVEDataSource(val context: Context){
             val allWarnings = Json { ignoreUnknownKeys = true }
                 .decodeFromString<List<FloodWarning>>(responseBodyString)
 
-            println("total warnings = ${allWarnings.size}")
 
-            // Move heavy processing to background thread
             return withContext(Dispatchers.Default) {
                 val coordinateMap = loadCoordinates()
-                println("loaded ${coordinateMap.size} coordinates from CSV")
 
-                // vil sortere etter de som har hatt flom med farenivå som 2 eller mer hvertfall 2 ganger. Den henter bare fra siste 16 år
+                // vil sortere etter de som har hatt flom med farenivå som 4 eller mer hvertfall 8 ganger. Den henter bare fra siste 15 år
                 val relevantEventIds = allWarnings
-                    .filter { it.ActivityLevel >= 3 }
+                    .filter { it.ActivityLevel >= 4 }
                     .groupBy { it.EventId }
-                    .filter { it.value.size >= 2 }
+                    .filter { it.value.size >= 8 }
                     .keys
-
-                println("filtered to ${relevantEventIds.size} relevant event IDs")
 
                 val filtered = allWarnings.filter { it.EventId in relevantEventIds }
                 println("filtered warnings: ${filtered.size}")
 
-                filtered
-                    .map { warning ->
+                filtered.map { warning ->
                         warning.copy(
                             MunicipalityList = warning.MunicipalityList.mapNotNull { municipality ->
                                 val coordinates = coordinateMap[municipality.Id]
-                                if (coordinates != null) {
-                                    municipality.copy(
-                                        lat = coordinates.first,
-                                        lon = coordinates.second
-                                    )
-                                } else {
-                                    null
+                                coordinates?.let {(lat, lon) ->
+                                    municipality.copy(lat = lat, lon = lon)
                                 }
                             }
                         )
-                    }
+                }
             }
         } else {
             throw Exception("Error getting flood warnings: ${response.status}")
         }
     }
 
-    fun loadCoordinates(): Map<Int, Pair<Double, Double>> {  //endret fra int til string for denne testen
+    fun loadCoordinates(): Map<Int, Pair<Double, Double>> {
         val coordinateMap = mutableMapOf<Int, Pair<Double, Double>>()
         try {
             val inputStream = context.assets.open("kommuner.csv")
@@ -82,9 +71,7 @@ class NVEDataSource(val context: Context){
 
                             coordinateMap[id] = Pair(lat, lon)
                         } catch (e: Exception) {
-                            // Skip malformed lines
                         }
-                        //coordinateMap[name] = Pair(lat, lon)
                     }
                 }
             }
