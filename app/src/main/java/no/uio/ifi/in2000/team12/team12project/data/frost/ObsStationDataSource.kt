@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
+import io.ktor.client.call.body
 import io.ktor.client.request.basicAuth
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
@@ -10,6 +11,7 @@ import no.uio.ifi.in2000.team12.team12project.data.exceptions.BadRequestExceptio
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoDataException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.UnauthorizedException
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObsResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.Point
@@ -45,17 +47,9 @@ class ObsStationsDataSource {
             }
         }
 
-        //println(response.toString())
-
-        val responseBodyString = response.bodyAsText()
-
-        //println(response.status.value)
         return when (response.status.value) {
             in 200..299 -> {
-                //response.body<ObsStation>()
-                Json { ignoreUnknownKeys = true }.decodeFromString<ObsStationResponse>(
-                    responseBodyString
-                ).data
+                response.body<ObsStationResponse>().data
             }
             400 -> {
                 throw BadRequestException(message = "Invalid parameter value or malformed request")
