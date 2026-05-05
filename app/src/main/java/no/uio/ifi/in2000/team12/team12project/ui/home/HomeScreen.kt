@@ -160,15 +160,15 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                                     askpermissonforlatlng!!.latitude,
                                     askpermissonforlatlng!!.longitude
                                 )
-                                //navigates to favorite screen
-                                navHostController.navigate("favorites")
+
 
                                 favoritesScreenViewModel.addFavoriteLocation(
                                 location = askpermissonforlatlng!!,
                                 name = tempname , //"add name",//name.toString(), //add apart of the address. will later on add ability to change the name
                                 address = address.toString()
                             )
-
+                                //navigates to favorite screen
+                                navHostController.navigate("favorites")
                             }
                             askforpermission = false
                         }) {

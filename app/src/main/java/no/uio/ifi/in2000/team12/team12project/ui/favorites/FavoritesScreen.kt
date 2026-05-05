@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
@@ -28,6 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.FavoriteCard
@@ -43,8 +47,8 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
     //check if the name whants to be changed
     var changename by remember { mutableStateOf<Boolean>(false) }
     var changenameto by remember { mutableStateOf("") }
-    var changenameof by remember { mutableStateOf<FavoriteLocation?>(null) }
-
+    var chosenlocation by remember { mutableStateOf<FavoriteLocation?>(null) }
+    var selectedName by remember { mutableStateOf<String?>(null) }
 
     /*
     LaunchedEffect(uiState.favoritesLocationList) {
@@ -86,7 +90,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
             val item = uiState.favoritesLocationMap.values.find{it.name == newname}//uiState.favoritesLocationMap[newname]//[deleteplacebyname]//[newname]
             if(item == null) return@LaunchedEffect
             //if(item != null){
-                changenameof = item
+                chosenlocation = item
                 deleteplacebyname = item.name
                 changename = true
             //}
@@ -94,20 +98,57 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
         }
     }
 
+    /*
+    LaunchedEffect(Unit) {
+        favoritesScreenViewModel.lastfavoriteadded.collect{newname ->
+            val item = uiState.favoritesLocationMap.values.find {
+                it.name == newname
+            }
+            if(item != null){
+                chosenlocation = item
+                deleteplacebyname = item.name
+                changename = true
+                return
+            }
+
+        }
+    }*/
+    /*
+    LaunchedEffect(Unit) {
+        favoritesScreenViewModel.lastfavoriteadded.collect { newname ->
+            snapshotFlow { uiState.favoritesLocationMap }
+                .map { it.values.find { loc -> loc.name == newname } }
+                .filterNotNull()
+                .first()
+                .let { item ->
+                    chosenlocation = item
+                    deleteplacebyname = item.name
+                    selectedName = item.name
+                    changename = true
+                }
+        }
+    }*/
+
     Box(modifier = Modifier){
+
+        //val favoriteList = uiState.favoritesLocationMap.toList()
+
+
     LazyColumn(
         modifier = Modifier
     )
         {
 
         items(uiState.favoritesLocationMap.toList()) { (key, favoriteLocation) ->
+            //items(favoriteList) { (key, favoriteLocation) ->
 
-            //var selectedbox = deleteplacebyname == favoriteLocation.name //using var because it will modify
-            var selectedbox = changenameof?.name == favoriteLocation.name
+            //var selectedbox = chosenlocation?.name == favoriteLocation.name
+            val selectedbox = selectedName == favoriteLocation.name
             Box(
                 modifier = Modifier.clickable{
                     deleteplacebyname =favoriteLocation.name
-                    changenameof =favoriteLocation
+                    chosenlocation =favoriteLocation
+                    selectedName = favoriteLocation.name
                 }
                     .padding(6.dp)
                     .border(
@@ -119,37 +160,26 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
             FavoriteCard(
                 title = favoriteLocation.name,
                 subtitle = favoriteLocation.address,
-                onButtonClick = { navHostController.navigate("graph") { popUpTo("graph") } } //seperate arrow button and name//address somehow
+                selected = selectedbox, //
+                onButtonClick = {
+                    navHostController.navigate("graph")
+                    { popUpTo("graph")
+                    }
+                } , //
+                onButtonDelete = {
+                    deleterequest = true
+                },
+                onButtonChangName = {
+                    changename = true
+                }
             )
         }
         }
 
     }
-        Button(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            onClick = {
-                if(changenameof != null) {
-                    deleterequest = true
-                }
-        }
-        ) {
-            Text("delete")
-        }
-
-        Button(
-            modifier = Modifier.align(Alignment.BottomStart),
-            onClick = {
-                if(changenameof != null) {
-                    changename = true
-                }
-            }
-        ) {
-            Text("add/change name")
-        }
-
     }
 
-    if(deleterequest == true && changenameof !=null){
+    if(deleterequest && chosenlocation !=null){
         AlertDialog(
             onDismissRequest = {deleterequest= false},
             title = {Text("delete?")},
@@ -161,7 +191,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                            favoritesScreenViewModel.removeFavoriteLocation(name)
                        }
                         deleterequest = false
-                        changenameof =null
+                        chosenlocation =null
                     }) {
                     Text("yessssssssssirrrr")
                 }
@@ -174,7 +204,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
         )
     }
 
-    if (changename && changenameof !=null) {
+    if (changename && chosenlocation != null) {
 
             AlertDialog(
             onDismissRequest = {
@@ -194,7 +224,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                 TextButton(onClick = {
                     //changenameof?.let {
                         favoritesScreenViewModel.changeFavoriteLocationName(
-                            prevname = changenameof!!.name,//it.name,
+                            prevname = chosenlocation!!.name,//it.name,
                             changenameto = changenameto
                         )
                     //}
