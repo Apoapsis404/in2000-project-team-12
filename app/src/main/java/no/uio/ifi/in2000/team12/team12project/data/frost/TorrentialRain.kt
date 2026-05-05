@@ -2,110 +2,79 @@ package no.uio.ifi.in2000.team12.team12project.data.frost
 
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
-import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import kotlin.math.min
-
-const val durationElement = "sum(duration_of_precipitation PT1H)"
-const val amountElement = "sum(precipitation_amount P1D)"
 
 class TorrentialRain(
     private val climateDataRepository: ClimateDataRepository = ClimateDataRepository()
 ) {
+    companion object {
+        private const val DURATION_ELEMENT = "sum(duration_of_precipitation PT1H)"
+        private const val AMOUNT_ELEMENT = "sum(precipitation_amount P1D)"
 
-    /*
-     * Torrential Rain is calculated as follows:
-     * Amount precipitation in a day / sum of minutes it has rained that day
-     * sum of minutes is found by adding up the duration in minutes individual hours of the day (annoying!)
-     */
-    private val torrentialRainRate = 7.5 // mm/hr (source: https://www.baranidesign.com/faq-articles/2020/1/19/rain-rate-intensity-classification)
+        /** mm/hr (source: https://www.baranidesign.com/faq-articles/2020/1/19/rain-rate-intensity-classification) */
+        private const val TORRENTIAL_RAIN_RATE_THRESHOLD = 7.5
 
-    private val instancesPerYear = 5 // How many instances of torrential rain should be minimum in a year for it to be considered a threat
+        /** Minimum instances per year to be considered a threat */
+        private const val INSTANCES_PER_YEAR_THRESHOLD = 5
 
-    /**
-     * Found that some observation where the duration of precipitation
-     * where really low, especially compared to the precipitation amount
-     * so limits the minimum duration of precipitation to 30 minutes
-     */
-    private val minPrecipitationDuration = 30 // minutes
+        /** Minimum duration (minutes) to avoid noise from low-duration observations */
+        private const val MIN_PRECIPITATION_DURATION_MINUTES = 30
 
-    suspend fun getClimateData(sourceId: String, monthsBack: UInt, elementId: String): List<ClimateObs> {
-        val obs = climateDataRepository.getClimateData(sourceId, elementId,constructTimeSeries(monthsBack))
-        return obs
+        private const val MAX_MONTHS_BACK = 120u
+        private const val DATE_STRING_LENGTH = 10
     }
 
-    suspend fun needsName(sourceId: String): Boolean {
-        var durationTimeSeries = ""
-        var amountTimeSeries = ""
-
-        try {
-            durationTimeSeries = climateDataRepository.getClimateTimeSeries(sourceId, durationElement).substring(0, 10)
-            amountTimeSeries = climateDataRepository.getClimateTimeSeries(sourceId, amountElement).substring(0, 10)
+    /**
+     * Checks if the station has a history of torrential rain that exceeds the threshold.
+     */
+    suspend fun isTorrentialRainThreat(sourceId: String): Boolean {
+        val (durationStart, amountStart) = try {
+            val dStart = climateDataRepository.getClimateTimeSeries(sourceId, DURATION_ELEMENT).take(DATE_STRING_LENGTH)
+            val aStart = climateDataRepository.getClimateTimeSeries(sourceId, AMOUNT_ELEMENT).take(DATE_STRING_LENGTH)
+            dStart to aStart
         } catch (e: NoAvailableTimeSeriesException) {
-            println("No time series found for $sourceId, skipping")
             return false
         }
 
-        println("Time series found for $sourceId")
+        val months = min(min(monthsSince(durationStart), monthsSince(amountStart)).toUInt(), MAX_MONTHS_BACK)
 
-        val months = min(min(monthsSince(durationTimeSeries), monthsSince(amountTimeSeries)).toUInt(), 120u)
-        println("Months since: $months")
+        val durationData = getClimateData(sourceId, months, DURATION_ELEMENT)
+        val amountData = getClimateData(sourceId, months, AMOUNT_ELEMENT)
 
+        val totalInstances = calculateTorrentialRainInstances(durationData, amountData)
+        val yearsCount = if (months >= 12u) (months / 12u).toInt() else 1
+        val averageInstancesPerYear = totalInstances / yearsCount
 
-
-        val duration = getClimateData(sourceId, months, durationElement)
-        val amount = getClimateData(sourceId, months, amountElement)
-
-        val rainfall = calculateTorrentialRain(duration, amount) / (if (months > 12u) (months / 12u).toInt() else 1)
-        println("Rainfall: $rainfall")
-
-        return rainfall >= instancesPerYear
+        return averageInstancesPerYear >= INSTANCES_PER_YEAR_THRESHOLD
     }
 
-    fun calculateTorrentialRain(duration: List<ClimateObs>, amount: List<ClimateObs>): Int {
-        var res = 0
-
-        // Keeps track of the index into the duration list
-        var durationIndex = 0
-
-        amount.forEach { amountObs ->
-            val date = amountObs.referenceTime.substring(0, 10)
-            val precipAmount = findMaxObs(amountObs)
-
-            val sum = sumPrecipitationDuration(date, duration, durationIndex)
-
-            durationIndex = sum.second
-
-            if (sum.first == 0.0 || precipAmount == 0.0 || sum.first < minPrecipitationDuration) {
-                return@forEach
-            }
-
-            val rate = precipAmount / (sum.first / 60)
-            if (rate > torrentialRainRate){
-//                println("Torrential rain: $rate, Date: $date, Amount: ${precipAmount}mm, Duration: ${sum.first} minutes")
-                res += 1
-            }
-        }
-        return res
+    suspend fun getClimateData(sourceId: String, monthsBack: UInt, elementId: String): List<ClimateObs> {
+        return climateDataRepository.getClimateData(sourceId, elementId, constructTimeSeries(monthsBack))
     }
 
     /**
-     * Starts looking through duration list from given index
-     * Sum up the amount of minutes it has rain until
-     * the first time the index is pointing at a date
-     * that is not equal to the given date
+     * Calculates total instances of torrential rain by comparing daily precipitation amount
+     * against total rain duration for that day.
      */
-    fun sumPrecipitationDuration(date: String, duration: List<ClimateObs>, index: Int): Pair<Double, Int> {
-        var sumDuration: Double = 0.0
-        var lastIndex: Int = 0
-
-        for (i in index until duration.size) {
-            lastIndex = i
-            if (duration[i].referenceTime.substring(0, 10) != date) {
-                break
+    fun calculateTorrentialRainInstances(durationObs: List<ClimateObs>, amountObs: List<ClimateObs>): Int {
+        // Group hourly duration observations by date for efficient lookup
+        val durationByDate = durationObs
+            .groupBy { it.referenceTime.take(DATE_STRING_LENGTH) }
+            .mapValues { (_, obsList) ->
+                obsList.sumOf { it.observations.firstOrNull()?.value ?: 0.0 }
             }
-            sumDuration += duration[i].observations[0].value
-        }
 
-        return Pair(sumDuration, lastIndex)
+        return amountObs.count { dailyAmount ->
+            val date = dailyAmount.referenceTime.take(DATE_STRING_LENGTH)
+            val precipAmount = findMaxObs(dailyAmount)
+            val totalDurationMinutes = durationByDate[date] ?: 0.0
+
+            if (totalDurationMinutes < MIN_PRECIPITATION_DURATION_MINUTES || precipAmount <= 0.0) {
+                false
+            } else {
+                val rateMmPerHour = precipAmount / (totalDurationMinutes / 60.0)
+                rateMmPerHour > TORRENTIAL_RAIN_RATE_THRESHOLD
+            }
+        }
     }
 }
