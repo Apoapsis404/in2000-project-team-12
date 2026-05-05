@@ -1,11 +1,14 @@
 package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +45,6 @@ fun PlantPopup(
         DropDown<Months>(
             uiState.month.toString(),
             onClick = {graphScreenViewModel.setMonth(it)},
- //           modifier = modifier.weight(1f)
         )
         Slider(
             value = uiState.yearSelected,
@@ -80,21 +82,16 @@ fun PlantPopup(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.Center
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.Center,
         ){
-            val plantCount = if (plantPq.size > 3) 3 else plantPq.size
-            if(plantCount <= 0){
-                Text("No plants found")
-            }else {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    items(plantCount) {
-                        PlantCard(plantPq.poll()!!)
-                    }
+
+            for (i in 1..3) {
+                if (!plantPq.isEmpty()) {
+                    PlantCard(plantPq.poll()!!)
                 }
             }
         }

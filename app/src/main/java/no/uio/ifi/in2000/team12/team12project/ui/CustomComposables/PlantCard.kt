@@ -12,7 +12,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Agriculture
+import androidx.compose.material.icons.filled.Egg
+import androidx.compose.material.icons.filled.Grain
+import androidx.compose.material.icons.filled.Grass
+import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.Nature
+import androidx.compose.material.icons.filled.SportsRugby
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,14 +55,13 @@ fun PlantCard(
             style = MaterialTheme.typography.titleMedium
             )
         Icon(
-            imageVector = Icons.Default.Nature,
+            imageVector = CategoryIcon(plant.category),
             contentDescription = plant.category,
             tint = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.size(80.dp)
         )
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = spacedBy(2.dp)
         ) {
@@ -91,7 +97,8 @@ fun PlantInfoRow(
 ){
     Column(
         modifier = Modifier
-            .fillMaxWidth(),
+        //    .fillMaxWidth(),
+                ,
         //verticalAlignment = Alignment.CenterVertically,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -107,6 +114,22 @@ fun PlantInfoRow(
             lineHeight = 8.sp
 
         )
+    }
+}
+
+fun CategoryIcon(category: String): ImageVector{
+    when(category) {
+        "Grain" -> return Icons.Default.Grain
+        "Fodder" -> return Icons.Default.Grass
+        "Legume" -> return Icons.Default.Egg
+        "Root" -> return Icons.Default.Nature
+        "Vegetable" -> return Icons.Default.Grass
+        "Fruit" -> return Icons.Default.Nature
+        "Nut" -> return Icons.Default.SportsRugby
+        "Oilseed" -> return Icons.Default.WaterDrop
+        "Fiber" -> return Icons.Default.LocalFlorist
+        "Industrial" -> return Icons.Default.Agriculture
+        else -> return Icons.Default.Nature
     }
 }
 
