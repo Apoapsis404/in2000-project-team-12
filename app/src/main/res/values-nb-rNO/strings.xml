@@ -18,6 +18,7 @@
     <string name="home">Hjem</string>
     <string name="favorites">Favoritter</string>
     <string name="settings">Innstillinger</string>
+    <string name="notes">Notater</string>
     <string name="cont_desc_menu">Meny</string>
     <string name="settingsTitle">Innstillinger</string>
     <string name="darkModeSwitch">Bytt til %1$s</string>

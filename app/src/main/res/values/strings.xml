@@ -41,6 +41,8 @@
     <string name="home">Home/Map</string>
     <string name="favorites">Favorites</string>
     <string name="settings">Settings</string>
+    <string name="notes">Notes</string>
+
     <string name="app_title" translatable="false">Almanakken</string>
     <string name="cont_desc_menu">Menu</string>
     <string name="climate_graph">Climate graph</string>

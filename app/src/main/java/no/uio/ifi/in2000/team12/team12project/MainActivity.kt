@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -187,7 +188,8 @@ fun MainComp(
                     color = MaterialTheme.colorScheme.secondary
                 )
                 NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.home)) },
+                    label = { Text(stringResource(R.string.home),
+                        fontWeight = Bold) },
                     selected = false,
                     onClick = {
                         navController.navigate("home")
@@ -196,7 +198,9 @@ fun MainComp(
                     colors = drawerItemColors
                 )
                 NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.climate_graph)) },
+                    label = { Text(stringResource(R.string.climate_graph),
+                        fontWeight = Bold)
+                            },
                     selected = false,
                     onClick = {
                         navController.navigate("graph")
@@ -205,7 +209,9 @@ fun MainComp(
                     colors = drawerItemColors
                 )
                 NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.favorites)) },
+                    label = { Text(stringResource(R.string.favorites),
+                        fontWeight = Bold)
+                            },
                     selected = false,
                     onClick = {
                         navController.navigate("favorites")
@@ -214,7 +220,7 @@ fun MainComp(
                     colors = drawerItemColors
                 )
                 NavigationDrawerItem(
-                    label = { Text("Notes") },
+                    label = { Text(stringResource(R.string.notes),) },
                     selected = false,
                     onClick = {
                         navController.navigate("notes")
@@ -223,7 +229,8 @@ fun MainComp(
                     colors = drawerItemColors
                 )
                 NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.settings)) },
+                    label = { Text(stringResource(R.string.settings),
+                        fontWeight = Bold) },
                     selected = false,
                     onClick = {
                         navController.navigate("settings")
