@@ -354,7 +354,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 }
 
                 Button(
-                    modifier = Modifier.align(Alignment.BottomEnd), //can later on decide the placement of the button
+                    modifier = Modifier.align(Alignment.TopEnd), //can later on decide the placement of the button
                     onClick = {
                         askpermissonforlatlng = uiState.markerPosition
                         askforpermission = true
