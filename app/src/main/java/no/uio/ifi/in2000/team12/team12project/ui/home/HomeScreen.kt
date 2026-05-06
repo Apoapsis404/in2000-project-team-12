@@ -19,8 +19,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.RemoveCircleOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +72,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.common.io.Files.map
 import com.google.maps.android.compose.AdvancedMarker
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -86,6 +95,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(uiState.markerPosition, 10f)
     }
+    val mapUiSettings = remember { MapUiSettings(zoomControlsEnabled = false) }
+
     val scope = rememberCoroutineScope()
 
     val locationPermissionRequest = rememberLauncherForActivityResult(
@@ -139,9 +150,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             },
             googleMapOptionsFactory = {
                 GoogleMapOptions().mapId( "48427ab8c098a917274af32e")
-            }
-
-
+            },
+            uiSettings = mapUiSettings,
         ) {
             //
             if(askforpermission == true && askpermissonforlatlng != null){
@@ -160,15 +170,15 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                                     askpermissonforlatlng!!.latitude,
                                     askpermissonforlatlng!!.longitude
                                 )
-
+                                //navigates to favorite screen
+                                navHostController.navigate("favorites")
 
                                 favoritesScreenViewModel.addFavoriteLocation(
                                 location = askpermissonforlatlng!!,
                                 name = tempname , //"add name",//name.toString(), //add apart of the address. will later on add ability to change the name
                                 address = address.toString()
                             )
-                                //navigates to favorite screen
-                                navHostController.navigate("favorites")
+
                             }
                             askforpermission = false
                         }) {
@@ -198,8 +208,6 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     contentDescription = "",
                     collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
                     icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.outline_rainy_24),
-
-
                     )
             }
             uiState.extremeWindList.forEach {
@@ -236,7 +244,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                     onValueChange = {
                         homeScreenViewModel.setSearchQuery(it)
                         //DENNE MÅ REAKTIVERES FOR Å FÅ FORSLAG PÅ SØK
-                        //homeScreenViewModel.fetchSuggestions(it)
+                        // homeScreenViewModel.fetchSuggestions(it)
                     },
                     placeholder = { Text(stringResource(R.string.search_location)) },
                     singleLine = true,
@@ -301,65 +309,93 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             Spacer(modifier = Modifier.weight(1f))
 
             Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.BottomCenter
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomEnd
             ) {
-                Button(
-                    modifier = Modifier.align(Alignment.BottomStart),
-                    onClick = {
-                        val fineLocationGranted =
-                            android.content.pm.PackageManager.PERMISSION_GRANTED ==
-                                    androidx.core.content.ContextCompat.checkSelfPermission(
-                                        context, Manifest.permission.ACCESS_FINE_LOCATION
-                                    )
-
-                        if (fineLocationGranted) {
-                            @Suppress("MissingPermission")
-                            homeScreenViewModel.fetchCurrentLocation { position ->
-                                scope.launch {
-                                    cameraPositionState.animate(
-                                        CameraUpdateFactory.newLatLngZoom(position, 15f)
-                                    )
-                                }
-                            }
-                        } else {
-                            locationPermissionRequest.launch(
-                                arrayOf(
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION
-                                )
-                            )
+                Column{
+                    // Favorite button
+                    FilledIconButton(
+                        onClick = {
+                            askpermissonforlatlng = uiState.markerPosition
+                            askforpermission = true
                         }
-                    },
-                    contentPadding = PaddingValues(8.dp),
-                    shape = CircleShape
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.outline_my_location_24),
-                        contentDescription = stringResource(R.string.cont_desc_return_to_current_position),
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                    )
-                }
-
-                Button(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    onClick = {
-                        navHostController.navigate("graph")
-                    },
-
-                    ) {
-                    Text(stringResource(R.string.navigate_to_graph_screen))
-                }
-
-                Button(
-                    modifier = Modifier.align(Alignment.TopEnd), //can later on decide the placement of the button
-                    onClick = {
-                        askpermissonforlatlng = uiState.markerPosition
-                        askforpermission = true
+                    ){
+                        Icon(
+                            imageVector = Icons.Default.FavoriteBorder,
+                            contentDescription = "Favorite button",
+                        )
                     }
-                ){Text("<33")}
+                    // My location button
+                    FilledIconButton(
+                        onClick = {
+                            val fineLocationGranted =
+                                android.content.pm.PackageManager.PERMISSION_GRANTED ==
+                                        androidx.core.content.ContextCompat.checkSelfPermission(
+                                            context, Manifest.permission.ACCESS_FINE_LOCATION
+                                        )
+
+                            if (fineLocationGranted) {
+                                @Suppress("MissingPermission")
+                                homeScreenViewModel.fetchCurrentLocation { position ->
+                                    scope.launch {
+                                        cameraPositionState.animate(
+                                            CameraUpdateFactory.newLatLngZoom(position, 15f)
+                                        )
+                                    }
+                                }
+                            } else {
+                                locationPermissionRequest.launch(
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                )
+                            }
+                        },
+                        //contentPadding = PaddingValues(8.dp),
+                        //shape = CircleShape
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MyLocation,
+                            contentDescription = "return to my location",
+                        )
+                    }
+                    FilledIconButton(
+                        onClick = {
+                            scope.launch {
+                                cameraPositionState.animate(CameraUpdateFactory.zoomIn())
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.AddCircleOutline,
+                            contentDescription = "zoom in",
+                        )
+                    }
+                    FilledIconButton(
+                        onClick = {
+                            scope.launch {
+                                cameraPositionState.animate(CameraUpdateFactory.zoomOut())
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.RemoveCircleOutline,
+                            contentDescription = "zoom out",
+                        )
+                    }
+
+                    // Show me the numbers button
+//                Button(
+//                    modifier = Modifier.align(Alignment.BottomCenter),
+//                    onClick = {
+//                        navHostController.navigate("graph")
+//                    },
+//
+//                    ) {
+//                    Text(stringResource(R.string.navigate_to_graph_screen))
+//                }
+                }
             }
 
         }

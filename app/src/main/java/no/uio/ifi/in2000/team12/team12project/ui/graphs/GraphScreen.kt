@@ -9,12 +9,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,11 +67,13 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.BulletedList
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.DropDown
+import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.PlantPopup
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.RoundCornerButton
 
 // Graph library used:
 // https://github.com/patrykandpatrick/vico
 
+@OptIn(ExperimentalMaterial3Api::class) // For ModalBottomSheet (Plant popup)
 @Composable
 fun GraphScreen(
     modifier: Modifier = Modifier,
@@ -76,6 +83,9 @@ fun GraphScreen(
     val modelProducer = remember { CartesianChartModelProducer() }
     val uiState by graphScreenViewModel.uiState.collectAsState()
     var yearSelected by remember { mutableStateOf(true) }
+    val plantPopupState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scrollState = rememberScrollState()
+
 
     LaunchedEffect(uiState.climateChartData, uiState.showMean) {
         if (uiState.climateChartData.years.isNotEmpty() && uiState.climateChartData.values.isNotEmpty()) {
@@ -96,33 +106,16 @@ fun GraphScreen(
         }
     }
 
-    Column(modifier = modifier.fillMaxSize()
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
     ) {
         Column(
 //            modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 16.dp, bottom = 12.dp),
-                horizontalArrangement = Arrangement.Center
-
-            ) {
-                RoundCornerButton(
-                    label = stringResource(R.string.compare_year),
-                    selected = yearSelected,
-                    onClick = { yearSelected = true },
-                )
-
-                RoundCornerButton(
-                    label = stringResource(R.string.compare_month),
-                    selected = !yearSelected,
-                    onClick = { yearSelected = false }
-                )
-
-            }
             when{
                 uiState.isLoading -> {
                     Column(modifier = Modifier
@@ -173,13 +166,15 @@ fun GraphScreen(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             ) {
                 Checkbox(
                     checked = uiState.showMean,
                     onCheckedChange = { graphScreenViewModel.toggleMean(it) }
                 )
-                Text(text = "Vis gjennomsnitt")
+                Text(text = stringResource(R.string.show_avg))
             }
         }
 
@@ -230,6 +225,25 @@ fun GraphScreen(
                         graphScreenViewModel.updateChartData()
                     }
                 )
+            }
+            Button(
+                onClick = {
+                    graphScreenViewModel.openPopup()
+                    graphScreenViewModel.updatePredictedClimate()
+                    },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            ) {
+                Text(stringResource(R.string.plant_prognosis_button))
+            }
+            if(uiState.showPopup) {
+                ModalBottomSheet(
+                    onDismissRequest = { graphScreenViewModel.closePopup() },
+                    sheetState = plantPopupState,
+                ){
+                    PlantPopup(graphScreenViewModel, uiState)
+                }
             }
         }
     }

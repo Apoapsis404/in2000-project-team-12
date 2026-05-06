@@ -22,7 +22,7 @@ import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewMode
 @Composable
 fun Navigator(
     modifier: Modifier = Modifier,
-    homeViewModel: HomeScreenViewModel = viewModel(),
+    homeViewModel: HomeScreenViewModel,// = viewModel(),
     graphViewModel: GraphScreenViewModel = viewModel(),
     settingsViewModel: SettingsScreenViewModel,
     favoritesViewModel: FavoritesScreenViewModel = viewModel(),
@@ -38,7 +38,11 @@ fun Navigator(
         composable(
             route = "home"
         ) {
-            HomeScreen(homeViewModel, favoritesScreenViewModel = favoritesViewModel,navController)
+            HomeScreen(
+                homeViewModel,
+                favoritesScreenViewModel = favoritesViewModel,
+                navController
+            )
         }
         composable(
             route = "graph"

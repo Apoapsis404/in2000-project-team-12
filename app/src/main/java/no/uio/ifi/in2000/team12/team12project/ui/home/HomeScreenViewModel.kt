@@ -3,11 +3,10 @@ package no.uio.ifi.in2000.team12.team12project.ui.home
 import android.Manifest
 import android.app.Application
 import android.content.Context
-import android.graphics.Bitmap
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -30,6 +29,7 @@ import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
 // Represent the different states exposed to the UI
 data class HomeScreenUiState(
     val markerPosition : LatLng = LatLng(59.91,10.74),
+    val address: String = "Almanakken",
     val searchQuery : String = "",
     val markerTitle : String = "",
     val isMapReady : Boolean = false,
@@ -162,6 +162,11 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
     // Takes in a position and updates marker position
     fun setMarkerPosition(position : LatLng){
         _uiState.update { it.copy(markerPosition = position) }
+    }
+
+    fun updateAddress(address : String){
+        _uiState.update { it.copy(address = address) }
+
     }
 
     // reads the content of the search bar and updates query

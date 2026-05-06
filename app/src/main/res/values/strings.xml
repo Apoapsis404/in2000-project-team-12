@@ -20,6 +20,9 @@
     <string name="try_again">Try again</string>
     <string name="climate_summary">insights summary:</string>
     <string name="unexpected_error">An unexpected error occurred</string>
+    <string name="plant_prognosis_button">Plant prognosis</string>
+    <string name="show_avg">Show average</string>
+    <string name="plant_popup_header">Plant prognosis</string>
 
     <!-- HOME -->
     <string name="favorites_popup_title">favorites?</string>
@@ -35,10 +38,12 @@
     <!-- HEADER AND MENU -->
     <string name="menu">Menu</string>
     <string name="cont_desc_exit">Exit</string>
-    <string name="home">Home</string>
+    <string name="home">Home/Map</string>
     <string name="favorites">Favorites</string>
     <string name="settings">Settings</string>
     <string name="app_title" translatable="false">Almanakken</string>
     <string name="cont_desc_menu">Menu</string>
+    <string name="climate_graph">Climate graph</string>
+
 
 </resources>

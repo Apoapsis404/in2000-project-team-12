@@ -21,7 +21,7 @@ class PlantsRepository(private val context: Context){
     }
 
     private fun getPlantData(): List<Plant>{
-        val jsonString = getTextFromResources(R.raw.plants_data)
+        val jsonString = getTextFromResources(R.raw.plants_datav2)
         return Json.decodeFromString(jsonString)
     }
 
@@ -37,18 +37,25 @@ class PlantsRepository(private val context: Context){
 
         val bestList = mutableListOf<Plant>()
         for(i in 0 until quantity){
-            if(heap.isNotEmpty()) bestList.add(heap.poll())
+            if(heap.isNotEmpty()) bestList.add(heap.poll()!!)
         }
         return bestList
     }
 
-    // does not filter out temperatures outside livable range
-    fun getBestPlantsPriorityQueue(targetTemp: Int): PriorityQueue<Plant>{
-        val pq = PriorityQueue<Plant>(compareBy { kotlin.math.abs(((it.optimal_temp_min+it.optimal_temp_max)/2)-targetTemp) })
-        plantList.forEach { pq.add(it) }
-        pq.filter { targetTemp >= it.temp_min && targetTemp <= it.temp_max }
+
+    fun getBestPlantsPriorityQueue(targetTemp: Float, targetHumidity: Float, targetSunshine: Float, targetPrecipitation: Float): PriorityQueue<Plant>{
+        val pq = PriorityQueue<Plant>(
+            compareBy<Plant> { kotlin.math.abs(((it.optimal_temp_min+it.optimal_temp_max)/2.0)-targetTemp) }
+                .thenBy {kotlin.math.abs(((it.humidity_min+it.humidity_max)/2.0)-targetHumidity)}
+                .thenBy { kotlin.math.abs(((it.sunshine_min+it.sunshine_max)/2.0)-targetSunshine)}
+                .thenBy { kotlin.math.abs(((it.precipitation_min+it.precipitation_max)/2.0)-targetPrecipitation) }
+        )
+        plantList
+            .filter { targetTemp >= it.temp_min && targetTemp <= it.temp_max }
+            .forEach { pq.add(it) }
         return pq
     }
+
 
     fun printPlant(plant: Plant){
         println("${plant.id} (${plant.name}) : " +

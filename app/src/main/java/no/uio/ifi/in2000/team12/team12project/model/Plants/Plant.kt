@@ -7,8 +7,14 @@ data class Plant(
     val id: Int,
     val name: String,
     val category: String,
-    val optimal_temp_min: Int,
-    val optimal_temp_max: Int,
-    val temp_min: Int,
-    val temp_max: Int
+    val optimal_temp_min: Float,
+    val optimal_temp_max: Float,
+    val temp_min: Float,
+    val temp_max: Float,
+    val humidity_min: Float,
+    val humidity_max: Float,
+    val sunshine_min: Float,
+    val sunshine_max: Float,
+    val precipitation_min: Float,
+    val precipitation_max: Float
 )
