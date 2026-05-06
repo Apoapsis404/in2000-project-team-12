@@ -254,7 +254,7 @@ private fun ComposeClimateGraph(
 ) {
     val startAxisValueFormatter = remember(unit) { CartesianValueFormatter.decimal(suffix = " $unit") }
     val axisLabelStyle = rememberTextComponent(
-        TextStyle(color = MaterialTheme.colorScheme.primary)
+        TextStyle(color = MaterialTheme.colorScheme.onBackground)
     )
     val positiveColumn =
         rememberLineComponent(
@@ -281,8 +281,14 @@ private fun ComposeClimateGraph(
 //                    columnCollectionSpacing = 4.dp,
 //                    rangeProvider = RangeProvider,
 //                ),
-                startAxis = VerticalAxis.rememberStart(valueFormatter = startAxisValueFormatter),
-                bottomAxis = HorizontalAxis.rememberBottom(labelRotationDegrees = 45f),
+                startAxis = VerticalAxis.rememberStart(
+                    valueFormatter = startAxisValueFormatter,
+                    label = axisLabelStyle
+                ),
+                bottomAxis = HorizontalAxis.rememberBottom(
+                    labelRotationDegrees = 45f,
+                    label = axisLabelStyle
+                ),
             ),
         modelProducer = modelProducer,
         modifier = modifier.height(234.dp),
