@@ -83,10 +83,10 @@ fun GraphScreen(
                 lineSeries {
                     series(uiState.climateChartData.years, uiState.climateChartData.values)
                     //println("${uiState.climateChartData.values} ${uiState.climateChartData.years}")
-                    val movingAverage = calculateWeightedMovingAverage(uiState.climateChartData.values, 3)
-                    if (movingAverage.isNotEmpty()) {
-                        series(uiState.climateChartData.years, movingAverage)
-                    }
+//                    val movingAverage = calculateWeightedMovingAverage(uiState.climateChartData.values, 3)
+//                    if (movingAverage.isNotEmpty()) {
+//                        series(uiState.climateChartData.years, movingAverage)
+//                    }
                     series(uiState.climateChartData.years, LinearRegressionModel(uiState.climateChartData.years.toDoubleArray(), uiState.climateChartData.values.toDoubleArray()).fitToYears(uiState.climateChartData.years))
                     if (uiState.showMean) {
                         series(uiState.climateChartData.years, List(uiState.climateChartData.years.size) { uiState.climateChartData.values.average() })
