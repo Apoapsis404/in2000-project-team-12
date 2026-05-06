@@ -9,8 +9,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -24,6 +26,10 @@ data class FavoritesScreenUiState(
 
 class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
     var lastfavoriteadded by mutableStateOf<String?>(null) //so it know the newly added favorite to delete
+    //private val _lastfavoriteadded = MutableSharedFlow<String?>()
+    //val lastfavoriteadded = _lastfavoriteadded.asSharedFlow()
+
+
 
     val uiState: StateFlow<FavoritesScreenUiState> = dao.getAllFavorites()
         .map { list ->
@@ -53,6 +59,7 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
             dao.upsertFavorite(entity)
 
             lastfavoriteadded = name
+            //_lastfavoriteadded.emit(name)
         }
     }
 

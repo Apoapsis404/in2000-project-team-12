@@ -16,10 +16,12 @@ package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
 //    }
 //}
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -39,6 +41,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,19 +57,30 @@ fun FavoriteCard(
     title: String,
     subtitle: String,
     buttonIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowForward,
+    selected: Boolean = false,
     onButtonClick: () -> Unit = {},
+    onButtonDelete: () -> Unit = {} ,
+    onButtonChangName: () -> Unit = {}
 
 ) {
-    Row(
+    //
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp, start = 4.dp, end = 4.dp)
-            .shadow(elevation = 6.dp, shape = RoundedCornerShape(20.dp), spotColor = Color(0x1A000000))
+            .padding(top = 4.dp,start = 4.dp,end = 4.dp)
+            .shadow(6.dp, RoundedCornerShape(20.dp), spotColor = Color(0x1A000000))
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.primary)
-            .padding(horizontal = 20.dp, vertical = 18.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .animateContentSize()
+            .padding(horizontal = 20.dp,vertical = 18.dp)
     ) {
+    Row(
+        modifier =Modifier
+            .fillMaxWidth()
+            .heightIn(min = 52.dp),
+        verticalAlignment = Alignment.CenterVertically
+
+    ){
         // Icon container
         Box(
             modifier = Modifier
@@ -91,13 +105,18 @@ fun FavoriteCard(
                 text = title,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = subtitle,
                 fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                minLines = 2
             )
         }
 
@@ -120,6 +139,29 @@ fun FavoriteCard(
             )
         }
     }
+
+        if(selected == true){
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick= onButtonChangName
+                ) {
+                    Text("add/change name")
+                }
+
+                Button(
+                    onClick = onButtonDelete
+                ){
+                    Text("delete")
+                }
+            }
+        }
+
+}
 }
 
 // --- Preview / Usage ---
