@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.model.frost
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.Umbrella
 import androidx.compose.material.icons.filled.WaterDrop
@@ -22,13 +21,13 @@ enum class ClimateType(
         "Mean air temperature",
         Icons.Default.Thermostat
     ),
-    MEAN_WIND_SPEED(
-        "mean(max(wind_speed P1D) P1M)",
-        "m/s",
-        "Mean wind speed",
-        "Mean wind speed",
-        Icons.Default.Air
-    ),
+//    MEAN_WIND_SPEED(
+//        "mean(max(wind_speed P1D) P1M)",
+//        "m/s",
+//        "Mean wind speed",
+//        "Mean wind speed",
+//        Icons.Default.Air
+//    ),
     RELATIVE_HUMIDITY(
         "mean(relative_humidity P1M)",
         "%",

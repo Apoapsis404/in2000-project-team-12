@@ -1,5 +1,6 @@
 [versions]
 agp = "9.0.1"
+commonsMath3 = "3.6.1"
 coreKtx = "1.17.0"
 gson = "2.13.2"
 junit = "4.13.2"
@@ -36,6 +37,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
+commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commonsMath3" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

@@ -83,7 +83,7 @@ fun GraphCard(
                 when (climateType) {
                     ClimateType.RELATIVE_HUMIDITY -> HumidityVisual(meanValue)
                     ClimateType.MEAN_AIR_TEMP -> TemperatureVisual(meanValue)
-                    ClimateType.MEAN_WIND_SPEED -> WindVisual(meanValue)
+                    //ClimateType.MEAN_WIND_SPEED -> WindVisual(meanValue)
                     ClimateType.PRECIPITATION -> PrecipitationVisual(meanValue)
                     ClimateType.DURATION_OF_SUN -> SunVisual(meanValue)
                 }
@@ -148,10 +148,10 @@ fun HumidityVisual(value: Double) {
 
 @Composable
 fun TemperatureVisual(value: Double) {
-    val minTemp = -10f
-    val maxTemp = 30f
+    val minTemp = -30f
+    val maxTemp = 40f
     val progress = ((value.toFloat() - minTemp) / (maxTemp - minTemp)).coerceIn(0f, 1f)
-    val accentColor = MaterialTheme.colorScheme.tertiary
+    val accentColor = if (value >= 0) Color.Red else Color.Blue  //MaterialTheme.colorScheme.tertiary
     val onPrimary = MaterialTheme.colorScheme.onPrimary
 
     Box(
@@ -296,7 +296,7 @@ fun GraphCardPreview() {
             GraphCard(
                 modifier = Modifier.weight(1f),
                 climateType = ClimateType.MEAN_AIR_TEMP,
-                meanValue = 22.0,
+                meanValue = -0.0,
                 onClick = {}
             )
         }

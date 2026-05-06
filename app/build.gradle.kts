@@ -96,6 +96,7 @@ dependencies {
 
     implementation(libs.vico.compose.m3)
 
+    implementation(libs.commons.math3)
 
     implementation("androidx.core:core-splashscreen:1.2.0")
 

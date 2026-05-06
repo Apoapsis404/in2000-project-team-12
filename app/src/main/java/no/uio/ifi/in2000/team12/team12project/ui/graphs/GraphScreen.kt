@@ -56,6 +56,8 @@ import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
+import no.uio.ifi.in2000.team12.team12project.data.regression.LinearRegressionModel
+import no.uio.ifi.in2000.team12.team12project.data.regression.calculateWeightedMovingAverage
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.BulletedList
@@ -80,6 +82,12 @@ fun GraphScreen(
             modelProducer.runTransaction {
                 lineSeries {
                     series(uiState.climateChartData.years, uiState.climateChartData.values)
+                    //println("${uiState.climateChartData.values} ${uiState.climateChartData.years}")
+                    val movingAverage = calculateWeightedMovingAverage(uiState.climateChartData.values, 3)
+                    if (movingAverage.isNotEmpty()) {
+                        series(uiState.climateChartData.years, movingAverage)
+                    }
+                    series(uiState.climateChartData.years, LinearRegressionModel(uiState.climateChartData.years.toDoubleArray(), uiState.climateChartData.values.toDoubleArray()).fitToYears(uiState.climateChartData.years))
                     if (uiState.showMean) {
                         series(uiState.climateChartData.years, List(uiState.climateChartData.years.size) { uiState.climateChartData.values.average() })
                     }
@@ -157,10 +165,10 @@ fun GraphScreen(
                 DropDown<Months>(uiState.month.toString(), modifier = modifier.weight(1f)) {
                     graphScreenViewModel.setMonth(it)
                 }
-                DropDown<ClimateType>(uiState.climateType.toString(), modifier = modifier.weight(1f)) {
-                    graphScreenViewModel.setClimateType(it)
-                    graphScreenViewModel.getClimateObs()
-                }
+//                DropDown<ClimateType>(uiState.climateType.toString(), modifier = modifier.weight(1f)) {
+//                    graphScreenViewModel.setClimateType(it)
+//                    graphScreenViewModel.getClimateObs()
+//                }
             }
 
             Row(
@@ -182,15 +190,21 @@ fun GraphScreen(
             ) {
                 GraphCard(
                     modifier = Modifier.weight(1f),
-                    climateType = ClimateType.RELATIVE_HUMIDITY,
-                    meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.RELATIVE_HUMIDITY, uiState.month) ?: 0.0,
-                    onClick = {}
+                    climateType = ClimateType.MEAN_AIR_TEMP,
+                    meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.MEAN_AIR_TEMP, uiState.month) ?: 0.0,
+                    onClick = {
+                        graphScreenViewModel.setClimateType(ClimateType.MEAN_AIR_TEMP)
+                        graphScreenViewModel.updateChartData()
+                    }
                 )
                 GraphCard(
                     modifier = Modifier.weight(1f),
-                    climateType = ClimateType.MEAN_WIND_SPEED,
-                    meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.MEAN_WIND_SPEED, uiState.month) ?: 0.0,
-                    onClick = {}
+                    climateType = ClimateType.RELATIVE_HUMIDITY,
+                    meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.RELATIVE_HUMIDITY, uiState.month) ?: 0.0,
+                    onClick = {
+                        graphScreenViewModel.setClimateType(ClimateType.RELATIVE_HUMIDITY)
+                        graphScreenViewModel.updateChartData()
+                    }
                 )
             }
             Row(
@@ -201,13 +215,20 @@ fun GraphScreen(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.DURATION_OF_SUN,
                     meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.DURATION_OF_SUN, uiState.month) ?: 0.0,
-                    onClick = {}
+                    onClick = {
+                        graphScreenViewModel.setClimateType(ClimateType.DURATION_OF_SUN)
+                        graphScreenViewModel.updateChartData()
+                    }
+
                 )
                 GraphCard(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.PRECIPITATION,
                     meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.PRECIPITATION, uiState.month) ?: 0.0,
-                    onClick = {}
+                    onClick = {
+                        graphScreenViewModel.setClimateType(ClimateType.PRECIPITATION)
+                        graphScreenViewModel.updateChartData()
+                    }
                 )
             }
         }
