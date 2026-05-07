@@ -336,7 +336,8 @@ fun Header(
             IconButton(onClick = onClick) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = stringResource(R.string.cont_desc_menu)
+                    contentDescription = stringResource(R.string.cont_desc_menu),
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         },
@@ -346,6 +347,7 @@ fun Header(
             navigationIconContentColor = MaterialTheme.colorScheme.secondary,
             titleContentColor = Color.DarkGray,
             actionIconContentColor = Color.Magenta,
+            subtitleContentColor = Color.DarkGray,
 
         ),
         actions = {
@@ -383,7 +385,7 @@ fun TopBarIcon(
         Icon(
             imageVector = imageVector,
             contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.secondary
+            tint = MaterialTheme.colorScheme.onPrimary
         )
     }
 }

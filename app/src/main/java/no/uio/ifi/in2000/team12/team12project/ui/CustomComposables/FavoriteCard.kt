@@ -46,10 +46,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-val MintGreen = Color(0xFF6ECFB8)
-val LightMint = Color(0xFFE8F8F5)
-val DarkText = Color(0xFF1A1A2E)
-val SubtleText = Color(0xFF8A9BB0)
 
 @Composable
 fun FavoriteCard(

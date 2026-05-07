@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,24 +8,16 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-//    primary = dark_green, // Header and button backgrounds etc
-//    secondary = yellow, // Symbols and lines
-//    tertiary = red, // Negative graph
-//    onPrimary = light_green, // Text on buttons etc
-//    background = Black_almost, // Background on graph, favorite and settings screen
-//    onBackground = White_nearly, // Text on background
-
     primary = prim2, // Header and button backgrounds etc
     secondary = sec2, // Symbols and lines
     tertiary = ter2, // Negative graph
     onPrimary = onprim2, // Text on buttons etc
     background = back2, // Background on graph, favorite and settings screen
     onBackground = onback2, // Text on background
-    )
+)
 
 private val LightColorScheme = lightColorScheme(
     primary = prim1, // Header and button backgrounds etc
@@ -35,16 +26,6 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = onprim1, // Text on buttons etc
     background = back1, // Background on graph, favorite and settings screen
     onBackground = onback1, // Text on background
-
-
-
-
-    /* Other default colors to override
-    surface = Color(0xFFFFFBFE),
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 @Composable
