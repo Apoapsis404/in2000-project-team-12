@@ -2,21 +2,17 @@ package no.uio.ifi.in2000.team12.team12project.ui.settings
 
 import android.app.Activity
 import android.content.Context
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
 import no.uio.ifi.in2000.team12.team12project.data.local.dao.SettingsDao
 import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
+import androidx.core.content.edit
 
 data class SettingsScreenUiState(
     val lightmode: Boolean = true,
@@ -49,11 +45,11 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
         val localeCode = when (newLanguage) {
             Languages.ENGLISH -> "en"
             Languages.NORSK -> "nb"
-            Languages.中國人 -> "zh"
+
         }
 
         val prefs = activity.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        prefs.edit().putString("language", localeCode).apply()
+        prefs.edit { putString("language", localeCode) }
         updateConfig {
             it.copy(language = newLanguage)
         }

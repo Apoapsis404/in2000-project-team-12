@@ -1,19 +1,13 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
-import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
-import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
+import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.forEach
 
 fun constructTimeSeries(n: UInt, currentDate: String = getCurrentDate()): String {
     val start = getStartOfDate(currentDate)
@@ -82,7 +76,7 @@ fun LatLng.Round(decimals: Int = 2): LatLng {
 }
 
 fun getStationIdsFromList(stationList: List<ObsStation>): String {
-    var stationIds: String = ""
+    var stationIds = ""
     for (station in stationList) {
         if (stationIds != ""){
             stationIds += ","

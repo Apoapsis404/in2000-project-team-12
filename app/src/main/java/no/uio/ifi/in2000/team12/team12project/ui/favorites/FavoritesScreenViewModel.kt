@@ -1,18 +1,13 @@
 package no.uio.ifi.in2000.team12.team12project.ui.favorites
 
-import android.location.Geocoder
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -69,12 +64,12 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
         }
     }
 
-    fun changeFavoriteIcon(name: String, newIcon: ImageVector) {
-        // Room databaser kan ikke lagre ImageVectors så
-        // Må legge til funksjonalitet for å hente det
-        // Fra strenger i stede for og så legge de strengene til
-        // FavoriteLocationEntity
-    }
+//    fun changeFavoriteIcon(name: String, newIcon: ImageVector) {
+//        // Room databaser kan ikke lagre ImageVectors så
+//        // Må legge til funksjonalitet for å hente det
+//        // Fra strenger i stede for og så legge de strengene til
+//        // FavoriteLocationEntity
+//    }
     fun changeFavoriteLocationName(prevname: String, changenameto: String){
         viewModelScope.launch {
             dao.changeFavoriteLocationName(prevname,changenameto)

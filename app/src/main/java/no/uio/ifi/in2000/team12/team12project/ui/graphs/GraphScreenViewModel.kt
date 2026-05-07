@@ -19,7 +19,7 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
-import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
+import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateData
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
@@ -95,7 +95,7 @@ class GraphScreenViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "Error loading data") }
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Error loading data ${e.message}") }
             }
         }
     }

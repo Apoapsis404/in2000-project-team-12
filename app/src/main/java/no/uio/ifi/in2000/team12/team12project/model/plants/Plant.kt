@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team12.team12project.model.Plants
+package no.uio.ifi.in2000.team12.team12project.model.plants
 
 import kotlinx.serialization.Serializable
 

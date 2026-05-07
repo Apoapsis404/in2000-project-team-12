@@ -1,12 +1,8 @@
-package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
+package no.uio.ifi.in2000.team12.team12project.ui.customComposables
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,17 +25,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.sqlite.throwSQLiteException
-import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
+import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
 
 @Composable
 fun PlantCard(
     plant: Plant,
-    modifier: Modifier = Modifier
+    //modifier: Modifier = Modifier
 ){
     Column(
         modifier = Modifier
@@ -55,7 +49,7 @@ fun PlantCard(
             style = MaterialTheme.typography.titleMedium
             )
         Icon(
-            imageVector = CategoryIcon(plant.category),
+            imageVector = categoryIcon(plant.category),
             contentDescription = plant.category,
             tint = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.size(80.dp)
@@ -117,19 +111,19 @@ fun PlantInfoRow(
     }
 }
 
-fun CategoryIcon(category: String): ImageVector{
-    when(category) {
-        "Grain" -> return Icons.Default.Grain
-        "Fodder" -> return Icons.Default.Grass
-        "Legume" -> return Icons.Default.Egg
-        "Root" -> return Icons.Default.Nature
-        "Vegetable" -> return Icons.Default.Grass
-        "Fruit" -> return Icons.Default.Nature
-        "Nut" -> return Icons.Default.SportsRugby
-        "Oilseed" -> return Icons.Default.WaterDrop
-        "Fiber" -> return Icons.Default.LocalFlorist
-        "Industrial" -> return Icons.Default.Agriculture
-        else -> return Icons.Default.Nature
+fun categoryIcon(category: String): ImageVector{
+    return when(category) {
+        "Grain" -> Icons.Default.Grain
+        "Fodder" -> Icons.Default.Grass
+        "Legume" -> Icons.Default.Egg
+        "Root" -> Icons.Default.Nature
+        "Vegetable" -> Icons.Default.Grass
+        "Fruit" -> Icons.Default.Nature
+        "Nut" -> Icons.Default.SportsRugby
+        "Oilseed" -> Icons.Default.WaterDrop
+        "Fiber" -> Icons.Default.LocalFlorist
+        "Industrial" -> Icons.Default.Agriculture
+        else -> Icons.Default.Nature
     }
 }
 

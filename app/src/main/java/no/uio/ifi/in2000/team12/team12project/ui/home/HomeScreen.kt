@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -64,8 +65,12 @@ import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewMo
 import java.util.Locale
 
 @Composable
-fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(),
-               navHostController: NavHostController) {
+fun HomeScreen(
+    homeScreenViewModel: HomeScreenViewModel = viewModel(),
+    favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(),
+    navHostController: NavHostController,
+    modifier : Modifier = Modifier
+) {
     val uiState by homeScreenViewModel.uiState.collectAsState()
 
     val context = LocalContext.current
@@ -113,10 +118,10 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
     }
 
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
 
         GoogleMap(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = { latLng ->
@@ -210,12 +215,13 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
         }
 
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(8.dp)
+                .navigationBarsPadding()
         ) {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
             ) {
                 TextField(
@@ -242,21 +248,21 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                         unfocusedContainerColor = Color.White,
                         focusedContainerColor = Color.White
                     ),
-                    modifier = Modifier
+                    modifier = modifier
                         .fillMaxWidth()
                        // .padding(16.dp)
                 )
 
                 if (uiState.suggestions.isNotEmpty() && uiState.searchQuery.isNotEmpty()){
                     Column(
-                        modifier = Modifier
+                        modifier = modifier
                             .fillMaxWidth()
                             .background(Color.White)
                     ){
                         uiState.suggestions.forEach { suggestion ->
                             Text(
                                 text = suggestion,
-                                modifier = Modifier
+                                modifier = modifier
                                     .fillMaxWidth()
                                     .clickable {
                                         searchLocation(suggestion)
@@ -271,24 +277,26 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 }
                 if (uiState.searchQuery.isNotEmpty() && uiState.suggestions.isEmpty()){
                     Column(
-                        modifier = Modifier
+                        modifier = modifier
                             .fillMaxWidth()
                             .background(Color.White)
 
                     ) {
                         Text(
                             text = stringResource(R.string.no_result),
-                            modifier = Modifier
+                            modifier = modifier
                                 .fillMaxWidth()
                                 .padding(12.dp)
                         )
                     }
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = modifier.weight(1f))
 
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding(),
                 contentAlignment = Alignment.BottomEnd
             ) {
                 Column{

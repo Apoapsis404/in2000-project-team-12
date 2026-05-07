@@ -12,7 +12,6 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.collections.map
 import android.content.Context
-import no.uio.ifi.in2000.team12.team12project.ui.home.getNameandAdress
 
 class NVEDataSource(val context: Context){
     val url: String = "https://api01.nve.no/hydrology/forecast/flood/v1.0.10/api/Warning/1/2016-01-01/2026-01-01"     //legge inn data for en dato hvis det ikke er noen varseler med /startdato på slutten
@@ -31,18 +30,18 @@ class NVEDataSource(val context: Context){
 
                 // vil sortere etter de som har hatt flom med farenivå som 4 eller mer hvertfall 8 ganger. Den henter bare fra siste 15 år
                 val relevantEventIds = allWarnings
-                    .filter { it.ActivityLevel >= 4 }
-                    .groupBy { it.EventId }
+                    .filter { it.activityLevel >= 4 }
+                    .groupBy { it.eventId }
                     .filter { it.value.size >= 8 }
                     .keys
 
-                val filtered = allWarnings.filter { it.EventId in relevantEventIds }
+                val filtered = allWarnings.filter { it.eventId in relevantEventIds }
                 println("filtered warnings: ${filtered.size}")
 
                 filtered.map { warning ->
                         warning.copy(
-                            MunicipalityList = warning.MunicipalityList.mapNotNull { municipality ->
-                                val coordinates = coordinateMap[municipality.Id]
+                            municipalityList = warning.municipalityList.mapNotNull { municipality ->
+                                val coordinates = coordinateMap[municipality.id]
                                 coordinates?.let {(lat, lon) ->
                                     municipality.copy(lat = lat, lon = lon)
                                 }

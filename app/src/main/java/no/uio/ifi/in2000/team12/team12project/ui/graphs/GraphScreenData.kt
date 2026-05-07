@@ -2,7 +2,6 @@ package no.uio.ifi.in2000.team12.team12project.ui.graphs
 
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
-import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
 import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
 import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData

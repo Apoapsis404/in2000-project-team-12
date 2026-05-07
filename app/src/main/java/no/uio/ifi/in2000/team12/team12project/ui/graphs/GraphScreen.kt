@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.ui.graphs
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,17 +27,13 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.Scroll
@@ -48,27 +43,22 @@ import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProdu
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.compose.cartesian.data.ColumnCartesianLayerModel
-import com.patrykandpatrick.vico.compose.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.compose.cartesian.layer.ColumnCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.Fill
 import com.patrykandpatrick.vico.compose.common.component.LineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
+import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import no.uio.ifi.in2000.team12.team12project.R
-import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.data.regression.LinearRegressionModel
-import no.uio.ifi.in2000.team12.team12project.data.regression.calculateWeightedMovingAverage
-import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
-import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.BulletedList
-import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.DropDown
-import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.PlantPopup
-import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.RoundCornerButton
+import no.uio.ifi.in2000.team12.team12project.model.frost.Months
+import no.uio.ifi.in2000.team12.team12project.ui.customComposables.DropDown
+import no.uio.ifi.in2000.team12.team12project.ui.customComposables.PlantPopup
 
 // Graph library used:
 // https://github.com/patrykandpatrick/vico

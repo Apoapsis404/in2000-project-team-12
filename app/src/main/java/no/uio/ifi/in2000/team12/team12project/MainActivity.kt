@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,12 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.DataThresholding
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
@@ -73,8 +67,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.InfoPopup
-import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.PlantPopup
+import no.uio.ifi.in2000.team12.team12project.ui.customComposables.InfoPopup
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
@@ -93,7 +86,7 @@ class MainActivity : ComponentActivity() {
     // For local language change
     override fun attachBaseContext(newBase: Context) {
         // Read saved language from SharedPreferences (Room is async, can't use it here)
-        val prefs = newBase.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val prefs = newBase.getSharedPreferences("settings", MODE_PRIVATE)
         val langCode = prefs.getString("language", "en") ?: "en"
         val locale = Locale(langCode)
         Locale.setDefault(locale)
@@ -118,8 +111,7 @@ class MainActivity : ComponentActivity() {
             val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoriteDao()))
             val notesScreenViewModel : NotesScreenViewModel = viewModel(factory = NotesScreenViewModelFactory(app.database.notesDao()))
             val homeScreenViewModel : HomeScreenViewModel = viewModel()
-            //HomeScreen()
-            //GraphScreen()
+
             Team12ProjectTheme(
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
@@ -300,7 +292,7 @@ fun Header(
 
 
     scope.launch {
-        val (name, address) = getNameandAdress( //name is no longer used
+        val (_, address) = getNameandAdress( //name is no longer used
             context,
             homeScreenViewModel.uiState.value.markerPosition.latitude,
             homeScreenViewModel.uiState.value.markerPosition.longitude

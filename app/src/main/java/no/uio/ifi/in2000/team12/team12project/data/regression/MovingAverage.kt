@@ -13,6 +13,6 @@ fun calculateWeightedMovingAverage(values: List<Double>, windowSize: Int): List<
                 sum += value * weight
             }
             sum / weightSum
-        }) as Double
+        })
     }
 }

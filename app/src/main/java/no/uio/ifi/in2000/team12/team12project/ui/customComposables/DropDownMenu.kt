@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
+package no.uio.ifi.in2000.team12.team12project.ui.customComposables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.heightIn
@@ -12,7 +12,6 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable

@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.data.nve
 
-import kotlinx.io.Buffer
 import no.uio.ifi.in2000.team12.team12project.model.nve.FloodWarning
 
 class NVERepository(private val nveDataSource: NVEDataSource) {

@@ -15,7 +15,6 @@ import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreen
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreen
 import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModel
-import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreen
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 
@@ -41,7 +40,8 @@ fun Navigator(
             HomeScreen(
                 homeViewModel,
                 favoritesScreenViewModel = favoritesViewModel,
-                navController
+                navController,
+                modifier = Modifier
             )
         }
         composable(

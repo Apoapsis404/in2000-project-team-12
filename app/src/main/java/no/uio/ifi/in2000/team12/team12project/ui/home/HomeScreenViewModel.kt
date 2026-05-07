@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
@@ -20,11 +21,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
 import no.uio.ifi.in2000.team12.team12project.data.frost.getStationIdsFromList
-import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
-import androidx.core.graphics.createBitmap
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
+import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 
 // Represent the different states exposed to the UI
 data class HomeScreenUiState(
@@ -135,7 +134,7 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
                 val warnings = nveRepository.getFloodWarnings()
                 //println("Fetched ${warnings.size} flood warnings")
                 val latLngs = warnings.flatMap { warning ->
-                    warning.MunicipalityList.map {
+                    warning.municipalityList.map {
                         //println("flood warning at ${it.lat}, ${it.lon}")
                         LatLng(it.lat!!, it.lon!!)
                     }

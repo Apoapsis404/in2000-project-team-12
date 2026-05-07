@@ -1,11 +1,9 @@
 package no.uio.ifi.in2000.team12.team12project.data.plants
 
 import android.content.Context
-import android.util.Log
-import androidx.navigationevent.NavigationEventDispatcher
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team12.team12project.R
-import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
+import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
 import java.util.PriorityQueue
 
 class PlantsRepository(private val context: Context){

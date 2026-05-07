@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FloodWarning(
-    val EventId: Int,           //id for hendelsen
-    val ActivityLevel: Int,     //faregrad
-    val DangerTypeName: String,
-    val ValidFrom: String,
-    val ValidTo: String,
-    val MunicipalityList: List<Municipality>        //Liste over komuner som påvirkes av varselet
+    val eventId: Int,           //id for hendelsen
+    val activityLevel: Int,     //faregrad
+    val dangerTypeName: String,
+    val validFrom: String,
+    val validTo: String,
+    val municipalityList: List<Municipality>        //Liste over komuner som påvirkes av varselet
 )
 

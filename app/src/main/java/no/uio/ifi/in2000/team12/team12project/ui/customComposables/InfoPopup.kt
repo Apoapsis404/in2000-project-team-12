@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
+package no.uio.ifi.in2000.team12.team12project.ui.customComposables
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
