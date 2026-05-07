@@ -32,7 +32,7 @@ class TorrentialRain(
             val dStart = climateDataRepository.getClimateTimeSeries(sourceId, DURATION_ELEMENT).take(DATE_STRING_LENGTH)
             val aStart = climateDataRepository.getClimateTimeSeries(sourceId, AMOUNT_ELEMENT).take(DATE_STRING_LENGTH)
             dStart to aStart
-        } catch (_: NoAvailableTimeSeriesException) {
+        } catch (_: Exception) {
             return false
         }
 

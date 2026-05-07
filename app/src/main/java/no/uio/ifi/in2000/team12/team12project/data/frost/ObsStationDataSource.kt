@@ -13,6 +13,7 @@ import no.uio.ifi.in2000.team12.team12project.data.exceptions.UnauthorizedExcept
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObsResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
+import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationIdResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.Point
 
@@ -65,5 +66,36 @@ class ObsStationsDataSource {
             }
         }
     }
+    
+    
+    suspend fun getMetStations(): String {
+        val response: HttpResponse = KtorClient.client.get(urlV0) {
 
+            basicAuth(clientId, clientSecret)
+
+            url {
+                parameters.append("country", "norge")
+                parameters.append("stationholder", "MET.NO")
+                parameters.append("fields", "id")
+            }
+        }
+
+        return when (response.status.value) {
+            in 200..299 -> {
+                response.body<ObsStationIdResponse>().data.joinToString(",") { it.id }
+            }
+            400 -> {
+                throw BadRequestException(message = "Invalid parameter value or malformed request")
+            }
+            401 -> {
+                throw UnauthorizedException("Unauthorized client ID")
+            }
+            404 -> {
+                throw NoDataException("No data found")
+            }
+            else -> {
+                throw Exception("Unknown error")
+            }
+        }
+    }
 }

@@ -22,6 +22,10 @@ class ObsStationRepository {
         }
     }
 
+    suspend fun getMetStations(): String {
+        return obsStationDataSource.getMetStations()
+    }
+
     fun addStationToCache(station: ObsStation, position: LatLng, climateType: ClimateType) {
         cachedStations[Pair(position, climateType)] = station
     }

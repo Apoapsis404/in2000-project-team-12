@@ -58,7 +58,7 @@ fun lastNMonths(n: UInt, currentDate: String): String {
 
 fun monthsSince(date: String, currentDate: String = getCurrentDate()): Int {
 
-    println("Date: $date, Current Date: $currentDate")
+//    println("Date: $date, Current Date: $currentDate")
 
     val currentYear = currentDate.split("-")[0].toInt()
     val currentMonth = currentDate.split("-")[1].toInt()
@@ -66,7 +66,7 @@ fun monthsSince(date: String, currentDate: String = getCurrentDate()): Int {
     val year = date.split("-")[0].toInt()
     val month = date.split("-")[1].toInt()
 
-    println("Year: $year, Month: $month")
+//    println("Year: $year, Month: $month")
 
     return (currentYear - year) * 12 + (currentMonth - month)
 }

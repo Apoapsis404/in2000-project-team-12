@@ -24,3 +24,13 @@ data class Geometry(
     val coordinates: List<Double>,
     val nearest: Boolean
 )
+
+@Serializable
+data class ObsStationId(
+    val id: String
+)
+
+@Serializable
+data class ObsStationIdResponse (
+    val data: List<ObsStationId>
+)

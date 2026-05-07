@@ -27,4 +27,11 @@ class TestTorrentialRain {
         println(res)
         assertTrue(res)
     }
+
+    @Test
+    fun testAllStationsTorrentialRain() = runTest {
+        val climateEvent = ClimateEvent()
+        val stations = climateEvent.listOfTorrentialRainStations()
+        println(stations)
+    }
 }
