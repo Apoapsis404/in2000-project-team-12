@@ -25,10 +25,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
+import androidx.sqlite.throwSQLiteException
+import no.uio.ifi.in2000.team12.team12project.R
 
 @Composable
 fun PlantCard(
@@ -38,7 +42,11 @@ fun PlantCard(
     Column(
         modifier = Modifier
             .padding(top = 4.dp, start = 4.dp, end = 4.dp)
-            .shadow(elevation = 6.dp, shape = RoundedCornerShape(20.dp), spotColor = Color(0x1A000000))
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = Color(0x1A000000)
+            )
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.primary)
             .padding(horizontal = 18.dp, vertical = 18.dp),
@@ -49,7 +57,7 @@ fun PlantCard(
             style = MaterialTheme.typography.titleMedium
             )
         Icon(
-            imageVector = categoryIcon(plant.category),
+            imageVector = CategoryIcon(plant.category),
             contentDescription = plant.category,
             tint = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.size(80.dp)
@@ -60,24 +68,44 @@ fun PlantCard(
             verticalArrangement = spacedBy(2.dp)
         ) {
             PlantInfoRow(
-                "Ideal temp",
-                "${plant.optimal_temp_min.toInt()}°C - ${plant.optimal_temp_max.toInt()}°C",
+                stringResource(R.string.plant_card_ideal_temp),
+                stringResource(
+                    R.string.temp_range,
+                    plant.optimal_temp_min.toInt(),
+                    plant.optimal_temp_max.toInt()
+                ),
             )
             PlantInfoRow(
-                "Tolerance range: ",
-                "${plant.temp_min.toInt()}°C - ${plant.temp_max.toInt()}°C"
+                stringResource(R.string.plant_card_tolerance_range),
+                stringResource(
+                    R.string.temp_range,
+                    plant.temp_min.toInt(),
+                    plant.temp_max.toInt()
+                )
             )
             PlantInfoRow(
-                "Humidity:",
-                "${plant.humidity_min.toInt()}? - ${plant.humidity_max.toInt()}?"
+                stringResource(R.string.plant_card_humidity),
+                stringResource(
+                    R.string.humidity_range,
+                    plant.humidity_min.toInt(),
+                    plant.humidity_max.toInt()
+                )
             )
             PlantInfoRow(
-                "Sunshine:",
-                "${plant.sunshine_min.toInt()}? - ${plant.sunshine_max.toInt()}?"
+                stringResource(R.string.plant_card_sunshine),
+                stringResource(
+                    R.string.sunshine_range,
+                    plant.sunshine_min.toInt(),
+                    plant.sunshine_max.toInt()
+                )
             )
             PlantInfoRow(
-                "Precipitation:",
-                "${plant.precipitation_min.toInt()}mm - ${plant.precipitation_max.toInt()}mm"
+                stringResource(R.string.plant_card_precipitation),
+                stringResource(
+                    R.string.precipitation_range,
+                    plant.precipitation_min.toInt() * 30, // mm/d to mm/month
+                    plant.precipitation_max.toInt() * 30
+                )
             )
         }
 
@@ -90,10 +118,6 @@ fun PlantInfoRow(
     value: String,
 ){
     Column(
-        modifier = Modifier
-        //    .fillMaxWidth(),
-                ,
-        //verticalAlignment = Alignment.CenterVertically,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -101,7 +125,6 @@ fun PlantInfoRow(
             fontSize = 10.sp,
             lineHeight = 6.sp
         )
-        //Spacer(modifier = Modifier.size(2.dp))
         Text(
             text = value,
             fontSize = 14.sp,
@@ -111,7 +134,7 @@ fun PlantInfoRow(
     }
 }
 
-fun categoryIcon(category: String): ImageVector{
+fun CategoryIcon(category: String): ImageVector{
     return when(category) {
         "Grain" -> Icons.Default.Grain
         "Fodder" -> Icons.Default.Grass

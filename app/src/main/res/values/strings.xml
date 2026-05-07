@@ -20,9 +20,9 @@
     <string name="try_again">Try again</string>
     <string name="climate_summary">insights summary:</string>
     <string name="unexpected_error">An unexpected error occurred</string>
-    <string name="plant_prognosis_button">Plant prognosis</string>
-    <string name="show_avg">Show average</string>
-    <string name="plant_popup_header">Plant prognosis</string>
+    <string name="plant_prognosis_button" translatable="false">Plant prognosis</string>
+    <string name="show_avg" translatable="false">Show average</string>
+    <string name="plant_popup_header" translatable="false">Plant prognosis</string>
 
     <!-- HOME -->
     <string name="favorites_popup_title">favorites?</string>
@@ -45,7 +45,20 @@
 
     <string name="app_title" translatable="false">Almanakken</string>
     <string name="cont_desc_menu">Menu</string>
-    <string name="climate_graph">Climate graph</string>
-
+    <string name="climate_graph" translatable="false">Climate graph</string>
+    <string name="plant_card_ideal_temp" translatable="false">Ideal temperature:</string>
+    <string name="plant_card_tolerance_range" translatable="false">"Tolerance range: "</string>
+    <string name="temp_range" translatable="false">%1$d°C - %2$d°C</string>
+    <string name="plant_card_humidity" translatable="false">Humidity:</string>
+    <string name="humidity_range" translatable="false">%1$d%% - %2$d%%</string>
+    <string name="plant_card_sunshine" translatable="false">Sunshine:</string>
+    <string name="sunshine_range" translatable="false">%1$dh - %2$dh</string>
+    <string name="plant_card_precipitation" translatable="false">Precipitation:</string>
+    <string name="precipitation_range" translatable="false">%1$dmm - %2$dmm</string>
+    <string name="plant_selected_year">Selected year: %1$d</string>
+    <string name="plant_predicted_temp">predicted temp: %1$.1f°C</string>
+    <string name="plant_predicted_humidity">predicted humidity: %1$.1f%%</string>
+    <string name="plant_predicted_sunshine">predicted sunshine: %1$.1fh</string>
+    <string name="plant_predicted_precipitation">predicted precipitation: %1$.1fmm</string>
 
 </resources>
