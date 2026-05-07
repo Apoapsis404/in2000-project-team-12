@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
+import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateEvent
 import no.uio.ifi.in2000.team12.team12project.data.frost.Round
 import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
@@ -55,6 +56,7 @@ class GraphScreenViewModel(
     val graphScreenData = GraphScreenData(_uiState.value.markerPosition)
 
     private var graphDataFetchJob : Job? = null
+
 
     fun getClimateObs(){
         _uiState.update{

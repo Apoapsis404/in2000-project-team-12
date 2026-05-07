@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team12.team12project.data.frost
 
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
+import no.uio.ifi.in2000.team12.team12project.model.frost.ThreatLevel
 import kotlin.math.min
 
 class TorrentialRain(
@@ -27,13 +28,14 @@ class TorrentialRain(
     /**
      * Checks if the station has a history of torrential rain that exceeds the threshold.
      */
-    suspend fun isTorrentialRainThreat(sourceId: String): Boolean {
+    suspend fun isTorrentialRainThreat(sourceId: String): ThreatLevel {
         val (durationStart, amountStart) = try {
             val dStart = climateDataRepository.getClimateTimeSeries(sourceId, DURATION_ELEMENT).take(DATE_STRING_LENGTH)
             val aStart = climateDataRepository.getClimateTimeSeries(sourceId, AMOUNT_ELEMENT).take(DATE_STRING_LENGTH)
             dStart to aStart
-        } catch (_: Exception) {
-            return false
+        } catch (e: Exception) {
+            println(e)
+            return ThreatLevel.NONE
         }
 
         val months = min(min(monthsSince(durationStart), monthsSince(amountStart)).toUInt(), MAX_MONTHS_BACK)
@@ -45,7 +47,12 @@ class TorrentialRain(
         val yearsCount = if (months >= 12u) (months / 12u).toInt() else 1
         val averageInstancesPerYear = totalInstances / yearsCount
 
-        return averageInstancesPerYear >= INSTANCES_PER_YEAR_THRESHOLD
+        return when (averageInstancesPerYear) {
+            in 0 until INSTANCES_PER_YEAR_THRESHOLD -> ThreatLevel.NONE
+            in INSTANCES_PER_YEAR_THRESHOLD until 2 * INSTANCES_PER_YEAR_THRESHOLD -> ThreatLevel.LOW
+            in 2 * INSTANCES_PER_YEAR_THRESHOLD until 3 * INSTANCES_PER_YEAR_THRESHOLD -> ThreatLevel.MEDIUM
+            else -> ThreatLevel.HIGH
+        }
     }
 
     suspend fun getClimateData(sourceId: String, monthsBack: UInt, elementId: String): List<ClimateObs> {
