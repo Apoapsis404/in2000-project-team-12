@@ -59,7 +59,7 @@ class GraphScreenViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var tempRegressionModel : LinearRegressionModel? = null// = LinearRegressionModel(uiState.value.climateChartData.years.toDoubleArray(), uiState.value.climateChartData.values.toDoubleArray())
-
+    private var precRegressionModel : LinearRegressionModel? = null
     val graphScreenData = GraphScreenData(_uiState.value.markerPosition)
 
     private var graphDataFetchJob : Job? = null
@@ -142,14 +142,17 @@ class GraphScreenViewModel(
         _uiState.update { it.copy(climateChartData = chartData) }
 
         // To update regression model when chart is updated
-        if(chartData.years.isNotEmpty() && chartData.values.isNotEmpty()){
-            try {
-                tempRegressionModel = LinearRegressionModel(uiState.value.climateChartData.years.toDoubleArray(), uiState.value.climateChartData.values.toDoubleArray())
-            }catch (
-                e: Exception
-            ){
-                Log.e("GraphViewModel", "Failed to update regression model", e)
-            }
+        try {
+            val tempData = graphScreenData.getClimateChartData(ClimateType.MEAN_AIR_TEMP, month = uiState.value.month)!!
+            tempRegressionModel = LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
+
+            val precData = graphScreenData.getClimateChartData(ClimateType.PRECIPITATION, month = uiState.value.month)!!
+            precRegressionModel = LinearRegressionModel(precData.years.toDoubleArray(), precData.values.toDoubleArray())
+
+        }catch (
+            e: Exception
+        ){
+            Log.e("GraphViewModel", "Failed to update regression model", e)
         }
     }
 
@@ -157,11 +160,10 @@ class GraphScreenViewModel(
     fun updatePredictedClimate(){
         _uiState.update {
             it.copy(
-                //predictedTemperature = (it.yearSelected - 2026) * 0.2f +10,
-                predictedTemperature = tempRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 14f,
-                predictedHumidity = (it.yearSelected - 2026) * 0.4f + 45,
-                predictedSunshine = (it.yearSelected - 2026) * 0.2f + 5,
-                predictedPrecipitation = (it.yearSelected - 2026) * 0.1f + 2
+                predictedTemperature = tempRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 0f,
+                predictedHumidity = graphScreenData.getMean(ClimateType.RELATIVE_HUMIDITY, uiState.value.month)?.toFloat() ?: 0f,
+                predictedSunshine = graphScreenData.getMean(ClimateType.DURATION_OF_SUN, uiState.value.month)?.toFloat() ?: 0f,
+                predictedPrecipitation = precRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 0f,
             )
         }
     }
