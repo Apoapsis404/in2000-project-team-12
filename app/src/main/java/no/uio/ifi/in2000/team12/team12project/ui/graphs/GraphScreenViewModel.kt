@@ -19,6 +19,7 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
 import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
+import no.uio.ifi.in2000.team12.team12project.data.regression.LinearRegressionModel
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
 import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateData
@@ -59,10 +60,12 @@ class GraphScreenViewModel(
     private val climateMap = mutableMapOf<ClimateType, ClimateData>()
     private val meansMap = mutableMapOf<Pair<ClimateType, Months>, Double>()
     private val chartDataMap = mutableMapOf<Pair<ClimateType, Months>, ClimateChartData>()
+    private var tempRegressionModel : LinearRegressionModel? = null// = LinearRegressionModel(uiState.value.climateChartData.years.toDoubleArray(), uiState.value.climateChartData.values.toDoubleArray())
+    private var precRegressionModel : LinearRegressionModel? = null
+
 
     private var graphDataFetchJob: Job? = null
 
-    // --- Cache management ---
 
     private fun clearCachedData() {
         climateMap.clear()
@@ -170,15 +173,30 @@ class GraphScreenViewModel(
         _uiState.update {
             it.copy(climateChartData = chartData ?: ClimateChartData(emptyList(), emptyList()))
         }
+        _uiState.update { it.copy(climateChartData = chartData ?: ClimateChartData(emptyList(), emptyList())) }
+
+        // To update regression model when chart is updated
+        try {
+            val tempData = getClimateChartData(ClimateType.MEAN_AIR_TEMP, month = uiState.value.month)!!
+            tempRegressionModel = LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
+
+            val precData = getClimateChartData(ClimateType.PRECIPITATION, month = uiState.value.month)!!
+            precRegressionModel = LinearRegressionModel(precData.years.toDoubleArray(), precData.values.toDoubleArray())
+
+        }catch (
+            e: Exception
+        ){
+            Log.e("GraphViewModel", "Failed to update regression model", e)
+        }
     }
 
     fun updatePredictedClimate() {
         _uiState.update {
             it.copy(
-                predictedTemperature = (it.yearSelected - 2026) * 0.2f + 10,
-                predictedHumidity = (it.yearSelected - 2026) * 0.4f + 45,
-                predictedSunshine = (it.yearSelected - 2026) * 0.2f + 5,
-                predictedPrecipitation = (it.yearSelected - 2026) * 0.1f + 2
+                predictedTemperature = tempRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 0f,
+                predictedHumidity = getMean(ClimateType.RELATIVE_HUMIDITY, uiState.value.month)?.toFloat() ?: 0f,
+                predictedSunshine = getMean(ClimateType.DURATION_OF_SUN, uiState.value.month)?.toFloat() ?: 0f,
+                predictedPrecipitation = precRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 0f,
             )
         }
     }

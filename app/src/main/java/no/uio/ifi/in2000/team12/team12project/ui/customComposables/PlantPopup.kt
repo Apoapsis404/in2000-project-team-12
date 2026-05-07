@@ -43,7 +43,9 @@ fun PlantPopup(
         )
         DropDown<Months>(
             uiState.month.toString(),
-            onClick = {graphScreenViewModel.setMonth(it)},
+            onClick = {
+                graphScreenViewModel.setMonth(it)
+                graphScreenViewModel.updatePredictedClimate()},
         )
         Slider(
             value = uiState.yearSelected,
