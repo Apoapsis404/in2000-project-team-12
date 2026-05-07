@@ -18,6 +18,7 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
+import no.uio.ifi.in2000.team12.team12project.data.regression.LinearRegressionModel
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
 import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateData
@@ -53,8 +54,11 @@ class GraphScreenViewModel(
     private val climateDataRepository = ClimateDataRepository()
     private val plantsRepository = PlantsRepository(context)
 
+
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
+
+    private var tempRegressionModel : LinearRegressionModel? = null// = LinearRegressionModel(uiState.value.climateChartData.years.toDoubleArray(), uiState.value.climateChartData.values.toDoubleArray())
 
     val graphScreenData = GraphScreenData(_uiState.value.markerPosition)
 
@@ -136,13 +140,25 @@ class GraphScreenViewModel(
             return
         }
         _uiState.update { it.copy(climateChartData = chartData) }
+
+        // To update regression model when chart is updated
+        if(chartData.years.isNotEmpty() && chartData.values.isNotEmpty()){
+            try {
+                tempRegressionModel = LinearRegressionModel(uiState.value.climateChartData.years.toDoubleArray(), uiState.value.climateChartData.values.toDoubleArray())
+            }catch (
+                e: Exception
+            ){
+                Log.e("GraphViewModel", "Failed to update regression model", e)
+            }
+        }
     }
 
     // REPLACE THIS FUNCTION
     fun updatePredictedClimate(){
         _uiState.update {
             it.copy(
-                predictedTemperature = (it.yearSelected - 2026) * 0.2f +10,
+                //predictedTemperature = (it.yearSelected - 2026) * 0.2f +10,
+                predictedTemperature = tempRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 14f,
                 predictedHumidity = (it.yearSelected - 2026) * 0.4f + 45,
                 predictedSunshine = (it.yearSelected - 2026) * 0.2f + 5,
                 predictedPrecipitation = (it.yearSelected - 2026) * 0.1f + 2
