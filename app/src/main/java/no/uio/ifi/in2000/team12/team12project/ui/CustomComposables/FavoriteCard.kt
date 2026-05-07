@@ -58,9 +58,9 @@ fun FavoriteCard(
     subtitle: String,
     buttonIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowForward,
     selected: Boolean = false,
-    onButtonClick: () -> Unit = {},
-    onButtonDelete: () -> Unit = {} ,
-    onButtonChangName: () -> Unit = {}
+    onGraphButtonClick: () -> Unit = {},
+    onDeleteButtonClick: () -> Unit = {} ,
+    onChangeNameButtonClick: () -> Unit = {}
 
 ) {
     //
@@ -128,7 +128,7 @@ fun FavoriteCard(
                 .size(42.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.onPrimary)
-                .clickable { onButtonClick() },
+                .clickable { onGraphButtonClick() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -148,13 +148,13 @@ fun FavoriteCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick= onButtonChangName
+                    onClick= onChangeNameButtonClick
                 ) {
                     Text("add/change name")
                 }
 
                 Button(
-                    onClick = onButtonDelete
+                    onClick = onDeleteButtonClick
                 ){
                     Text("delete")
                 }
@@ -171,6 +171,6 @@ fun CardPreview() {
     FavoriteCard(
         title = "Sea Freight",
         subtitle = "3 active shipments",
-        onButtonClick = { /* navigate */ }
+        onGraphButtonClick = { /* navigate */ }
     )
 }

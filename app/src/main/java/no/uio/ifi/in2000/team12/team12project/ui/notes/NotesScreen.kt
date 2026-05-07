@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.FavoriteCard
+import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.MintGreen
+import no.uio.ifi.in2000.team12.team12project.ui.theme.sec2
 
 
 @Composable
@@ -65,9 +67,28 @@ fun NotesScreenContent(
         if (editing) {
             NoteEntryField(
                 note = selectedNote,
+                /*
                 onSave = { updatedText ->
                     val noteToSave = selectedNote?.copy(content = updatedText) ?: Note(content = updatedText)
                     onAddNote(noteToSave)
+                    editing = false
+                }*/
+                onSave = { updatedText ->
+
+                    val noteToSave =
+                        if (selectedNote != null) {
+                            selectedNote!!.copy(content = updatedText)
+                        } else {
+                            Note(content = updatedText)
+                        }
+
+                    onAddNote(noteToSave)
+
+                    selectedNote = null
+                    editing = false
+                },
+                onCancel = {
+                    selectedNote = null
                     editing = false
                 }
             )
@@ -77,6 +98,39 @@ fun NotesScreenContent(
                     notes,
                     key = { it.id ?: it.hashCode() }
                 ) { note ->
+                    val isSelected = selectedNote?.id == note.id
+
+                    Box(
+                        modifier = Modifier
+                            .padding(6.dp)
+                            /*
+                            .border(
+                                width = if (isSelected) 2.dp else 0.dp,
+                                color = if (isSelected) sec2 else Color.Transparent,
+                                shape = RoundedCornerShape(20.dp)
+                            )*/
+                    ){
+                        NoteItem(
+                            note = note,
+
+                            selected = isSelected,
+
+                            onClick = {
+                                selectedNote = note
+                            },
+
+                            onDeleteButtonClick = {
+                                selectedNote = note
+                                showDialog = true
+                            },
+
+                            onEditButtonClick = {
+                                selectedNote = note
+                                editing = true
+                            }
+                        )
+                    }
+                    }
                     /*
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { state ->
@@ -124,25 +178,31 @@ fun NotesScreenContent(
                     //
 
                     //
+                    /*
                     NoteItem(
                         note = note,
+                        /*
+                        //
                         onClick = {
-                            editing = true
+                            //editing = true /hmmmmm
                             selectedNote = note
-                        },
-                        onDeleteClick = {
+                        },*/ //
+                        onDeleteButtonClick = {
                             selectedNote = note
                             showDialog = true
+                        },
+                        onEditButtonClick = {
+                            editing = true
                         }
                     )
-                }
+                }*/
 
             }
             Button(
                 modifier = Modifier.padding(16.dp),
                 onClick = {
                     editing = true
-                    selectedNote = Note(content = "")
+                    selectedNote = null//(content = "")
                 }
             ) {
                 Text("Add note")
@@ -165,7 +225,7 @@ fun NotesScreenContent(
                         showDialog = false
                     }
                 ){
-                    Text("delete", color = Color.Red)
+                    Text("delete")//, color = Color.Red)
                 }
             },
             dismissButton = {
@@ -179,6 +239,7 @@ fun NotesScreenContent(
             }
         )
     }
+
 }
 
 @Preview(showBackground = true)

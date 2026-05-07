@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.FavoriteCard
 import no.uio.ifi.in2000.team12.team12project.ui.home.getNameandAdress
+import no.uio.ifi.in2000.team12.team12project.ui.theme.sec2
 
 @Composable
 fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(), navHostController: NavHostController) {
@@ -151,25 +152,26 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                     selectedName = favoriteLocation.name
                 }
                     .padding(6.dp)
+                    /*
                     .border(
                         width = if(selectedbox) 2.dp else 0.dp,
-                        color = if(selectedbox) Color.Green else Color.Transparent,
+                        color = if(selectedbox) sec2 else Color.Transparent,
                         shape = RoundedCornerShape(20.dp)
-                    )
+                    )*/
             ){
             FavoriteCard(
                 title = favoriteLocation.name,
                 subtitle = favoriteLocation.address,
                 selected = selectedbox, //
-                onButtonClick = {
+                onGraphButtonClick = {
                     navHostController.navigate("graph")
                     { popUpTo("graph")
                     }
                 } , //
-                onButtonDelete = {
+                onDeleteButtonClick = {
                     deleterequest = true
                 },
-                onButtonChangName = {
+                onChangeNameButtonClick = {
                     changename = true
                 }
             )
