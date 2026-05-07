@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.DataThresholding
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -42,6 +43,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.rememberDrawerState
@@ -70,6 +72,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.InfoPopup
@@ -100,6 +103,7 @@ class MainActivity : ComponentActivity() {
         config.setLocale(locale)
         super.attachBaseContext(newBase.createConfigurationContext(config))
     }
+
 
 
     @SuppressLint("UnrememberedMutableState")
@@ -146,10 +150,17 @@ fun MainComp(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
+    //variables with the changed location on the map and to ask if user wants to add location to favorites
+    var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
+    var askforpermission by remember { mutableStateOf(false)}
+
+    val context = LocalContext.current
+
     val drawerItemColors = NavigationDrawerItemDefaults.colors(
         unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
         selectedTextColor = MaterialTheme.colorScheme.onPrimary
     )
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -247,7 +258,14 @@ fun MainComp(
                 Header(
                     onClick = { scope.launch { drawerState.open() } },
                     homeScreenViewModel = homeScreenViewModel,
-                    navHostController = navController
+                    navHostController = navController,
+                    onFavoriteButtonClick = {
+
+                        askpermissonforlatlng =
+                            homeScreenViewModel.uiState.value.markerPosition
+
+                        askforpermission = true
+                    }
                 )
             },
         ) { innerPadding ->
@@ -262,6 +280,45 @@ fun MainComp(
             )
 
         }
+        if(askforpermission == true && askpermissonforlatlng != null){
+            AlertDialog(
+                onDismissRequest = {askforpermission = false},
+                title = {Text(stringResource(R.string.favorites_popup_title))},
+                text = {Text(stringResource(R.string.favorites_popup_question))},
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            scope.launch {
+                                val tempname = "temp_${System.currentTimeMillis()}" //temporary name so it is easier to tell apart the diffrent adresses in order to rename
+
+                                val (name, address) = getNameandAdress( //name is no longer used
+                                    context,
+                                    askpermissonforlatlng!!.latitude,
+                                    askpermissonforlatlng!!.longitude
+                                )
+                                //navigates to favorite screen
+                                navController.navigate("favorites")
+
+                                favoriteScreenViewModel.addFavoriteLocation(
+                                    location = askpermissonforlatlng!!,
+                                    name = tempname , //"add name",//name.toString(), //add apart of the address. will later on add ability to change the name
+                                    address = address.toString()
+                                )
+
+                            }
+                            askforpermission = false
+                        }) {
+                        Text(stringResource(R.string.yes))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {askforpermission = false}) {
+                        Text(stringResource(R.string.no))
+                    }
+                }
+            )
+        }
+
     }
 }
 
@@ -273,6 +330,7 @@ fun Header(
     onClick: () -> Unit,
     homeScreenViewModel: HomeScreenViewModel,
     navHostController: NavHostController,
+    onFavoriteButtonClick: () -> Unit
 ){
     val titleColors = MaterialTheme.colorScheme.onPrimary
     val scope = rememberCoroutineScope()
@@ -284,6 +342,8 @@ fun Header(
 
     // Put inside a viewModel?
     var showPopup by remember { mutableStateOf(false) }
+
+
 
 
     scope.launch {
@@ -347,6 +407,26 @@ fun Header(
             }
             //Information symbol
             TopBarIcon({showPopup = true}, Icons.Outlined.Info, "Information")
+
+            //favorite symbol
+            TopBarIcon(
+                onClick = onFavoriteButtonClick,
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = "Favorite"
+            )
+            /*
+            IconButton( //why not topbaricon
+                onClick = {
+                    askpermissonforlatlng = uiState.markerPosition
+                    askforpermission = true
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = "Add favorite",
+                    tint = MaterialTheme.colorScheme.secondary
+                )
+            }*/
 
         }
 

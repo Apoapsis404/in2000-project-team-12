@@ -118,8 +118,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
     }
 
     //variables with the changed location on the map and to ask if user wants to add location to favorites
-    var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
-    var askforpermission by remember { mutableStateOf(false)}
+    //var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
+    //var askforpermission by remember { mutableStateOf(false)}
 
 
     fun searchLocation(query: String) {
@@ -145,7 +145,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                 homeScreenViewModel.onMapClick(latLng)  //updates marker position
                 println(uiState.markerPosition)
 
-                askpermissonforlatlng = latLng
+                //askpermissonforlatlng = latLng
 
             },
             googleMapOptionsFactory = {
@@ -153,6 +153,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             },
             uiSettings = mapUiSettings,
         ) {
+            /*
             //
             if(askforpermission == true && askpermissonforlatlng != null){
                 AlertDialog(
@@ -191,7 +192,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                         }
                     }
                 )
-            }
+            }*/
             AdvancedMarker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
                 title = uiState.markerTitle ,
@@ -314,6 +315,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             ) {
                 Column{
                     // Favorite button
+                    /*
                     FilledIconButton(
                         onClick = {
                             askpermissonforlatlng = uiState.markerPosition
@@ -324,7 +326,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
                             imageVector = Icons.Default.FavoriteBorder,
                             contentDescription = "Favorite button",
                         )
-                    }
+                    }*/
                     // My location button
                     FilledIconButton(
                         onClick = {
