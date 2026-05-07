@@ -17,6 +17,7 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
 import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
+import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
 import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
@@ -31,11 +32,11 @@ data class GraphScreenUiState(
     val month: Months = Months.JANUARY,
     val climateType: ClimateType = ClimateType.MEAN_AIR_TEMP,
     val climateChartData: ClimateChartData = ClimateChartData(emptyList(), emptyList()),
-    val markerPosition : LatLng = LatLng(0.0,0.0),
-    val isLoading : Boolean = false,
-    val errorMessage : String? = null,
+    val markerPosition: LatLng = LatLng(0.0, 0.0),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
     val showMean: Boolean = false,
-    val showPopup: Boolean = false, // sett til false
+    val showPopup: Boolean = false,
     val yearSelected: Float = 2026f,
     val predictedTemperature: Float = 15f,
     val predictedHumidity: Float = 100f,
@@ -43,10 +44,8 @@ data class GraphScreenUiState(
     val predictedPrecipitation: Float = 100f,
 )
 
-
 class GraphScreenViewModel(
     application: Application
-    //private val plantsRepository: PlantsRepository
 ) : AndroidViewModel(application) {
 
     private val context = getApplication<Application>().applicationContext
@@ -56,15 +55,56 @@ class GraphScreenViewModel(
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    val graphScreenData = GraphScreenData(_uiState.value.markerPosition)
+    // Cache maps, previously in GraphScreenData
+    private val climateMap = mutableMapOf<ClimateType, ClimateData>()
+    private val meansMap = mutableMapOf<Pair<ClimateType, Months>, Double>()
+    private val chartDataMap = mutableMapOf<Pair<ClimateType, Months>, ClimateChartData>()
 
-    private var graphDataFetchJob : Job? = null
+    private var graphDataFetchJob: Job? = null
 
-    fun getClimateObs(){
-        _uiState.update{
-            it.copy(climateObs = graphScreenData.getClimateData(_uiState.value.climateType)!!.climateObs)
+    // --- Cache management ---
+
+    private fun clearCachedData() {
+        climateMap.clear()
+        meansMap.clear()
+        chartDataMap.clear()
+    }
+
+    private fun setClimateData(climateType: ClimateType, climateData: ClimateData) {
+        climateMap[climateType] = climateData
+    }
+
+    private fun getClimateData(climateType: ClimateType): ClimateData? {
+        return climateMap[climateType]
+    }
+
+    private fun computeAllMeans() {
+        for (climateType in ClimateType.entries) {
+            for (month in Months.entries) {
+                val obs = getObsFromMonth(month, climateMap[climateType]?.climateObs ?: continue)
+                meansMap[Pair(climateType, month)] = findMeanValue(obs)
+            }
         }
     }
+
+    private fun getClimateChartData(climateType: ClimateType, month: Months): ClimateChartData? {
+        val key = Pair(climateType, month)
+        if (chartDataMap.containsKey(key)) return chartDataMap[key]
+        val data = climateMap[climateType] ?: return null
+        val obsFromMonth = getObsFromMonth(month, data.climateObs)
+        val chartData = getYearAndData(obsFromMonth)
+        chartDataMap[key] = chartData
+        return chartData
+    }
+
+    // --- Public API ---
+
+    fun setMarkerPositionAndFetch(position: LatLng) {
+        clearCachedData()
+        _uiState.update { it.copy(markerPosition = position) }
+        fetchAllClimateData()
+    }
+
     fun fetchAllClimateData() {
         val position = _uiState.value.markerPosition
         graphDataFetchJob?.cancel()
@@ -74,13 +114,12 @@ class GraphScreenViewModel(
             try {
                 val refTime = constructTimeSeries(120u)
 
-                // Fetches all climate types in parallel
                 val deferreds = ClimateType.entries.map { type ->
                     async {
                         try {
                             val obs = climateDataRepository.getClimateDataFailing(position, type, refTime)
                             val climateData = ClimateData(refTime, obs, type)
-                            graphScreenData.setClimateData(type, climateData)
+                            setClimateData(type, climateData)
                         } catch (e: CancellationException) {
                             throw e
                         } catch (e: Exception) {
@@ -89,17 +128,24 @@ class GraphScreenViewModel(
                     }
                 }
                 deferreds.awaitAll()
-
+                computeAllMeans()
                 updateChartData()
                 _uiState.update { it.copy(isLoading = false) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "Error loading data ${e.message}") }
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = "Error loading data ${e.message}")
+                }
             }
         }
     }
 
+    fun getClimateObs() {
+        _uiState.update {
+            it.copy(climateObs = getClimateData(it.climateType)?.climateObs ?: emptyList())
+        }
+    }
 
     fun setMonth(month: Months) {
         _uiState.update { it.copy(month = month) }
@@ -108,10 +154,7 @@ class GraphScreenViewModel(
 
     fun setClimateType(climateType: ClimateType) {
         _uiState.update { it.copy(climateType = climateType) }
-    }
-
-    fun setMarkerPosition(position : LatLng){
-        _uiState.update { it.copy(markerPosition = position) }
+        updateChartData()
     }
 
     fun toggleMean(show: Boolean) {
@@ -119,30 +162,20 @@ class GraphScreenViewModel(
     }
 
     fun getMean(climateType: ClimateType, month: Months): Double? {
-        if (!graphScreenData.containsKey(climateType, month)) {
-            // Calculate mean and store it in the map
-            val obsFromMonth = getObsFromMonth(month, graphScreenData.getClimateData(climateType)!!.climateObs)
-            val mean = findMeanValue(obsFromMonth)
-            graphScreenData.setMean(climateType, month, mean)
-            return mean
-        }
-        return graphScreenData.getMean(climateType, month)
+        return meansMap[Pair(climateType, month)]
     }
 
     fun updateChartData(climateType: ClimateType = _uiState.value.climateType) {
-        val chartData: ClimateChartData? = graphScreenData.getClimateChartData(climateType, _uiState.value.month)
-        if (chartData == null) {
-            _uiState.update { it.copy(climateChartData = ClimateChartData(emptyList(), emptyList())) }
-            return
+        val chartData = getClimateChartData(climateType, _uiState.value.month)
+        _uiState.update {
+            it.copy(climateChartData = chartData ?: ClimateChartData(emptyList(), emptyList()))
         }
-        _uiState.update { it.copy(climateChartData = chartData) }
     }
 
-    // REPLACE THIS FUNCTION
-    fun updatePredictedClimate(){
+    fun updatePredictedClimate() {
         _uiState.update {
             it.copy(
-                predictedTemperature = (it.yearSelected - 2026) * 0.2f +10,
+                predictedTemperature = (it.yearSelected - 2026) * 0.2f + 10,
                 predictedHumidity = (it.yearSelected - 2026) * 0.4f + 45,
                 predictedSunshine = (it.yearSelected - 2026) * 0.2f + 5,
                 predictedPrecipitation = (it.yearSelected - 2026) * 0.1f + 2
@@ -153,15 +186,23 @@ class GraphScreenViewModel(
     fun openPopup() {
         _uiState.update { it.copy(showPopup = true) }
     }
-    fun closePopup(){
+
+    fun closePopup() {
         _uiState.update { it.copy(showPopup = false) }
     }
+
     fun updateSelectedYear(year: Float) {
         _uiState.update { it.copy(yearSelected = year) }
     }
-    fun getBestPlants(targetTemp: Float, targetHumidity: Float = 50f, targetSunshine: Float = 7f, targetPrecipitation: Float = 5f): PriorityQueue<Plant>{
-        return plantsRepository.getBestPlantsPriorityQueue(targetTemp, targetHumidity, targetSunshine, targetPrecipitation)
+
+    fun getBestPlants(
+        targetTemp: Float,
+        targetHumidity: Float = 50f,
+        targetSunshine: Float = 7f,
+        targetPrecipitation: Float = 5f
+    ): PriorityQueue<Plant> {
+        return plantsRepository.getBestPlantsPriorityQueue(
+            targetTemp, targetHumidity, targetSunshine, targetPrecipitation
+        )
     }
-
-
 }

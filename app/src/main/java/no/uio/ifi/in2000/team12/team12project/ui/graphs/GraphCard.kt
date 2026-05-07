@@ -69,7 +69,6 @@ fun GraphCard(
                 color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.align(Alignment.Start)
             )
 
             // Visual representation in the middle

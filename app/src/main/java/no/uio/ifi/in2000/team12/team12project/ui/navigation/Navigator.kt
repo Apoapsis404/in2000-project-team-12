@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team12.team12project.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -44,13 +45,11 @@ fun Navigator(
                 modifier = Modifier
             )
         }
-        composable(
-            route = "graph"
-        ) {
-            graphViewModel.setMarkerPosition(homeViewModel.getMarkerPosition())
-            graphViewModel.fetchAllClimateData()
+        composable(route = "graph") {
+            LaunchedEffect(homeViewModel.getMarkerPosition()) {
+                graphViewModel.setMarkerPositionAndFetch(homeViewModel.getMarkerPosition())
+            }
             GraphScreen(graphScreenViewModel = graphViewModel)
-
         }
         composable  (
             route = "settings"
@@ -60,7 +59,7 @@ fun Navigator(
         composable  (
             route = "favorites"
         ){
-            FavoritesScreen(favoritesScreenViewModel = favoritesViewModel, navController)
+            FavoritesScreen(favoritesScreenViewModel = favoritesViewModel, graphViewModel, navController)
         }
         composable (
             route = "notes",

@@ -130,7 +130,7 @@ fun GraphScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.padding(8.dp))
-                        Button(onClick =  { graphScreenViewModel.getClimateObs()} ){
+                        Button(onClick =  { graphScreenViewModel.fetchAllClimateData()} ){
                             Text(stringResource(R.string.try_again))
                         }
                     }
@@ -144,7 +144,8 @@ fun GraphScreen(
 
             Spacer(modifier = modifier.height(10.dp))
 
-            Row(modifier = modifier.fillMaxWidth()) {
+            Row(modifier = modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center) {
                 DropDown<Months>(uiState.month.toString(), modifier = modifier.weight(1f)) {
                     graphScreenViewModel.setMonth(it)
                 }
@@ -154,18 +155,18 @@ fun GraphScreen(
 //                }
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Checkbox(
-                    checked = uiState.showMean,
-                    onCheckedChange = { graphScreenViewModel.toggleMean(it) }
-                )
-                Text(text = stringResource(R.string.show_avg))
-            }
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically,
+//                modifier = modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 16.dp)
+//            ) {
+//                Checkbox(
+//                    checked = uiState.showMean,
+//                    onCheckedChange = { graphScreenViewModel.toggleMean(it) }
+//                )
+//                Text(text = stringResource(R.string.show_avg))
+//            }
         }
 
         Column {
@@ -176,7 +177,7 @@ fun GraphScreen(
                 GraphCard(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.MEAN_AIR_TEMP,
-                    meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.MEAN_AIR_TEMP, uiState.month) ?: 0.0,
+                    meanValue = graphScreenViewModel.getMean(ClimateType.MEAN_AIR_TEMP, uiState.month) ?: 0.0,
                     onClick = {
                         graphScreenViewModel.setClimateType(ClimateType.MEAN_AIR_TEMP)
                         graphScreenViewModel.updateChartData()
@@ -185,7 +186,7 @@ fun GraphScreen(
                 GraphCard(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.RELATIVE_HUMIDITY,
-                    meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.RELATIVE_HUMIDITY, uiState.month) ?: 0.0,
+                    meanValue = graphScreenViewModel.getMean(ClimateType.RELATIVE_HUMIDITY, uiState.month) ?: 0.0,
                     onClick = {
                         graphScreenViewModel.setClimateType(ClimateType.RELATIVE_HUMIDITY)
                         graphScreenViewModel.updateChartData()
@@ -199,7 +200,7 @@ fun GraphScreen(
                 GraphCard(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.DURATION_OF_SUN,
-                    meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.DURATION_OF_SUN, uiState.month) ?: 0.0,
+                    meanValue = graphScreenViewModel.getMean(ClimateType.DURATION_OF_SUN, uiState.month) ?: 0.0,
                     onClick = {
                         graphScreenViewModel.setClimateType(ClimateType.DURATION_OF_SUN)
                         graphScreenViewModel.updateChartData()
@@ -209,7 +210,7 @@ fun GraphScreen(
                 GraphCard(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.PRECIPITATION,
-                    meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.PRECIPITATION, uiState.month) ?: 0.0,
+                    meanValue = graphScreenViewModel.getMean(ClimateType.PRECIPITATION, uiState.month) ?: 0.0,
                     onClick = {
                         graphScreenViewModel.setClimateType(ClimateType.PRECIPITATION)
                         graphScreenViewModel.updateChartData()

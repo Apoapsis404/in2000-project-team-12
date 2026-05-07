@@ -25,9 +25,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.FavoriteCard
+import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
+import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 
 @Composable
-fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(), navHostController: NavHostController) {
+fun FavoritesScreen(
+    favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(),
+    graphScreenViewModel: GraphScreenViewModel = viewModel(),
+    navHostController: NavHostController) {
 
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
     //string that will be added to removefavoritefunction
@@ -39,40 +44,8 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
     var chosenlocation by remember { mutableStateOf<FavoriteLocation?>(null) }
     var selectedName by remember { mutableStateOf<String?>(null) }
 
-    /*
-    LaunchedEffect(uiState.favoritesLocationList) {
 
-        //dersom det ikke er noen favoritt, legges til default hardkodet plasser
-        if (uiState.favoritesLocationList.isEmpty()) {
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(1.1, 1.1),
-                "Pappas gård",
-                "Fadervegen 1"
-            )
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(1.1, 1.1),
-                "Bakgården",
-                "Bak huset"
-            )
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(1.1, 1.1),
-                "Skjærgården",
-                "Husmans gate 10"
-            )
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(1.1, 1.1),
-                "Forigården",
-                "Fortiden"
-            )
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(2.2, 2.2),
-                name = "Stellan Skaarsgården",
-                address = "Sverige"
-            )
 
-        }
-    */
-    //check for newly added to favorites
     LaunchedEffect(favoritesScreenViewModel.lastfavoriteadded,uiState.favoritesLocationMap) {
         val newname = favoritesScreenViewModel.lastfavoriteadded
         if(newname != null){
@@ -86,37 +59,6 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
             favoritesScreenViewModel.lastfavoriteadded = null
         }
     }
-
-    /*
-    LaunchedEffect(Unit) {
-        favoritesScreenViewModel.lastfavoriteadded.collect{newname ->
-            val item = uiState.favoritesLocationMap.values.find {
-                it.name == newname
-            }
-            if(item != null){
-                chosenlocation = item
-                deleteplacebyname = item.name
-                changename = true
-                return
-            }
-
-        }
-    }*/
-    /*
-    LaunchedEffect(Unit) {
-        favoritesScreenViewModel.lastfavoriteadded.collect { newname ->
-            snapshotFlow { uiState.favoritesLocationMap }
-                .map { it.values.find { loc -> loc.name == newname } }
-                .filterNotNull()
-                .first()
-                .let { item ->
-                    chosenlocation = item
-                    deleteplacebyname = item.name
-                    selectedName = item.name
-                    changename = true
-                }
-        }
-    }*/
 
     Box(modifier = Modifier){
 
@@ -151,10 +93,13 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                 subtitle = favoriteLocation.address,
                 selected = selectedbox, //
                 onButtonClick = {
+                    graphScreenViewModel.setMarkerPositionAndFetch(
+                        favoriteLocation.coordinates
+                    )
                     navHostController.navigate("graph")
                     { popUpTo("graph")
                     }
-                } , //
+                } ,
                 onButtonDelete = {
                     deleterequest = true
                 },
@@ -171,8 +116,8 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
     if(deleterequest && chosenlocation !=null){
         AlertDialog(
             onDismissRequest = {deleterequest= false},
-            title = {Text("delete?")},
-            text = {Text("do you wish to delete address ${deleteplacebyname}" )},
+            title = {Text("Delete location")},
+            text = {Text("Do you wish to delete your location ${deleteplacebyname}?" )},
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -182,12 +127,12 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                         deleterequest = false
                         chosenlocation =null
                     }) {
-                    Text("yessssssssssirrrr")
+                    Text("Delete")
                 }
             },
             dismissButton = {
                 TextButton(onClick = {deleterequest = false}) {
-                    Text("Nosirrrrrrrrrr")
+                    Text("Cancel")
                 }
             }
         )

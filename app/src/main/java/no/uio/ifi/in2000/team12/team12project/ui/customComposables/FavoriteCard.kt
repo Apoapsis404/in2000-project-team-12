@@ -152,13 +152,13 @@ fun FavoriteCard(
                 Button(
                     onClick= onButtonChangName
                 ) {
-                    Text("add/change name")
+                    Text("Edit name")
                 }
 
                 Button(
                     onClick = onButtonDelete
                 ){
-                    Text("delete")
+                    Text("Delete")
                 }
             }
         }
@@ -166,13 +166,3 @@ fun FavoriteCard(
 }
 }
 
-// --- Preview / Usage ---
-@Preview
-@Composable
-fun CardPreview() {
-    FavoriteCard(
-        title = "Sea Freight",
-        subtitle = "3 active shipments",
-        onButtonClick = { /* navigate */ }
-    )
-}
