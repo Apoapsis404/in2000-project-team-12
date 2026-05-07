@@ -43,6 +43,7 @@ class ObsStationsDataSource {
 
             url {
                 parameters.append("geometry", nearestString)
+//                parameters.append("types", "SensorSystem")
                 parameters.append("nearestmaxcount", maxCount.toString())
                 parameters.append("fields", fieldsString)
             }
@@ -75,6 +76,7 @@ class ObsStationsDataSource {
 
             url {
                 parameters.append("country", "norge")
+                parameters.append("types", "SensorSystem")
                 parameters.append("stationholder", "MET.NO")
                 parameters.append("fields", "id")
             }
