@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
@@ -25,7 +26,6 @@ import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
 fun PlantPopup(
     graphScreenViewModel: GraphScreenViewModel,
     uiState: GraphScreenUiState,
-    modifier: Modifier = Modifier
 ){
     val plantPq = graphScreenViewModel.getBestPlants(
         uiState.predictedTemperature,
@@ -48,8 +48,8 @@ fun PlantPopup(
         )
         Slider(
             value = uiState.yearSelected,
-            valueRange = 2026f..2126f, // Hardcoded range for now
-            steps = 100,
+            valueRange = 2026f..2076f, // Hardcoded range for now
+            steps = 50,
             onValueChange = {
                 graphScreenViewModel.updateSelectedYear(it)
                 graphScreenViewModel.updatePredictedClimate()
@@ -59,26 +59,30 @@ fun PlantPopup(
                 .fillMaxWidth(),
             )
         Text(
-            "Selected year: ${uiState.yearSelected.toInt()}",
+            stringResource(R.string.plant_selected_year, uiState.yearSelected.toInt()),
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         Column(
             verticalArrangement = spacedBy(1.dp)
         ) {
             Text(
-                "predicted temp: ${uiState.predictedTemperature}C",
+                stringResource(R.string.plant_predicted_temp, uiState.predictedTemperature),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Text(
-                "predicted humidity: ${uiState.predictedHumidity}?",
+                stringResource(R.string.plant_predicted_humidity, uiState.predictedHumidity),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Text(
-                "predicted sunshine: ${uiState.predictedSunshine}?",
+                stringResource(R.string.plant_predicted_sunshine, uiState.predictedSunshine),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Text(
-                "predicted precipitation: ${uiState.predictedPrecipitation}mm",
+                stringResource(
+                    R.string.plant_predicted_precipitation,
+                    uiState.predictedPrecipitation * 30
+                ),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
