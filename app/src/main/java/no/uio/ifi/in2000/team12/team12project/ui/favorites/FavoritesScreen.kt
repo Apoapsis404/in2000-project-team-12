@@ -123,12 +123,12 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                         deleterequest = false
                         chosenlocation =null
                     }) {
-                    Text("yessssssssssirrrr")
+                    Text("Yes")
                 }
             },
             dismissButton = {
                 TextButton(onClick = {deleterequest = false}) {
-                    Text("Nosirrrrrrrrrr")
+                    Text("No")
                 }
             }
         )

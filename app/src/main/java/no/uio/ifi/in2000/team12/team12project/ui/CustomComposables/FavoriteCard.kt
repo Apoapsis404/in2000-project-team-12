@@ -159,7 +159,7 @@ fun FavoriteCard(
                     ),
                     onClick= onChangeNameButtonClick
                 ) {
-                    Text("change name")
+                    Text("Change name")
                 }
 
                 Button(
@@ -172,7 +172,7 @@ fun FavoriteCard(
                     ),
                     onClick = onDeleteButtonClick
                 ){
-                    Text("delete")
+                    Text("Delete")
                 }
             }
         }
