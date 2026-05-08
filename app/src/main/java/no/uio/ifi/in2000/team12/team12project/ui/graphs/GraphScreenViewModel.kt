@@ -19,6 +19,7 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
 import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData
+import no.uio.ifi.in2000.team12.team12project.data.frost.monthsSince
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.data.regression.LinearRegressionModel
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
@@ -28,6 +29,7 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
 import java.util.PriorityQueue
+import kotlin.math.min
 
 data class GraphScreenUiState(
     val climateObs: List<ClimateObs> = emptyList(),
@@ -119,12 +121,14 @@ class GraphScreenViewModel(
         graphDataFetchJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val refTime = constructTimeSeries(120u)
-
                 val deferreds = ClimateType.entries.map { type ->
                     async {
                         try {
-                            val obs = climateDataRepository.getClimateDataFailing(position, type, refTime)
+                            val (timeSeries, source) = climateDataRepository.getClimateTimeSeriesFromPos(position, type)
+                            val months = monthsSince(timeSeries)
+                            val refTime = constructTimeSeries(min(months.toUInt(), 360u))
+
+                            val obs = climateDataRepository.getClimateData(source, type.elementId, refTime)
                             val climateData = ClimateData(refTime, obs, type)
                             setClimateData(type, climateData)
                         } catch (e: CancellationException) {
