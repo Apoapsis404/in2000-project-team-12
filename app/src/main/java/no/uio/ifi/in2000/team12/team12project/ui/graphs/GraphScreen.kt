@@ -201,7 +201,7 @@ fun GraphScreen(
                     selected = uiState.climateType == ClimateType.DURATION_OF_SUN,
                     onClick = {
                         graphScreenViewModel.setClimateType(ClimateType.DURATION_OF_SUN)
-                        graphScreenViewModel.updateChartData()git
+                        graphScreenViewModel.updateChartData()
                     }
 
                 )
