@@ -5,7 +5,7 @@ import org.junit.Test
 import kotlinx.coroutines.test.runTest
 
 
-class GetClimateDataTest {
+class TestClimateDataSource {
 
     @Test
     fun testGetClimateData() = runTest {
@@ -30,5 +30,14 @@ class GetClimateDataTest {
             val station = climateDataSource.getClimateData(stationIds, "mean(min(air_temperature P1D) P1M)", "2016-01-01/2017-01-01")
             printClimateObsList(station)
         }
+    }
+
+    @Test
+    fun testGetClimateTimeSeries() = runTest {
+        val expected = "1993-11-07T00:00:00.000Z"
+        val dataSource = ClimateDataSource()
+        val actual = dataSource.getClimateTimeSeries("SN18700", "sum(duration_of_precipitation PT1H)")
+        println(actual)
+        assert(actual.contains(expected))
     }
 }

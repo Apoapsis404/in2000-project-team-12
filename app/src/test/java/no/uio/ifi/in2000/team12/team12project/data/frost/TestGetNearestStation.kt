@@ -29,4 +29,13 @@ class GetNearestStationTest {
         }
     }
 
+    @Test
+    fun testGetMetStation() = runTest {
+        val dataSource = ObsStationsDataSource()
+
+        val stations = dataSource.getMetStations()
+        println(stations)
+        assertEquals(stations.split(",").size, 404)
+    }
+
 }

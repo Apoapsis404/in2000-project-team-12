@@ -3,10 +3,13 @@ package no.uio.ifi.in2000.team12.team12project.ui.home
 import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.annotation.RequiresPermission
+import androidx.compose.foundation.Canvas
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
+import no.uio.ifi.in2000.team12.team12project.data.frost.TorrentialRain
 import no.uio.ifi.in2000.team12.team12project.data.frost.getStationIdsFromList
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
@@ -33,36 +37,13 @@ data class HomeScreenUiState(
     val markerTitle : String = "",
     val isMapReady : Boolean = false,
     val suggestions: List<String> = emptyList(),
-    val downpourList: List<LatLng> = listOf(
-        //Oslo
-        LatLng(59.94, 10.71),
-        LatLng(59.93, 10.73),
-        LatLng(59.92, 10.76),
-        LatLng(59.87, 10.76),
-        LatLng(59.87, 10.81),
-        //Dala
-        LatLng(60.91, 10.78),
-        //Berg
-        LatLng(60.37, 5.33),
-        LatLng(60.33, 5.29)
-        ),
-    val extremeWindList: List<LatLng> = listOf(
-        LatLng(59.96, 10.73),
-        LatLng(59.95, 10.75),
-        LatLng(59.94, 10.78),
-        LatLng(59.89, 10.78),
-        LatLng(59.89, 10.83),
-        //Dala
-        LatLng(60.93, 10.80),
-        //Berg
-        LatLng(60.39, 5.35),
-        LatLng(60.35, 5.31)
-    ),
-
+    val downpourList: List<LatLng> = emptyList(),
+    val extremeWindList: List<LatLng> = emptyList(),
     val flomList: List<LatLng> = emptyList()
 )
 
 class HomeScreenViewModel(application : Application) : AndroidViewModel(application){
+    private val torrentialRain = TorrentialRain()
     private val obsStationsDataSource : ObsStationsDataSource = ObsStationsDataSource()
     private val nveRepository : NVERepository = NVERepository(NVEDataSource(application))
     private val _uiState = MutableStateFlow(HomeScreenUiState())
@@ -73,6 +54,11 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
 
     private val placesClient = Places.createClient(application)
     private val sessionToken = AutocompleteSessionToken.newInstance()
+
+    init {
+        readLatLngIntoList()
+        fetchFloodWarnings()
+    }
 
     fun fetchSuggestions(query: String) {
         println("fetchSuggestions called with: $query")
@@ -219,8 +205,17 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
         return BitmapDescriptorFactory.fromBitmap(bitMap)
     }
 
-    init {
-        fetchFloodWarnings()
+    fun readLatLngIntoList() {
+        val context = getApplication<Application>().applicationContext
+        val torrentialRainStations = torrentialRain.readLatLngFromJson(context, "torrential_rain_stations.json")
+        val highWindStations = torrentialRain.readLatLngFromJson(context, "high_wind_speed_stations.json")
+
+        _uiState.update {
+            it.copy(
+                downpourList = torrentialRainStations,
+                extremeWindList = highWindStations
+            )
+        }
     }
 }
 

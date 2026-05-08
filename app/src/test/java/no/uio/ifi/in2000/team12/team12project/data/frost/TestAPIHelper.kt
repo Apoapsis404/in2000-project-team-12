@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
+import no.uio.ifi.in2000.team12.team12project.model.frost.Observation
 import org.junit.Test
 import org.junit.Assert.*
 
@@ -74,5 +76,20 @@ class TestAPIHelper {
         val referenceTime = "2016-01-01"
         assertEquals(true, isFromYear(referenceTime, 2016))
         assertEquals(false, isFromYear(referenceTime, 2017))
+    }
+
+    @Test
+    fun testFindMaxObs() {
+        val climateObs = ClimateObs(
+            sourceId = "SN18700",
+            referenceTime = "2023-01-01",
+            observations = listOf(
+                Observation(elementId = "mean_wind_speed", value = 5.0, unit = "m/s"),
+                Observation(elementId = "mean_wind_speed", value = 10.0, unit = "m/s"),
+                Observation(elementId = "mean_wind_speed", value = 15.0, unit = "m/s")
+            )
+        )
+        val max = findMaxObs(climateObs)
+        assertEquals(15.0, max, 0.001)
     }
 }

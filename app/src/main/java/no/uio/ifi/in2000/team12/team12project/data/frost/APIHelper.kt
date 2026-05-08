@@ -55,6 +55,27 @@ fun lastNMonths(n: UInt, currentDate: String): String {
     return "$fromYear-${fromMonth.toString().padStart(2, '0')}-01"
 }
 
+fun monthsSince(date: String, currentDate: String = getCurrentDate()): Int {
+
+//    println("Date: $date, Current Date: $currentDate")
+
+    val currentYear = currentDate.split("-")[0].toInt()
+    val currentMonth = currentDate.split("-")[1].toInt()
+
+    val year = date.split("-")[0].toInt()
+    val month = date.split("-")[1].toInt()
+
+//    println("Year: $year, Month: $month")
+
+    return (currentYear - year) * 12 + (currentMonth - month)
+}
+
+fun yearsSince(date: String, currentDate: String = getCurrentDate()): Int {
+    val currentYear = currentDate.split("-")[0].toInt()
+    val year = date.split("-")[0].toInt()
+    return currentYear - year
+}
+
 
 fun isFromMonth(referencetime: String, month: Int): Boolean {
     return referencetime.split("-")[1].toInt() == month
@@ -191,4 +212,12 @@ fun findMeanObs(climateObs: ClimateObs): Double {
 
     val sum = observations.sumOf { it.value }
     return sum / observations.size
+}
+
+fun findMaxObs(climateObs: ClimateObs): Double {
+    val observations = climateObs.observations
+    require(observations.isNotEmpty()) {
+        "Cannot compute max of ClimateObs with no observations"
+    }
+    return observations.maxOf { it.value }
 }
