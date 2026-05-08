@@ -31,8 +31,11 @@ import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 @Composable
 fun NoteItem(
     note: Note, modifier: Modifier = Modifier,
+    selected: Boolean = false,
     onClick: () -> Unit = {},
-    onDeleteClick: () -> Unit = {}) {
+    onDeleteButtonClick: () -> Unit = {},
+    onEditButtonClick: () -> Unit = {}
+) {
     Card(
         modifier = modifier
             .padding(8.dp)
@@ -72,7 +75,7 @@ fun NoteItem(
                     .clickable(
                         indication = null,
                         interactionSource = remember{MutableInteractionSource()}
-                    ){onDeleteClick()},
+                    ){onDeleteButtonClick()},
                 contentAlignment = Alignment.Center
 
             ){Icon(

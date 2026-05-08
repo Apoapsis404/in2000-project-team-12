@@ -1,6 +1,9 @@
 package no.uio.ifi.in2000.team12.team12project.ui.notes
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -22,7 +25,14 @@ import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 
 @Composable
-fun NoteEntryField(modifier: Modifier = Modifier, maxChars: Int = 200, note: Note? = null, onSave: (String) -> Unit) {
+fun NoteEntryField(
+    modifier: Modifier = Modifier,
+    maxChars: Int = 200,
+    note: Note? = null,
+    onSave: (String) -> Unit,
+    onCancel: () -> Unit = {}
+
+) {
     var text by remember { mutableStateOf(note?.content ?: "") }
 
     Column {
@@ -43,11 +53,31 @@ fun NoteEntryField(modifier: Modifier = Modifier, maxChars: Int = 200, note: Not
                 )
             }
         )
-        Button(
-            modifier = Modifier.padding(top = 8.dp),
-            onClick = { onSave(text) },
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(stringResource(R.string.save_note))
+            Button(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                ,
+                onClick = { onCancel() },
+            ) {
+                Text("Cancel")
+            }
+
+            Spacer(modifier = Modifier.padding(8.dp))
+
+            Button(
+                modifier = Modifier
+                    .padding(top = 8.dp),
+                onClick = { onSave(text) },
+            ) {
+                Text("Save")
+            }
+
+
         }
     }
 }

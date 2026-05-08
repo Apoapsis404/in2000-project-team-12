@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.DataThresholding
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,6 +45,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.rememberDrawerState
@@ -73,6 +76,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.InfoPopup
@@ -105,6 +109,7 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -120,7 +125,8 @@ class MainActivity : ComponentActivity() {
             val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoriteDao()))
             val notesScreenViewModel : NotesScreenViewModel = viewModel(factory = NotesScreenViewModelFactory(app.database.notesDao()))
             val homeScreenViewModel : HomeScreenViewModel = viewModel()
-
+            //HomeScreen()
+            //GraphScreen()
             Team12ProjectTheme(
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
@@ -148,6 +154,12 @@ fun MainComp(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
+    //variables with the changed location on the map and to ask if user wants to add location to favorites
+    var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
+    var askforpermission by remember { mutableStateOf(false)}
+
+    val context = LocalContext.current
+
     val drawerItemColors = NavigationDrawerItemDefaults.colors(
         unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
         selectedTextColor = MaterialTheme.colorScheme.onPrimary
@@ -261,7 +273,14 @@ fun MainComp(
                 Header(
                     onClick = { scope.launch { drawerState.open() } },
                     homeScreenViewModel = homeScreenViewModel,
-                    navHostController = navController
+                    navHostController = navController,
+                    onFavoriteButtonClick = {
+
+                        askpermissonforlatlng =
+                            homeScreenViewModel.uiState.value.markerPosition
+
+                        askforpermission = true
+                    }
                 )
             },
         ) { innerPadding ->
@@ -276,6 +295,101 @@ fun MainComp(
             )
 
         }
+        if(askforpermission == true && askpermissonforlatlng != null){
+            AlertDialog(
+                onDismissRequest = {
+                    askforpermission = false
+                },
+
+                title = {
+                    Text(stringResource(R.string.favorites_popup_title))
+                },
+
+                text = {
+                    Text(stringResource(R.string.favorites_popup_question))
+                },
+
+                confirmButton = {
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        TextButton(
+                            onClick = {
+                                askforpermission = false
+                            }
+                        ) {
+                            Text(stringResource(R.string.no))
+                        }
+
+                        TextButton(
+                            onClick = {
+                                scope.launch {
+
+                                    val tempname = "temp_${System.currentTimeMillis()}"
+
+                                    val (name, address) = getNameandAdress(
+                                        context,
+                                        askpermissonforlatlng!!.latitude,
+                                        askpermissonforlatlng!!.longitude
+                                    )
+
+                                    navController.navigate("favorites")
+
+                                    favoriteScreenViewModel.addFavoriteLocation(
+                                        location = askpermissonforlatlng!!,
+                                        name = tempname,
+                                        address = address.toString()
+                                    )
+                                }
+
+                                askforpermission = false
+                            }
+                        ) {
+                            Text(stringResource(R.string.yes))
+                        }
+                    }
+                }
+            )
+            /*AlertDialog(
+                onDismissRequest = {askforpermission = false},
+                title = {Text(stringResource(R.string.favorites_popup_title))},
+                text = {Text(stringResource(R.string.favorites_popup_question))},
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            scope.launch {
+                                val tempname = "temp_${System.currentTimeMillis()}" //temporary name so it is easier to tell apart the diffrent adresses in order to rename
+
+                                val (name, address) = getNameandAdress( //name is no longer used
+                                    context,
+                                    askpermissonforlatlng!!.latitude,
+                                    askpermissonforlatlng!!.longitude
+                                )
+                                //navigates to favorite screen
+                                navController.navigate("favorites")
+
+                                favoriteScreenViewModel.addFavoriteLocation(
+                                    location = askpermissonforlatlng!!,
+                                    name = tempname , //"add name",//name.toString(), //add apart of the address. will later on add ability to change the name
+                                    address = address.toString()
+                                )
+
+                            }
+                            askforpermission = false
+                        }) {
+                        Text(stringResource(R.string.Yes))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {askforpermission = false}) {
+                        Text(stringResource(R.string.no))
+                    }
+                }
+            )*/
+        }
     }
 }
 
@@ -287,6 +401,7 @@ fun Header(
     onClick: () -> Unit,
     homeScreenViewModel: HomeScreenViewModel,
     navHostController: NavHostController,
+    onFavoriteButtonClick: () -> Unit
 ){
     val titleColors = MaterialTheme.colorScheme.onPrimary
     val scope = rememberCoroutineScope()
@@ -364,6 +479,13 @@ fun Header(
             }
             //Information symbol
             TopBarIcon({showPopup = true}, Icons.Outlined.Info, "Information")
+
+            //favorite symbol
+            TopBarIcon(
+                onClick = onFavoriteButtonClick,
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = "Favorite"
+            )
 
         }
 

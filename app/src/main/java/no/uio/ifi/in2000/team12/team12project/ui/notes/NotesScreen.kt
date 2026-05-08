@@ -1,7 +1,14 @@
 package no.uio.ifi.in2000.team12.team12project.ui.notes
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -55,9 +62,28 @@ fun NotesScreenContent(
         if (editing) {
             NoteEntryField(
                 note = selectedNote,
+                /*
                 onSave = { updatedText ->
                     val noteToSave = selectedNote?.copy(content = updatedText) ?: Note(content = updatedText)
                     onAddNote(noteToSave)
+                    editing = false
+                }*/
+                onSave = { updatedText ->
+
+                    val noteToSave =
+                        if (selectedNote != null) {
+                            selectedNote!!.copy(content = updatedText)
+                        } else {
+                            Note(content = updatedText)
+                        }
+
+                    onAddNote(noteToSave)
+
+                    selectedNote = null
+                    editing = false
+                },
+                onCancel = {
+                    selectedNote = null
                     editing = false
                 }
             )
@@ -67,72 +93,42 @@ fun NotesScreenContent(
                     notes,
                     key = { it.id ?: it.hashCode() }
                 ) { note ->
-                    /*
-                    val dismissState = rememberSwipeToDismissBoxState(
-                        confirmValueChange = { state ->
-                            if (state == SwipeToDismissBoxValue.EndToStart) {
-                                onRemoveNote(note)
-                                true
-                            } else {
-                                false
-                            }
-                        }
-                    )*/
-                    /*
-                    SwipeToDismissBox(
-                        state = dismissState,
-                        enableDismissFromStartToEnd = false,
-                        backgroundContent = {
-                            val color = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                                Color.Red.copy(alpha = 0.8f)
-                            } else Color.Transparent
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(color)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Delete",
-                                    tint = Color.White
+                    val isSelected = selectedNote?.id == note.id
 
-                                )
-                            }
-                        }
-                    ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(6.dp)
+
+                    ){
                         NoteItem(
-                            note,
-                            onClick = {
-                                editing = true
-                                selectedNote = note
-                            }, //
-                            onDeleteClick = {
+                            note = note,
 
+                            selected = isSelected,
+
+                            onClick = {
+                                selectedNote = note
+                            },
+
+                            onDeleteButtonClick = {
+                                selectedNote = note
+                                showDialog = true
+                            },
+
+                            onEditButtonClick = {
+                                selectedNote = note
+                                editing = true
                             }
                         )
-                    }*/
-                    //
+                    }
+                    }
 
-                    //
-                    NoteItem(
-                        note = note,
-                        onClick = {
-                            editing = true
-                            selectedNote = note
-                        },
-                        onDeleteClick = {
-                            selectedNote = note
-                            showDialog = true
-                        }
-                    )
-                }
 
             }
             Button(
                 modifier = Modifier.padding(16.dp),
                 onClick = {
                     editing = true
-                    selectedNote = Note(content = "")
+                    selectedNote = null//(content = "")
                 }
             ) {
                 Text(stringResource(R.string.add_note))
@@ -140,6 +136,52 @@ fun NotesScreenContent(
         }
     }
     if(showDialog && selectedNote != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+            },
+
+            title = {
+                Text("Delete note")
+            },
+
+            text = {
+                Text("Do wish to delete this note?")
+            },
+
+            confirmButton = {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    // NO -> left
+                    TextButton(
+                        onClick = {
+                            showDialog = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.no))
+                    }
+
+                    // YES -> right
+                    TextButton(
+                        onClick = {
+                            selectedNote?.let {
+                                onRemoveNote(it)
+                            }
+
+                            selectedNote = null
+                            showDialog = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.yes))
+                    }
+                }
+            }
+        )
+        /*
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text(stringResource(R.string.delete_pop_up_header)) },
@@ -167,7 +209,7 @@ fun NotesScreenContent(
                     Text(stringResource(R.string.delete_pop_up_cancel))
                 }
             }
-        )
+        )*/
     }
 }
 
