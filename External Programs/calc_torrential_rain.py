@@ -1,6 +1,5 @@
 import concurrent.futures
 import requests
-import pandas as pd
 import time
 
 client_id='7e3f32d8-a66e-45a7-b8be-14e67bfbd5d4'
@@ -52,11 +51,11 @@ print(months_since("2016-01-01"))
 print(years_since("2016-01-01"))
 print(last_n_months(124))
 
-def get_time_series(source):
+def get_time_series(source, element):
     endpoint = 'https://frost.met.no/observations/availableTimeSeries/v0.jsonld'
     params = {
         'sources': source,
-        'elements': ELEMENT,
+        'elements': element,
     }
     
     # Requesting data (Client ID is used as the username, password is empty)
@@ -72,11 +71,11 @@ def get_time_series(source):
         return None
     
 
-def get_frost_data(source, time_range):
+def get_frost_data(source, time_range, element):
     endpoint = 'https://frost.met.no/observations/v0.jsonld'
     params = {
         'sources': source,
-        'elements': ELEMENT,
+        'elements': element,
         'referencetime': time_range,
     }
     
@@ -106,8 +105,6 @@ def analyze_rain(data):
         hourly_rate = val * 6 
         
         if val >= TORRENTIAL_LIMIT_10M:
-            # print(f"⚠️  TORRENTIAL RAIN: {time}")
-            # print(f"   Amount: {val} mm in 10 mins | Rate: {hourly_rate:.2f} mm/h\n")
             found_events += 1
             
 
@@ -131,7 +128,8 @@ def get_met_stations():
         print(f"Error! Status code: {r.status_code}")
         # print(f"Server says: {r.text}") # This will tell you the ACTUAL problem
         return None
-    
+
+print(get_met_stations()[0]['geometry']['coordinates']) 
     
 def get_rain_events_from_stations():
     # List of sourceIds
@@ -169,7 +167,51 @@ def get_rain_events_from_stations():
 
     return res
 
-print(get_rain_events_from_stations())
+# print(get_rain_events_from_stations())
+
+def analyze_wind(data):
+    # Threshold: 50mm/h. For a 10min period, this is 50 / 6 = 8.33mm
+    STRONG_WIND = 11.2 #m/s source: https://www.hastings.gov.uk/content/weather-management/Beaufort_Wind_Scale.pdf
+    
+    found_events = 0
+    
+    for observation in data:
+        time = observation['referenceTime']
+        # The 'value' is the mm amount recorded in those 10 minutes
+        val = observation['observations'][0]['value']
+        
+        if val >= STRONG_WIND:
+            found_events += 1
+
+    return found_events
+
+
+def get_wind_events_from_stations():
+    # List of sourceIds
+
+    wind_element = "max(wind_speed P1D)"
+
+    sources = get_met_stations()
+    res = []
+    def process_station(source):
+        sourceName = source['id']
+        events = 0
+        raw_data = get_frost_data(sourceName, construct_time_series(120), wind_element)
+        if raw_data is None:
+            return
+        events += analyze_wind(raw_data)
+
+        print(f"Found {events} events for {sourceName}")
+        return (source['geometry']['coordinates'], events) if events > 1 else None
+
+    res = []
+    max_workers = min(5, len(sources))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for station_result in executor.map(process_station, sources):
+            if station_result is not None:
+                res.append(station_result)
+
+    return res
 
 
 
@@ -180,19 +222,20 @@ print(get_rain_events_from_stations())
 
 
 
-# # Start the timer
-# start_time = time.perf_counter()
+# Start the timer
+start_time = time.perf_counter()
 
 # # Run it
-# raw_data = get_frost_data()
+# print(get_wind_events_from_stations())
+
 
 # # Got Data!
 
-# end_time = time.perf_counter()
+end_time = time.perf_counter()
 
-# # Calculate and print duration
-# execution_time = end_time - start_time
-# print(f"Executed in {execution_time:.4f} seconds")
+# Calculate and print duration
+execution_time = end_time - start_time
+print(f"Executed in {execution_time:.4f} seconds")
 
 # # timeSeries = get_time_series()
 # # if timeSeries:
