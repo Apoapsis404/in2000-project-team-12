@@ -27,10 +27,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team12.team12project.R
-import no.uio.ifi.in2000.team12.team12project.model.Plants.Plant
 import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
 import androidx.sqlite.throwSQLiteException
-import no.uio.ifi.in2000.team12.team12project.R
+
 
 @Composable
 fun PlantCard(

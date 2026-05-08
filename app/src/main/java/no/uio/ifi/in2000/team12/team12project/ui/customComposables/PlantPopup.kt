@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.localizedName
+import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.PlantCard
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenUiState
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
 
