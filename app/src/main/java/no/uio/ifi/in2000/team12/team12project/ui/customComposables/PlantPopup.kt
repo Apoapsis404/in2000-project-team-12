@@ -93,10 +93,15 @@ fun PlantPopup(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Text(
-                stringResource(
-                    R.string.plant_predicted_precipitation,
-                    uiState.predictedPrecipitation * 30
-                ),
+                if (uiState.predictedPrecipitation != null){
+                    stringResource(
+                        R.string.plant_predicted_precipitation,
+                        uiState.predictedPrecipitation * 30
+
+                    )
+                }else{
+                    "no data, predicted ${uiState.predictedPrecipitation}"
+                },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }

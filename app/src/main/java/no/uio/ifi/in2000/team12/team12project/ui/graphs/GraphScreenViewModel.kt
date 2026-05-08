@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
 import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
@@ -45,7 +46,7 @@ data class GraphScreenUiState(
     val predictedTemperature: Float = 15f,
     val predictedHumidity: Float = 100f,
     val predictedSunshine: Float = 100f,
-    val predictedPrecipitation: Float = 100f,
+    val predictedPrecipitation: Float? = 100f,
 )
 
 
@@ -126,6 +127,8 @@ class GraphScreenViewModel(
                         try {
                             val (timeSeries, source) = climateDataRepository.getClimateTimeSeriesFromPos(position, type)
                             val months = monthsSince(timeSeries)
+
+
                             val refTime = constructTimeSeries(min(months.toUInt(), 360u))
 
                             val obs = climateDataRepository.getClimateData(source, type.elementId, refTime)
@@ -188,7 +191,14 @@ class GraphScreenViewModel(
             tempRegressionModel = LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
 
             val precData = getClimateChartData(ClimateType.PRECIPITATION, month = uiState.value.month)!!
-            precRegressionModel = LinearRegressionModel(precData.years.toDoubleArray(), precData.values.toDoubleArray())
+            if (precData.years.size < 10) {
+                precRegressionModel = null
+            } else {
+                precRegressionModel = LinearRegressionModel(
+                    precData.years.toDoubleArray(),
+                    precData.values.toDoubleArray()
+                )
+            }
 
         }catch (
             e: Exception
@@ -203,7 +213,7 @@ class GraphScreenViewModel(
                 predictedTemperature = tempRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 0f,
                 predictedHumidity = getMean(ClimateType.RELATIVE_HUMIDITY, uiState.value.month)?.toFloat() ?: 0f,
                 predictedSunshine = getMean(ClimateType.DURATION_OF_SUN, uiState.value.month)?.toFloat() ?: 0f,
-                predictedPrecipitation = precRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 0f,
+                predictedPrecipitation = precRegressionModel?.predict(it.yearSelected.toInt())?.toFloat(),
             )
         }
     }
@@ -224,7 +234,7 @@ class GraphScreenViewModel(
         targetTemp: Float,
         targetHumidity: Float = 50f,
         targetSunshine: Float = 7f,
-        targetPrecipitation: Float = 5f
+        targetPrecipitation: Float? = 5f
     ): PriorityQueue<Plant> {
         return plantsRepository.getBestPlantsPriorityQueue(
             targetTemp, targetHumidity, targetSunshine, targetPrecipitation

@@ -65,7 +65,7 @@ class ClimateDataRepository(
                     continue
                 }
 
-                if (result.isNotEmpty()) {
+                if (result.isNotEmpty() && monthsSince(result) >= 60) {
                     stationRepository.addStationToCache(source, position, climateType)
                     return Pair(result, source.id)
                 }
