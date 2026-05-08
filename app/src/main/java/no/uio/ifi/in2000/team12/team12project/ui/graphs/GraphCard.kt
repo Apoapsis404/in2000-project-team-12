@@ -39,20 +39,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
+import no.uio.ifi.in2000.team12.team12project.ui.theme.humidityBlue
+import no.uio.ifi.in2000.team12.team12project.ui.theme.precipiationBlue
+import no.uio.ifi.in2000.team12.team12project.ui.theme.sunshineYellow
 
 @Composable
 fun GraphCard(
     modifier: Modifier = Modifier,
     climateType: ClimateType = ClimateType.MEAN_AIR_TEMP,
     meanValue: Double = 0.0,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    selected : Boolean = false
 ) {
     Card(
         modifier = modifier
             .aspectRatio(1f),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = if (selected) MaterialTheme.colorScheme.secondary
+            else MaterialTheme.colorScheme.primary
         ),
         onClick = onClick,
     ) {
@@ -133,7 +138,7 @@ fun HumidityVisual(value: Double) {
                     .fillMaxWidth()
                     .fillMaxHeight(progress)
                     .clip(RoundedCornerShape(50))
-                    .background(secondaryColor)
+                    .background(humidityBlue)
             )
         }
         Icon(
@@ -236,7 +241,7 @@ fun PrecipitationVisual(value: Double) {
                     .fillMaxWidth()
                     .fillMaxHeight(progress)
                     .align(Alignment.BottomCenter)
-                    .background(secondaryColor)
+                    .background(precipiationBlue)
             )
         }
         Icon(
@@ -262,7 +267,7 @@ fun SunVisual(value: Double) {
                 style = Stroke(width = 4f)
             )
             drawArc(
-                color = secondaryColor,
+                color = sunshineYellow,
                 startAngle = -90f,
                 sweepAngle = 360f * progress,
                 useCenter = false,
@@ -272,7 +277,7 @@ fun SunVisual(value: Double) {
         Icon(
             Icons.Default.WbSunny,
             null,
-            tint = Color.White,
+            tint = sunshineYellow,
             modifier = Modifier.size(22.dp)
         )
     }

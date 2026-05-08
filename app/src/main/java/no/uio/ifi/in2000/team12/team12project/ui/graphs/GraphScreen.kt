@@ -177,6 +177,7 @@ fun GraphScreen(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.MEAN_AIR_TEMP,
                     meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.MEAN_AIR_TEMP, uiState.month) ?: 0.0,
+                    selected = uiState.climateType == ClimateType.MEAN_AIR_TEMP,
                     onClick = {
                         graphScreenViewModel.setClimateType(ClimateType.MEAN_AIR_TEMP)
                         graphScreenViewModel.updateChartData()
@@ -186,6 +187,7 @@ fun GraphScreen(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.RELATIVE_HUMIDITY,
                     meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.RELATIVE_HUMIDITY, uiState.month) ?: 0.0,
+                    selected = uiState.climateType == ClimateType.RELATIVE_HUMIDITY,
                     onClick = {
                         graphScreenViewModel.setClimateType(ClimateType.RELATIVE_HUMIDITY)
                         graphScreenViewModel.updateChartData()
@@ -200,6 +202,7 @@ fun GraphScreen(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.DURATION_OF_SUN,
                     meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.DURATION_OF_SUN, uiState.month) ?: 0.0,
+                    selected = uiState.climateType == ClimateType.DURATION_OF_SUN,
                     onClick = {
                         graphScreenViewModel.setClimateType(ClimateType.DURATION_OF_SUN)
                         graphScreenViewModel.updateChartData()
@@ -210,6 +213,7 @@ fun GraphScreen(
                     modifier = Modifier.weight(1f),
                     climateType = ClimateType.PRECIPITATION,
                     meanValue = graphScreenViewModel.graphScreenData.getMean(ClimateType.PRECIPITATION, uiState.month) ?: 0.0,
+                    selected = uiState.climateType == ClimateType.PRECIPITATION,
                     onClick = {
                         graphScreenViewModel.setClimateType(ClimateType.PRECIPITATION)
                         graphScreenViewModel.updateChartData()

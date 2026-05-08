@@ -57,7 +57,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -263,7 +262,7 @@ fun MainComp(
                 homeViewModel = homeScreenViewModel,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding), navController = navController
+                    .padding(top = innerPadding.calculateTopPadding()), navController = navController
             )
 
         }
@@ -384,8 +383,3 @@ fun TopBarIcon(
 
 
 
-@Preview
-@Composable
-fun HeaderPreview(modifier: Modifier = Modifier.fillMaxSize()){
-    //Header() {}
-}
