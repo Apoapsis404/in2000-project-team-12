@@ -54,7 +54,8 @@ fun PlantCard(
     ) {
         Text(
             plant.name,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onPrimary
             )
         Icon(
             imageVector = CategoryIcon(plant.category),
@@ -123,12 +124,14 @@ fun PlantInfoRow(
         Text(
             text = text,
             fontSize = 10.sp,
-            lineHeight = 6.sp
+            lineHeight = 6.sp,
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
             text = value,
             fontSize = 14.sp,
-            lineHeight = 8.sp
+            lineHeight = 8.sp,
+            color = MaterialTheme.colorScheme.onPrimary
 
         )
     }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -230,7 +231,13 @@ fun GraphScreen(
             if(uiState.showPopup) {
                 ModalBottomSheet(
                     onDismissRequest = { graphScreenViewModel.closePopup() },
+                    containerColor = MaterialTheme.colorScheme.background,
                     sheetState = plantPopupState,
+                    dragHandle = {
+                        BottomSheetDefaults.DragHandle(
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 ){
                     PlantPopup(graphScreenViewModel, uiState)
                 }
