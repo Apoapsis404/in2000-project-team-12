@@ -93,11 +93,7 @@ fun FavoritesScreen(
                     selectedName = favoriteLocation.name
                 }
                     .padding(6.dp)
-                    .border(
-                        width = if(selectedbox) 2.dp else 0.dp,
-                        color = if(selectedbox) Color.Green else Color.Transparent,
-                        shape = RoundedCornerShape(20.dp)
-                    )
+
             ){
             FavoriteCard(
                 title = favoriteLocation.name,

@@ -309,17 +309,7 @@ fun HomeScreen(
             ) {
                 Column{
                     // Favorite button
-                    FilledIconButton(
-                        onClick = {
-                            askpermissonforlatlng = uiState.markerPosition
-                            askforpermission = true
-                        }
-                    ){
-                        Icon(
-                            imageVector = Icons.Default.FavoriteBorder,
-                            contentDescription = "Favorite button",
-                        )
-                    }
+
                     // My location button
                     FilledIconButton(
                         onClick = {
