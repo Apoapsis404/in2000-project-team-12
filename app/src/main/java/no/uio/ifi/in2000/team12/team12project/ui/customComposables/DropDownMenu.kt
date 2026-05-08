@@ -25,7 +25,11 @@ import kotlin.enums.enumEntries
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-inline fun <reified E : Enum<E>> DropDown(defaultName: String, modifier: Modifier = Modifier, crossinline onClick : (E) -> Unit) {
+inline fun <reified E : Enum<E>> DropDown(
+    defaultName: String,
+    modifier: Modifier = Modifier,
+    crossinline onClick : (E) -> Unit
+) {
 
     val options = enumEntries<E>()
     var expanded by remember { mutableStateOf(false) }

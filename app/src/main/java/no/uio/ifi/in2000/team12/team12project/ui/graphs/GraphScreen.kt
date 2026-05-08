@@ -142,7 +142,8 @@ fun GraphScreen(
             Spacer(modifier = modifier.height(10.dp))
 
 
-                DropDown<Months>(uiState.month.toString()) {
+                DropDown<Months>(
+                    uiState.month.toString()) {
                     graphScreenViewModel.setMonth(it)
                 }
 //                DropDown<ClimateType>(uiState.climateType.toString(), modifier = modifier.weight(1f)) {

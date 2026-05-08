@@ -1,10 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- MONTHS -->
+    <string name="january">JANUAR</string>
+    <string name="february">FEBRUAR</string>
+    <string name="march">MARS</string>
+    <string name="april">APRIL</string>
+    <string name="may">MAI</string>
+    <string name="june">JUNI</string>
+    <string name="july">JULI</string>
+    <string name="august">AUGUST</string>
+    <string name="september">SEPTEMBER</string>
+    <string name="october">OKTOBER</string>
+    <string name="november">NOVEMBER</string>
+    <string name="december">DESEMBER</string>
+
+    <!-- SETTINGS -->
+    <string name="settingsTitle">Innstillinger</string>
+    <string name="darkModeSwitch">Bytt til %1$s</string>
+    <string name="language">Språk</string>
+    <string name="dark_mode">mørkt tema</string>
+    <string name="light_mode">lyst tema</string>
+
+    <!-- LOADING SCREEN -->
+    <string name="loading_map">Laster inn kart…</string>
+    <string name="content_desc_wallpaper">Bakgrunn</string>
+    <string name="content_desc_logo">Logo</string>
+
+    <!-- GRAPH -->
+    <string name="no_data_available">Ingen klimadata funnet</string>
+    <string name="compare_year">Sammenlign år</string>
     <string name="compare_month">Sammenlign måned</string>
-    <string name="loading_climate_data">Laster inn klimadata...</string>
+    <string name="loading_climate_data">Laster inn klimadata…</string>
     <string name="try_again">Prøv igjen</string>
     <string name="climate_summary">Innsiktsoppsummering:</string>
     <string name="unexpected_error">En uventet feil oppstod</string>
+
+    <string name="plant_selected_year">Valgt år: %1$d</string>
+    <string name="plant_predicted_temp">Forventet temperatur: %1$.1f°C</string>
+    <string name="plant_predicted_humidity">Forventet luftfuktighet: %1$.1f%%</string>
+    <string name="plant_predicted_sunshine">Forventet soltid: %1$.1fh</string>
+    <string name="plant_predicted_precipitation">Forventet nedbør: %1$.1fmm</string>
+
+    <!-- HOME -->
     <string name="favorites_popup_title">Favoritter?</string>
     <string name="favorites_popup_question">Ønsker du å legge til denne posisjonen i favoritter?</string>
     <string name="yes">Bekreft</string>
@@ -13,23 +51,8 @@
     <string name="no_result">Ingen resultater</string>
     <string name="cont_desc_return_to_current_position">Gå tilbake til nåværende posisjon</string>
     <string name="navigate_to_graph_screen">Vis meg tallene!</string>
-    <string name="menu">Meny</string>
-    <string name="cont_desc_exit">Tilbake</string>
-    <string name="home">Hjem</string>
-    <string name="favorites">Favoritter</string>
-    <string name="settings">Innstillinger</string>
-    <string name="notes">Notater</string>
-    <string name="cont_desc_menu">Meny</string>
-    <string name="settingsTitle">Innstillinger</string>
-    <string name="darkModeSwitch">Bytt til %1$s</string>
-    <string name="language">Språk</string>
-    <string name="loading_map">Laster inn kart...</string>
-    <string name="content_desc_wallpaper">Bakgrunn</string>
-    <string name="content_desc_logo">Logo</string>
-    <string name="no_data_available">Ingen klimadata funnet</string>
-    <string name="compare_year">Sammenlign år</string>
-    <string name="dark_mode">mørkt tema</string>
-    <string name="light_mode">lyst tema</string>
+
+    <!-- NOTES -->
     <string name="delete_pop_up_header">Slett notat?"</string>
     <string name="delete_pop_up_body">Vil du slette dette notatet?"</string>
     <string name="delete_pop_up_cancel">Avbryt</string>
@@ -37,4 +60,13 @@
     <string name="add_note">Legg til notat</string>
     <string name="save_note">Lagre</string>
     <string name="write_note">Skriv et notat</string>
+
+    <!-- HEADER AND MENU -->
+    <string name="menu">Meny</string>
+    <string name="cont_desc_menu">Meny</string>
+    <string name="cont_desc_exit">Tilbake</string>
+    <string name="home">Hjem</string>
+    <string name="favorites">Favoritter</string>
+    <string name="settings">Innstillinger</string>
+    <string name="notes">Notater</string>
 </resources>
