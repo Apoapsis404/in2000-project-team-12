@@ -21,19 +21,12 @@ class TestTorrentialRain {
     }
 
     @Test
-    fun testNeedName() = runTest {
+    fun testIsTorrentialRainThread() = runTest {
         val sourceId = "SN18700"
         val res = torrentialRain.isTorrentialRainThreat(sourceId)
         println(res)
     }
 
-    @Test
-    fun testAllStationsTorrentialRain() = runTest {
-        val climateEvent = ClimateEvent()
-        val stations = climateEvent.listOfTorrentialRainStations()
-        println(stations)
-    }
-    
     @Test
     fun testParseLatLngFromJson() {
         val jsonString = """
