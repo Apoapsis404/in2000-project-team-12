@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
+import no.uio.ifi.in2000.team12.team12project.data.frost.TorrentialRain
 import no.uio.ifi.in2000.team12.team12project.data.frost.getStationIdsFromList
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import androidx.core.graphics.createBitmap
@@ -33,31 +34,8 @@ data class HomeScreenUiState(
     val markerTitle : String = "",
     val isMapReady : Boolean = false,
     val suggestions: List<String> = emptyList(),
-    val downpourList: List<LatLng> = listOf(
-        //Oslo
-        LatLng(59.94, 10.71),
-        LatLng(59.93, 10.73),
-        LatLng(59.92, 10.76),
-        LatLng(59.87, 10.76),
-        LatLng(59.87, 10.81),
-        //Dala
-        LatLng(60.91, 10.78),
-        //Berg
-        LatLng(60.37, 5.33),
-        LatLng(60.33, 5.29)
-        ),
-    val extremeWindList: List<LatLng> = listOf(
-        LatLng(59.96, 10.73),
-        LatLng(59.95, 10.75),
-        LatLng(59.94, 10.78),
-        LatLng(59.89, 10.78),
-        LatLng(59.89, 10.83),
-        //Dala
-        LatLng(60.93, 10.80),
-        //Berg
-        LatLng(60.39, 5.35),
-        LatLng(60.35, 5.31)
-    ),
+    val downpourList: List<LatLng> = emptyList(),
+    val extremeWindList: List<LatLng> = emptyList(),
     val flomList: List<LatLng> = listOf(
         LatLng(59.98, 10.75),
         LatLng(59.97, 10.77),
@@ -75,6 +53,7 @@ data class HomeScreenUiState(
 
 
 class HomeScreenViewModel(application : Application) : AndroidViewModel(application){
+    private val torrentialRain = TorrentialRain()
     private val obsStationsDataSource : ObsStationsDataSource = ObsStationsDataSource()
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState = _uiState.asStateFlow()
@@ -84,6 +63,10 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
 
     private val placesClient = Places.createClient(application)
     private val sessionToken = AutocompleteSessionToken.newInstance()
+
+    init {
+        readLatLngIntoList()
+    }
 
     fun fetchSuggestions(query: String) {
         println("fetchSuggestions called with: $query")
@@ -199,6 +182,19 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
         drawable.draw(canvas)
 
         return BitmapDescriptorFactory.fromBitmap(bitMap)
+    }
+    
+    fun readLatLngIntoList() {
+        val context = getApplication<Application>().applicationContext
+        val torrentialRainStations = torrentialRain.readLatLngFromJson(context, "torrential_rain_stations.json")
+        val highWindStations = torrentialRain.readLatLngFromJson(context, "high_wind_speed_stations.json")
+
+        _uiState.update {
+            it.copy(
+                downpourList = torrentialRainStations,
+                extremeWindList = highWindStations
+            )
+        }
     }
 }
 

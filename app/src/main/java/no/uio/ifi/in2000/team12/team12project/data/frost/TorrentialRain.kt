@@ -1,9 +1,19 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
+import android.content.Context
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.ThreatLevel
 import kotlin.math.min
+
+@Serializable
+private data class StationData(
+    val coordinates: List<Double>,
+    val event: Int
+)
 
 class TorrentialRain(
     private val climateDataRepository: ClimateDataRepository = ClimateDataRepository()
@@ -83,6 +93,35 @@ class TorrentialRain(
                 rateMmPerHour > TORRENTIAL_RAIN_RATE_THRESHOLD
             }
         }
+    }
+
+    /**
+     * Reads station coordinates from a JSON file in the raw resources.
+     *
+     * @param context The application context.
+     * @param fileName The name of the JSON file in res/raw (e.g., "torrential_rain_stations.json").
+     * @return A list of LatLng coordinates.
+     */
+    fun readLatLngFromJson(context: Context, fileName: String): List<LatLng> {
+        val resourceName = fileName.substringBeforeLast(".")
+        val resourceId = context.resources.getIdentifier(resourceName, "raw", context.packageName)
+
+        if (resourceId == 0) return emptyList()
+
+        val jsonString = context.resources.openRawResource(resourceId).bufferedReader().use { it.readText() }
+        return parseLatLngFromJson(jsonString)
+    }
+
+    /**
+     * Parses a list of LatLng coordinates from a JSON string.
+     *
+     * @param jsonString The JSON string to parse.
+     * @return A list of LatLng coordinates.
+     */
+    fun parseLatLngFromJson(jsonString: String): List<LatLng> {
+        val stations = Json.decodeFromString<List<StationData>>(jsonString)
+        // The coordinates are stored as [Longitude, Latitude]
+        return stations.map { LatLng(it.coordinates[1], it.coordinates[0]) }
     }
 }
 /*
