@@ -130,9 +130,6 @@ class GraphScreenViewModel(
                             val (timeSeries, source) = climateDataRepository.getClimateTimeSeriesFromPos(position, type)
                             val months = monthsSince(timeSeries)
 
-                            if (months < 60) {
-                                throw NoAvailableTimeSeriesException()
-                            }
 
                             val refTime = constructTimeSeries(min(months.toUInt(), 360u))
 
