@@ -34,15 +34,4 @@ class TestTorrentialRain {
         println(stations)
     }
 
-    @Test
-    fun testMaxRainFallRate() = runTest {
-        val climateEvent = ClimateEvent()
-        val obsStationRepository = ObsStationRepository()
-        val sources = obsStationRepository.getMetStations()
-        println(sources)
-//        val climateDataRepository = ClimateDataRepository()
-//        val response = climateDataRepository.getClimateData(sources, "max(rainfall_rate PT1M", "2023-01-01/2023-01-02")
-//        println(response)
-
-    }
 }
