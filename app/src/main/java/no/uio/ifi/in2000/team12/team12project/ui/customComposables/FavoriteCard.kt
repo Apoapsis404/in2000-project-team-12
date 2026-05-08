@@ -35,6 +35,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AddLocation
+import androidx.compose.material.icons.filled.DataThresholding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -127,17 +128,17 @@ fun FavoriteCard(
         // Circular button
         Box(
             modifier = Modifier
-                .size(42.dp)
+                .size(52.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.onPrimary)
                 .clickable { onButtonClick() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = buttonIcon,
+                imageVector = Icons.Default.DataThresholding,
                 contentDescription = "Action",
                 tint = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(26.dp)
             )
         }
     }
