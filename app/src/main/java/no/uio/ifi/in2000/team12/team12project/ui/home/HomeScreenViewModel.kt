@@ -32,6 +32,7 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 // Represent the different states exposed to the UI
 data class HomeScreenUiState(
     val markerPosition : LatLng = LatLng(59.91,10.74),
+    val hasInitialLocationBeenSet: Boolean = false,
     val address: String = "Almanakken",
     val searchQuery : String = "",
     val markerTitle : String = "",
@@ -216,6 +217,10 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
                 extremeWindList = highWindStations
             )
         }
+    }
+
+    fun setInitialLocationFlag(){
+        _uiState.update { it.copy(hasInitialLocationBeenSet = true) }
     }
 }
 
