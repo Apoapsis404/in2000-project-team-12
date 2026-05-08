@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateEvent
 import no.uio.ifi.in2000.team12.team12project.data.frost.Round
@@ -128,6 +129,11 @@ class GraphScreenViewModel(
                         try {
                             val (timeSeries, source) = climateDataRepository.getClimateTimeSeriesFromPos(position, type)
                             val months = monthsSince(timeSeries)
+
+                            if (months < 60) {
+                                throw NoAvailableTimeSeriesException()
+                            }
+
                             val refTime = constructTimeSeries(min(months.toUInt(), 360u))
 
                             val obs = climateDataRepository.getClimateData(source, type.elementId, refTime)
