@@ -32,16 +32,17 @@ import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 fun FavoritesScreen(
     favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(),
     graphScreenViewModel: GraphScreenViewModel = viewModel(),
+    homeScreenViewModel: HomeScreenViewModel = viewModel(),
     navHostController: NavHostController) {
 
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
     //string that will be added to removefavoritefunction
-    var deleteplacebyname by remember { mutableStateOf<String?>(null) }
-    var deleterequest by remember { mutableStateOf<Boolean>(false) }
-    //check if the name whants to be changed
-    var changename by remember { mutableStateOf<Boolean>(false) }
-    var changenameto by remember { mutableStateOf("") }
-    var chosenlocation by remember { mutableStateOf<FavoriteLocation?>(null) }
+    var deletePlaceByName by remember { mutableStateOf<String?>(null) }
+    var deleteRequest by remember { mutableStateOf(false) }
+    //check if the name wants to be changed
+    var changeName by remember { mutableStateOf(false) }
+    var changeNameTo by remember { mutableStateOf("") }
+    var chosenLocation by remember { mutableStateOf<FavoriteLocation?>(null) }
     var selectedName by remember { mutableStateOf<String?>(null) }
 
 
@@ -52,9 +53,9 @@ fun FavoritesScreen(
             val item = uiState.favoritesLocationMap.values.find{it.name == newname}//uiState.favoritesLocationMap[newname]//[deleteplacebyname]//[newname]
             if(item == null) return@LaunchedEffect
             //if(item != null){
-                chosenlocation = item
-                deleteplacebyname = item.name
-                changename = true
+                chosenLocation = item
+                deletePlaceByName = item.name
+                changeName = true
             //}
             favoritesScreenViewModel.lastfavoriteadded = null
         }
@@ -77,8 +78,8 @@ fun FavoritesScreen(
             val selectedbox = selectedName == favoriteLocation.name
             Box(
                 modifier = Modifier.clickable{
-                    deleteplacebyname =favoriteLocation.name
-                    chosenlocation =favoriteLocation
+                    deletePlaceByName =favoriteLocation.name
+                    chosenLocation =favoriteLocation
                     selectedName = favoriteLocation.name
                 }
                     .padding(6.dp)
@@ -93,18 +94,16 @@ fun FavoritesScreen(
                 subtitle = favoriteLocation.address,
                 selected = selectedbox, //
                 onButtonClick = {
-                    graphScreenViewModel.setMarkerPositionAndFetch(
-                        favoriteLocation.coordinates
-                    )
+                    homeScreenViewModel.setMarkerPosition(favoriteLocation.coordinates)
                     navHostController.navigate("graph")
                     { popUpTo("graph")
                     }
                 } ,
                 onButtonDelete = {
-                    deleterequest = true
+                    deleteRequest = true
                 },
                 onButtonChangName = {
-                    changename = true
+                    changeName = true
                 }
             )
         }
@@ -113,44 +112,44 @@ fun FavoritesScreen(
     }
     }
 
-    if(deleterequest && chosenlocation !=null){
+    if(deleteRequest && chosenLocation !=null){
         AlertDialog(
-            onDismissRequest = {deleterequest= false},
+            onDismissRequest = {deleteRequest= false},
             title = {Text("Delete location")},
-            text = {Text("Do you wish to delete your location ${deleteplacebyname}?" )},
+            text = {Text("Do you wish to delete your location ${deletePlaceByName}?" )},
             confirmButton = {
                 TextButton(
                     onClick = {
-                       deleteplacebyname?.let { name ->
+                       deletePlaceByName?.let { name ->
                            favoritesScreenViewModel.removeFavoriteLocation(name)
                        }
-                        deleterequest = false
-                        chosenlocation =null
+                        deleteRequest = false
+                        chosenLocation =null
                     }) {
                     Text("Delete")
                 }
             },
             dismissButton = {
-                TextButton(onClick = {deleterequest = false}) {
+                TextButton(onClick = {deleteRequest = false}) {
                     Text("Cancel")
                 }
             }
         )
     }
 
-    if (changename && chosenlocation != null) {
+    if (changeName && chosenLocation != null) {
 
             AlertDialog(
             onDismissRequest = {
-                changename = false
-                changenameto = ""
+                changeName = false
+                changeNameTo = ""
 
             },
             title = { Text("Enter new name") },
             text = {
                 TextField(
-                    value = changenameto,
-                    onValueChange = { changenameto = it },
+                    value = changeNameTo,
+                    onValueChange = { changeNameTo = it },
                     placeholder = { Text("New name") }
                 )
             },
@@ -158,12 +157,12 @@ fun FavoritesScreen(
                 TextButton(onClick = {
                     //changenameof?.let {
                         favoritesScreenViewModel.changeFavoriteLocationName(
-                            prevname = chosenlocation!!.name,//it.name,
-                            changenameto = changenameto
+                            prevname = chosenLocation!!.name,//it.name,
+                            changenameto = changeNameTo
                         )
                     //}
-                    changenameto = ""
-                    changename = false
+                    changeNameTo = ""
+                    changeName = false
 
                 }) {
                     Text("Save")
@@ -171,7 +170,7 @@ fun FavoritesScreen(
             },
             dismissButton = {
                 TextButton(onClick = {
-                    changename = false
+                    changeName = false
 
                 }) {
                     Text("Cancel")

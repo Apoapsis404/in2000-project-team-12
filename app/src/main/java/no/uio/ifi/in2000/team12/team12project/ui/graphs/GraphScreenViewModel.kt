@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.graphs
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -49,6 +50,7 @@ class GraphScreenViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
+    @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
     private val climateDataRepository = ClimateDataRepository()
     private val plantsRepository = PlantsRepository(context)
@@ -160,9 +162,9 @@ class GraphScreenViewModel(
         updateChartData()
     }
 
-    fun toggleMean(show: Boolean) {
-        _uiState.update { it.copy(showMean = show) }
-    }
+//    fun toggleMean(show: Boolean) {
+//        _uiState.update { it.copy(showMean = show) }
+//    }
 
     fun getMean(climateType: ClimateType, month: Months): Double? {
         return meansMap[Pair(climateType, month)]

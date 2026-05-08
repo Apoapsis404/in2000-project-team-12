@@ -1,20 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.ui.customComposables
 
-//import androidx.compose.material3.Card
-//import androidx.compose.runtime.Composable
-//import androidx.compose.ui.Modifier
-//import com.google.android.gms.maps.model.LatLng
-//import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
-//
-//@Composable
-//fun FavoriteCard(
-//    favorite : FavoriteLocation,
-//    modifier : Modifier = Modifier
-//){
-//    Card(modifier = modifier) {
-//
-//    }
-//}
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -48,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -63,7 +47,6 @@ fun FavoriteCard(
     onButtonClick: () -> Unit = {},
     onButtonDelete: () -> Unit = {} ,
     onButtonChangName: () -> Unit = {}
-
 ) {
     //
     Column(

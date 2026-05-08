@@ -59,7 +59,7 @@ fun Navigator(
         composable  (
             route = "favorites"
         ){
-            FavoritesScreen(favoritesScreenViewModel = favoritesViewModel, graphViewModel, navController)
+            FavoritesScreen(favoritesScreenViewModel = favoritesViewModel, graphViewModel,homeViewModel, navController)
         }
         composable (
             route = "notes",
