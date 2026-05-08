@@ -3,9 +3,12 @@ package no.uio.ifi.in2000.team12.team12project.ui.notes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -142,6 +145,52 @@ fun NotesScreenContent(
     }
     if(showDialog && selectedNote != null) {
         AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+            },
+
+            title = {
+                Text("Delete note")
+            },
+
+            text = {
+                Text("Do wish to delete this note?")
+            },
+
+            confirmButton = {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    // NO -> left
+                    TextButton(
+                        onClick = {
+                            showDialog = false
+                        }
+                    ) {
+                        Text("No")
+                    }
+
+                    // YES -> right
+                    TextButton(
+                        onClick = {
+                            selectedNote?.let {
+                                onRemoveNote(it)
+                            }
+
+                            selectedNote = null
+                            showDialog = false
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                }
+            }
+        )
+        /*
+        AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("Delete note") },
             text = { Text("Do wish to delete this note?") },
@@ -156,7 +205,7 @@ fun NotesScreenContent(
                         showDialog = false
                     }
                 ){
-                    Text("delete")//, color = Color.Red)
+                    Text("yes")//, color = Color.Red)
                 }
             },
             dismissButton = {
@@ -165,10 +214,10 @@ fun NotesScreenContent(
                         showDialog = false
                     }
                 ) {
-                    Text("cancel")
+                    Text("no")
                 }
             }
-        )
+        )*/
     }
 
 }

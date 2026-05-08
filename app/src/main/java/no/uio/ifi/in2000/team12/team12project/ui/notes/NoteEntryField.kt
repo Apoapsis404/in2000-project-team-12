@@ -60,20 +60,24 @@ fun NoteEntryField(
         ) {
             Button(
                 modifier = Modifier
+                    .padding(top = 8.dp)
+                ,
+                onClick = { onCancel() },
+            ) {
+                Text("Cancel")
+            }
+
+            Spacer(modifier = Modifier.padding(8.dp))
+
+            Button(
+                modifier = Modifier
                     .padding(top = 8.dp),
                 onClick = { onSave(text) },
             ) {
                 Text("Save")
             }
-            Spacer(modifier = Modifier.padding(8.dp))
-            Button(
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    ,
-                onClick = { onCancel() },
-            ) {
-                Text("Cancel")
-            }
+
+
         }
 
     }

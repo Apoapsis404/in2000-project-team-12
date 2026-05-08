@@ -2,8 +2,11 @@ package no.uio.ifi.in2000.team12.team12project.ui.favorites
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -111,6 +114,50 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
 
     if(deleterequest && chosenlocation !=null){
         AlertDialog(
+            onDismissRequest = { deleterequest = false },
+
+            title = {
+                Text("Delete?")
+            },
+
+            text = {
+                Text("Do you wish to delete address $deleteplacebyname")
+            },
+
+            confirmButton = {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    // NO -> left
+                    TextButton(
+                        onClick = {
+                            deleterequest = false
+                        }
+                    ) {
+                        Text("No")
+                    }
+
+                    // YES -> right
+                    TextButton(
+                        onClick = {
+                            deleteplacebyname?.let { name ->
+                                favoritesScreenViewModel.removeFavoriteLocation(name)
+                            }
+
+                            deleterequest = false
+                            chosenlocation = null
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                }
+            }
+        )
+        /*
+        AlertDialog(
             onDismissRequest = {deleterequest= false},
             title = {Text("delete?")},
             text = {Text("do you wish to delete address ${deleteplacebyname}" )},
@@ -131,11 +178,65 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                     Text("Nosirrrrrrrrrr")
                 }
             }
-        )
+        )*/
     }
 
     if (changename && chosenlocation != null) {
+        AlertDialog(
+            onDismissRequest = {
+                changename = false
+                changenameto = ""
+            },
 
+            title = {
+                Text("Enter new name")
+            },
+
+            text = {
+                TextField(
+                    value = changenameto,
+                    onValueChange = { changenameto = it },
+                    placeholder = {
+                        Text("New name")
+                    }
+                )
+            },
+
+            confirmButton = {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    // Cancel -> left
+                    TextButton(
+                        onClick = {
+                            changename = false
+                            changenameto = ""
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    // Save -> right
+                    TextButton(
+                        onClick = {
+                            favoritesScreenViewModel.changeFavoriteLocationName(
+                                prevname = chosenlocation!!.name,
+                                changenameto = changenameto
+                            )
+
+                            changenameto = ""
+                            changename = false
+                        }
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+        )
+            /*
             AlertDialog(
             onDismissRequest = {
                 changename = false
@@ -173,7 +274,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                     Text("Cancel")
                 }
             }
-        )
+        )*/
     }
 
 
