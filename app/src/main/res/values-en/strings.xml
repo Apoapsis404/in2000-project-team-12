@@ -3,7 +3,7 @@
     <string name="climate_summary">insights summary:</string>
     <string name="unexpected_error">An unexpected error occurred</string>
     <string name="favorites_popup_question">do you want this location added to your favorites?</string>
-    <string name="yes">yessssssssssirrrr</string>
+    <string name="Yes">Yes</string>
     <string name="language">Language</string>
     <string name="loading_map">Loading map…</string>
     <string name="content_desc_wallpaper">Wallpaper</string>
@@ -18,7 +18,7 @@
     <string name="favorites">Favorites</string>
     <string name="settings">Settings</string>
     <string name="notes">Notes</string>
-    <string name="no">Nosirrrrrrrrrr</string>
+    <string name="no">No</string>
     <string name="search_location">Search location...</string>
     <string name="content_desc_logo">Logo</string>
     <string name="no_data_available">No climate data found!</string>
@@ -30,4 +30,5 @@
     <string name="compare_year">Compare by year</string>
     <string name="plant_prognosis_button">Plant prognosis</string>
     <string name="plant_popup_header">Plant prognosis</string>
+    <string name="yes">Yes</string>
 </resources>

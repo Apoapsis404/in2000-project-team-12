@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,11 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.DataThresholding
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
@@ -76,7 +72,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.InfoPopup
-import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.PlantPopup
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
@@ -282,6 +277,63 @@ fun MainComp(
         }
         if(askforpermission == true && askpermissonforlatlng != null){
             AlertDialog(
+                onDismissRequest = {
+                    askforpermission = false
+                },
+
+                title = {
+                    Text(stringResource(R.string.favorites_popup_title))
+                },
+
+                text = {
+                    Text(stringResource(R.string.favorites_popup_question))
+                },
+
+                confirmButton = {
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        TextButton(
+                            onClick = {
+                                askforpermission = false
+                            }
+                        ) {
+                            Text(stringResource(R.string.no))
+                        }
+
+                        TextButton(
+                            onClick = {
+                                scope.launch {
+
+                                    val tempname = "temp_${System.currentTimeMillis()}"
+
+                                    val (name, address) = getNameandAdress(
+                                        context,
+                                        askpermissonforlatlng!!.latitude,
+                                        askpermissonforlatlng!!.longitude
+                                    )
+
+                                    navController.navigate("favorites")
+
+                                    favoriteScreenViewModel.addFavoriteLocation(
+                                        location = askpermissonforlatlng!!,
+                                        name = tempname,
+                                        address = address.toString()
+                                    )
+                                }
+
+                                askforpermission = false
+                            }
+                        ) {
+                            Text(stringResource(R.string.Yes))
+                        }
+                    }
+                }
+            )
+            /*AlertDialog(
                 onDismissRequest = {askforpermission = false},
                 title = {Text(stringResource(R.string.favorites_popup_title))},
                 text = {Text(stringResource(R.string.favorites_popup_question))},
@@ -308,7 +360,7 @@ fun MainComp(
                             }
                             askforpermission = false
                         }) {
-                        Text(stringResource(R.string.yes))
+                        Text(stringResource(R.string.Yes))
                     }
                 },
                 dismissButton = {
@@ -316,7 +368,7 @@ fun MainComp(
                         Text(stringResource(R.string.no))
                     }
                 }
-            )
+            )*/
         }
 
     }

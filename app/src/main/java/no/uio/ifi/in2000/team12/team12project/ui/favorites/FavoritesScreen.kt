@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.FavoriteCard
 import no.uio.ifi.in2000.team12.team12project.ui.home.getNameandAdress
@@ -131,16 +133,14 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
 
-                    // NO -> left
                     TextButton(
                         onClick = {
                             deleterequest = false
                         }
                     ) {
-                        Text("No")
+                        Text(stringResource(R.string.no))
                     }
 
-                    // YES -> right
                     TextButton(
                         onClick = {
                             deleteplacebyname?.let { name ->
@@ -151,7 +151,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                             chosenlocation = null
                         }
                     ) {
-                        Text("Yes")
+                        Text(stringResource(R.string.yes))
                     }
                 }
             }

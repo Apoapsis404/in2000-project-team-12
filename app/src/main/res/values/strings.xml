@@ -27,8 +27,8 @@
     <!-- HOME -->
     <string name="favorites_popup_title">favorites?</string>
     <string name="favorites_popup_question">do you want this location added to your favorites?</string>
-    <string name="yes">yessssssssssirrrr</string>
-    <string name="no">Nosirrrrrrrrrr</string>
+    <string name="Yes">Yes</string>
+    <string name="no">No</string>
     <string name="search_location">Search location...</string>
     <string name="no_result">No results</string>
     <string name="cont_desc_return_to_current_position">return to current position</string>
@@ -46,6 +46,7 @@
     <string name="app_title" translatable="false">Almanakken</string>
     <string name="cont_desc_menu">Menu</string>
     <string name="climate_graph">Climate graph</string>
+    <string name="yes">Yes</string>
 
 
 </resources>

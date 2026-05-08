@@ -31,9 +31,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.FavoriteCard
 import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.MintGreen
@@ -170,7 +172,7 @@ fun NotesScreenContent(
                             showDialog = false
                         }
                     ) {
-                        Text("No")
+                        Text(stringResource(R.string.no))
                     }
 
                     // YES -> right
@@ -184,7 +186,7 @@ fun NotesScreenContent(
                             showDialog = false
                         }
                     ) {
-                        Text("Yes")
+                        Text(stringResource(R.string.yes))
                     }
                 }
             }
