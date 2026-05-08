@@ -49,6 +49,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -468,6 +469,11 @@ fun Header(
 
         ),
         actions = {
+            TopBarIcon(
+                onClick = onFavoriteButtonClick,
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = "Favorite"
+            )
 
             if(currentRoute == "graph"){
                 //Map symbol
@@ -481,19 +487,17 @@ fun Header(
             TopBarIcon({showPopup = true}, Icons.Outlined.Info, "Information")
 
             //favorite symbol
-            TopBarIcon(
-                onClick = onFavoriteButtonClick,
-                imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = "Favorite"
-            )
+
 
         }
 
     )
+    val infoPopupState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     if(showPopup) {
         // Modal bottom sheet for info button
         ModalBottomSheet(
-            onDismissRequest = { showPopup = false },
+            onDismissRequest = { showPopup = false},
+            sheetState = infoPopupState,
             containerColor = MaterialTheme.colorScheme.background,
 
             dragHandle = {
@@ -502,7 +506,7 @@ fun Header(
                 )
             }
         ) {
-            InfoPopup(if (currentRoute == "graph") "graph" else "home")
+            InfoPopup(currentRoute ?: "home")
         }
     }
 }
