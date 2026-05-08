@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,7 +20,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.DataThresholding
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
@@ -59,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -303,7 +310,6 @@ fun Header(
         }
     }
 
-
     TopAppBar(
         {
             Row(
@@ -392,4 +398,12 @@ fun TopBarIcon(
             tint = MaterialTheme.colorScheme.onPrimary
         )
     }
+}
+
+
+
+@Preview
+@Composable
+fun HeaderPreview(modifier: Modifier = Modifier.fillMaxSize()){
+    //Header() {}
 }
