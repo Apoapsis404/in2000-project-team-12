@@ -2,11 +2,13 @@ package no.uio.ifi.in2000.team12.team12project.ui.graphs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -53,6 +55,7 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.localizedName
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.DropDown
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.PlantPopup
+import androidx.compose.ui.platform.LocalConfiguration
 
 // Graph library used:
 // https://github.com/patrykandpatrick/vico
@@ -100,10 +103,11 @@ fun GraphScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            when{
+            when {
                 uiState.isLoading -> {
-                    Column(modifier = Modifier
-                        .fillMaxWidth(),
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -112,9 +116,11 @@ fun GraphScreen(
                         Text(stringResource(R.string.loading_climate_data))
                     }
                 }
-                uiState.errorMessage != null ->{
-                    Column(modifier = Modifier
-                        .fillMaxWidth(),
+
+                uiState.errorMessage != null -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -124,11 +130,12 @@ fun GraphScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.padding(8.dp))
-                        Button(onClick =  { graphScreenViewModel.fetchAllClimateData()} ){
+                        Button(onClick = { graphScreenViewModel.fetchAllClimateData() }) {
                             Text(stringResource(R.string.try_again))
                         }
                     }
                 }
+
                 else -> {
                     key(uiState.climateType) {
                         ComposeClimateGraph(modelProducer, uiState.climateType.unit)
@@ -165,85 +172,95 @@ fun GraphScreen(
 //            }
         }
 
-        Column {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(16.dp)
-            ) {
-                GraphCard(
-                    modifier = Modifier.weight(1f),
-                    climateType = ClimateType.MEAN_AIR_TEMP,
-                    meanValue = graphScreenViewModel.getMean(ClimateType.MEAN_AIR_TEMP, uiState.month) ?: 0.0,
-                    selected = uiState.climateType == ClimateType.MEAN_AIR_TEMP,
-                    onClick = {
-                        graphScreenViewModel.setClimateType(ClimateType.MEAN_AIR_TEMP)
-                        graphScreenViewModel.updateChartData()
-                    }
-                )
-                GraphCard(
-                    modifier = Modifier.weight(1f),
-                    climateType = ClimateType.RELATIVE_HUMIDITY,
-                    meanValue = graphScreenViewModel.getMean(ClimateType.RELATIVE_HUMIDITY, uiState.month) ?: 0.0,
-                    selected = uiState.climateType == ClimateType.RELATIVE_HUMIDITY,
-                    onClick = {
-                        graphScreenViewModel.setClimateType(ClimateType.RELATIVE_HUMIDITY)
-                        graphScreenViewModel.updateChartData()
-                    }
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(16.dp)
-            ) {
-                GraphCard(
-                    modifier = Modifier.weight(1f),
-                    climateType = ClimateType.DURATION_OF_SUN,
-                    meanValue = graphScreenViewModel.getMean(ClimateType.DURATION_OF_SUN, uiState.month) ?: 0.0,
-                    selected = uiState.climateType == ClimateType.DURATION_OF_SUN,
-                    onClick = {
-                        graphScreenViewModel.setClimateType(ClimateType.DURATION_OF_SUN)
-                        graphScreenViewModel.updateChartData()
-                    }
+        val configuration = LocalConfiguration.current
+        val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-                )
-                GraphCard(
-                    modifier = Modifier.weight(1f),
-                    climateType = ClimateType.PRECIPITATION,
-                    meanValue = graphScreenViewModel.getMean(ClimateType.PRECIPITATION, uiState.month) ?: 0.0,
-                    selected = uiState.climateType == ClimateType.PRECIPITATION,
-                    onClick = {
-                        graphScreenViewModel.setClimateType(ClimateType.PRECIPITATION)
-                        graphScreenViewModel.updateChartData()
-                    }
-                )
-            }
-            Button(
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(16.dp),
+            maxItemsInEachRow = if (isLandscape) 4 else 2
+        ) {
+
+            val cardModifier = Modifier
+                .weight(1f)
+            GraphCard(
+                modifier = cardModifier,
+                climateType = ClimateType.MEAN_AIR_TEMP,
+                meanValue = graphScreenViewModel.getMean(ClimateType.MEAN_AIR_TEMP, uiState.month)
+                    ?: 0.0,
+                selected = uiState.climateType == ClimateType.MEAN_AIR_TEMP,
                 onClick = {
-                    graphScreenViewModel.openPopup()
-                    graphScreenViewModel.updatePredictedClimate()
-                    },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            ) {
-                Text(stringResource(R.string.plant_prognosis_button))
-            }
-            if(uiState.showPopup) {
-                ModalBottomSheet(
-                    onDismissRequest = { graphScreenViewModel.closePopup() },
-                    containerColor = MaterialTheme.colorScheme.background,
-                    sheetState = plantPopupState,
-                    dragHandle = {
-                        BottomSheetDefaults.DragHandle(
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                ){
-                    PlantPopup(graphScreenViewModel, uiState)
+                    graphScreenViewModel.setClimateType(ClimateType.MEAN_AIR_TEMP)
+                    graphScreenViewModel.updateChartData()
                 }
+            )
+            GraphCard(
+                modifier = cardModifier,
+                climateType = ClimateType.RELATIVE_HUMIDITY,
+                meanValue = graphScreenViewModel.getMean(
+                    ClimateType.RELATIVE_HUMIDITY,
+                    uiState.month
+                ) ?: 0.0,
+                selected = uiState.climateType == ClimateType.RELATIVE_HUMIDITY,
+                onClick = {
+                    graphScreenViewModel.setClimateType(ClimateType.RELATIVE_HUMIDITY)
+                    graphScreenViewModel.updateChartData()
+                }
+            )
+
+
+            GraphCard(
+                modifier = cardModifier,
+                climateType = ClimateType.DURATION_OF_SUN,
+                meanValue = graphScreenViewModel.getMean(ClimateType.DURATION_OF_SUN, uiState.month)
+                    ?: 0.0,
+                selected = uiState.climateType == ClimateType.DURATION_OF_SUN,
+                onClick = {
+                    graphScreenViewModel.setClimateType(ClimateType.DURATION_OF_SUN)
+                    graphScreenViewModel.updateChartData()
+                }
+
+            )
+            GraphCard(
+                modifier = cardModifier,
+                climateType = ClimateType.PRECIPITATION,
+                meanValue = graphScreenViewModel.getMean(ClimateType.PRECIPITATION, uiState.month)
+                    ?: 0.0,
+                selected = uiState.climateType == ClimateType.PRECIPITATION,
+                onClick = {
+                    graphScreenViewModel.setClimateType(ClimateType.PRECIPITATION)
+                    graphScreenViewModel.updateChartData()
+                }
+            )
+        }
+        Button(
+            onClick = {
+                graphScreenViewModel.openPopup()
+                graphScreenViewModel.updatePredictedClimate()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            Text(stringResource(R.string.plant_prognosis_button))
+        }
+        if (uiState.showPopup) {
+            ModalBottomSheet(
+                onDismissRequest = { graphScreenViewModel.closePopup() },
+                containerColor = MaterialTheme.colorScheme.background,
+                sheetState = plantPopupState,
+                dragHandle = {
+                    BottomSheetDefaults.DragHandle(
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            ) {
+                PlantPopup(graphScreenViewModel, uiState)
             }
         }
     }
+
 }
 
 private val RangeProvider =

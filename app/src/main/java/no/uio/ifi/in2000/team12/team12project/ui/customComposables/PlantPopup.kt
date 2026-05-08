@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderColors
@@ -24,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.localizedName
-import no.uio.ifi.in2000.team12.team12project.ui.CustomComposables.PlantCard
+import no.uio.ifi.in2000.team12.team12project.ui.customComposables.PlantCard
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenUiState
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
 
@@ -39,9 +40,12 @@ fun PlantPopup(
         targetSunshine = uiState.predictedSunshine,
         targetPrecipitation = uiState.predictedPrecipitation,
     )
+    val verticalScrollState = rememberScrollState()
     Column(
        modifier =  Modifier
-           .fillMaxWidth(),
+           .fillMaxWidth()
+           .verticalScroll(verticalScrollState)
+           .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -100,7 +104,7 @@ fun PlantPopup(
 
                     )
                 }else{
-                    "no data, predicted ${uiState.predictedPrecipitation}"
+                    stringResource(R.string.too_few_precipitation_data)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )

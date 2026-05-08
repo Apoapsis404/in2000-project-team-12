@@ -28,6 +28,8 @@
     <string name="plant_predicted_humidity">Forventet luftfuktighet: %1$.1f%%</string>
     <string name="plant_predicted_sunshine">Forventet soltid: %1$.1fh</string>
     <string name="plant_predicted_precipitation">Forventet nedbør: %1$.1fmm</string>
+    <string name="too_few_precipitation_data" translatable="false">Forventet nedbør: Ikke nok data</string>
+
 
     <!-- HOME -->
     <string name="favorites_popup_title">Favoritter?</string>
@@ -47,6 +49,7 @@
     <string name="add_note">Legg til notat</string>
     <string name="save_note">Lagre</string>
     <string name="write_note">Skriv et notat</string>
+    <string name="edit_note">Rediger</string>
 
     <!-- HEADER AND MENU -->
     <string name="menu">Meny</string>

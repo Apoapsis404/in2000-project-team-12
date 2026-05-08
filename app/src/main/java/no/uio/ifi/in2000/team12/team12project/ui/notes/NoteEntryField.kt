@@ -64,7 +64,7 @@ fun NoteEntryField(
                 ,
                 onClick = { onCancel() },
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.delete_pop_up_cancel))
             }
 
             Spacer(modifier = Modifier.padding(8.dp))
@@ -74,7 +74,7 @@ fun NoteEntryField(
                     .padding(top = 8.dp),
                 onClick = { onSave(text) },
             ) {
-                Text("Save")
+                Text(stringResource(R.string.save_note))
             }
 
 
