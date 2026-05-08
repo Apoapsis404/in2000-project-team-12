@@ -14,6 +14,11 @@ val onprim1 = Color(0xFFF1DEB6)
 val onback1 = Color(0xFF2F2F2F)
 val back1 = Color(0xFFF0E1C3)
 
+val humidityBlue = Color(0xFFA5D7EC)
+val precipiationBlue = Color(0xFF2674D2)
+val sunshineYellow = Color(0xFFFFC107)
+
+
 
 
 // Dark mode
