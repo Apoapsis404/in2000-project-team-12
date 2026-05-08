@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MyLocation
@@ -33,10 +35,12 @@ import no.uio.ifi.in2000.team12.team12project.R
 fun InfoPopup(
     currentScreen: String
 ){
+    val verticalScrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .verticalScroll(verticalScrollState)
     ) {
         if (currentScreen == "home") {
             // INFO SCREEN FOR MAP

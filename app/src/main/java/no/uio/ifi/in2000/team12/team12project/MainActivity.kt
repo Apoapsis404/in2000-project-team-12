@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -295,7 +297,7 @@ fun MainComp(
             )
 
         }
-        if(askforpermission == true && askpermissonforlatlng != null){
+        if(askforpermission && askpermissonforlatlng != null){
             AlertDialog(
                 onDismissRequest = {
                     askforpermission = false

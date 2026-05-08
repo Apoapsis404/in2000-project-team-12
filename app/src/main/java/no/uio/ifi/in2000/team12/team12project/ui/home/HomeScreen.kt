@@ -193,7 +193,7 @@ fun HomeScreen(
 
             uiState.downpourList.forEach {
                 AdvancedMarker(
-                    state = MarkerState(it),
+                    state = remember{MarkerState(it)},
                     contentDescription = "",
                     collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
                     icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.outline_rainy_24),
@@ -201,7 +201,7 @@ fun HomeScreen(
             }
             uiState.extremeWindList.forEach {
                 AdvancedMarker(
-                    state = MarkerState(it),
+                    state = remember{MarkerState(it)},
                     contentDescription = "",
                     collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
                     icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.baseline_air_24)
@@ -209,7 +209,7 @@ fun HomeScreen(
             }
             uiState.flomList.forEach {
                 AdvancedMarker(
-                    state = MarkerState(it),
+                    state = remember{MarkerState(it)},
                     contentDescription = "",
                     collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
                     icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.baseline_water_24),

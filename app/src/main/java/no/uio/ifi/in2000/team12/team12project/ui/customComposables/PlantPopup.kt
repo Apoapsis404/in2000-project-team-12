@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.ui.customComposables
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
@@ -12,7 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderColors
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.localizedName
-import no.uio.ifi.in2000.team12.team12project.ui.customComposables.PlantCard
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenUiState
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
 
