@@ -827,7 +827,7 @@
  {
    "id": 55,
    "name": "Hemp",
-   "category": "Fiber",
+   "category": "Industrial",
    "optimal_temp_min": 16,
    "optimal_temp_max": 24,
    "temp_min": 5,

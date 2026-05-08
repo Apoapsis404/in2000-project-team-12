@@ -127,7 +127,6 @@ fun CategoryIcon(category: String): ImageVector{
         "Fruit" -> return Icons.Default.Nature
         "Nut" -> return Icons.Default.SportsRugby
         "Oilseed" -> return Icons.Default.WaterDrop
-        "Fiber" -> return Icons.Default.LocalFlorist
         "Industrial" -> return Icons.Default.Agriculture
         else -> return Icons.Default.Nature
     }
