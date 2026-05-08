@@ -27,6 +27,8 @@
     <string name="plant_predicted_humidity">predicted humidity: %1$.1f%%</string>
     <string name="plant_predicted_sunshine">predicted sunshine: %1$.1fh</string>
     <string name="plant_predicted_precipitation">predicted precipitation: %1$.1fmm</string>
+    <string name="too_few_precipitation_data">Predicted precipitation: Not enough data available</string>
+
 
     <!-- HOME -->
     <string name="favorites_popup_title">favorites?</string>
@@ -46,6 +48,7 @@
     <string name="add_note">Add note</string>
     <string name="save_note">Save</string>
     <string name="write_note">Write a note</string>
+    <string name="edit_note">Edit</string>
 
     <!-- HEADER AND MENU -->
     <string name="menu">Menu</string>
