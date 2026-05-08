@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
-import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateEvent
-import no.uio.ifi.in2000.team12.team12project.data.frost.Round
 import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
@@ -24,11 +22,11 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.data.regression.LinearRegressionModel
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
-import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateData
-import no.uio.ifi.in2000.team12.team12project.model.frost.Months
-import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
+import no.uio.ifi.in2000.team12.team12project.model.frost.Months
+import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
 import java.util.PriorityQueue
 
 data class GraphScreenUiState(
