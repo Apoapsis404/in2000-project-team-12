@@ -87,9 +87,13 @@ fun HomeScreen(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false)) {
-            @Suppress("MissingPermission")
-            homeScreenViewModel.fetchCurrentLocation { pos ->
-                cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(pos, 15f))
+            if(!homeScreenViewModel.uiState.value.hasInitialLocationBeenSet) {
+                @Suppress("MissingPermission")
+                homeScreenViewModel.fetchCurrentLocation { pos ->
+                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(pos, 15f))
+                    homeScreenViewModel.onMapClick(pos)
+                    homeScreenViewModel.setInitialLocationFlag()
+                }
             }
         }
     }
