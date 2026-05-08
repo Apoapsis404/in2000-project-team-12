@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
+import io.ktor.client.call.body
 import io.ktor.client.request.basicAuth
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
@@ -10,7 +11,9 @@ import no.uio.ifi.in2000.team12.team12project.data.exceptions.BadRequestExceptio
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoDataException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.UnauthorizedException
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObsResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
+import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationIdResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.Point
 
@@ -40,22 +43,15 @@ class ObsStationsDataSource {
 
             url {
                 parameters.append("geometry", nearestString)
+//                parameters.append("types", "SensorSystem")
                 parameters.append("nearestmaxcount", maxCount.toString())
                 parameters.append("fields", fieldsString)
             }
         }
 
-        //println(response.toString())
-
-        val responseBodyString = response.bodyAsText()
-
-        //println(response.status.value)
         return when (response.status.value) {
             in 200..299 -> {
-                //response.body<ObsStation>()
-                Json { ignoreUnknownKeys = true }.decodeFromString<ObsStationResponse>(
-                    responseBodyString
-                ).data
+                response.body<ObsStationResponse>().data
             }
             400 -> {
                 throw BadRequestException(message = "Invalid parameter value or malformed request")
@@ -71,5 +67,37 @@ class ObsStationsDataSource {
             }
         }
     }
+    
+    
+    suspend fun getMetStations(): String {
+        val response: HttpResponse = KtorClient.client.get(urlV0) {
 
+            basicAuth(clientId, clientSecret)
+
+            url {
+                parameters.append("country", "norge")
+                parameters.append("types", "SensorSystem")
+                parameters.append("stationholder", "MET.NO")
+                parameters.append("fields", "id")
+            }
+        }
+
+        return when (response.status.value) {
+            in 200..299 -> {
+                response.body<ObsStationIdResponse>().data.joinToString(",") { it.id }
+            }
+            400 -> {
+                throw BadRequestException(message = "Invalid parameter value or malformed request")
+            }
+            401 -> {
+                throw UnauthorizedException("Unauthorized client ID")
+            }
+            404 -> {
+                throw NoDataException("No data found")
+            }
+            else -> {
+                throw Exception("Unknown error")
+            }
+        }
+    }
 }

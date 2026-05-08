@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
+import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateEvent
+import no.uio.ifi.in2000.team12.team12project.data.frost.Round
 import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
@@ -45,6 +47,7 @@ data class GraphScreenUiState(
     val predictedSunshine: Float = 100f,
     val predictedPrecipitation: Float = 100f,
 )
+
 
 class GraphScreenViewModel(
     application: Application
@@ -91,6 +94,7 @@ class GraphScreenViewModel(
             }
         }
     }
+
 
     private fun getClimateChartData(climateType: ClimateType, month: Months): ClimateChartData? {
         val key = Pair(climateType, month)
@@ -175,7 +179,6 @@ class GraphScreenViewModel(
         _uiState.update {
             it.copy(climateChartData = chartData ?: ClimateChartData(emptyList(), emptyList()))
         }
-        _uiState.update { it.copy(climateChartData = chartData ?: ClimateChartData(emptyList(), emptyList())) }
 
         // To update regression model when chart is updated
         try {

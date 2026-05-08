@@ -21,31 +21,30 @@ class ClimateDataRepository(
     }
 
     /**
-     * Fetch climate data for the nearest station to the given position.
-     * Also updates internal weatherObsList cache.
+     * Fetch climate data for the given station
      */
     suspend fun getClimateData(
-        position: LatLng,
-        climateType: ClimateType,
+        sourceId: String,
+        elementId: String,
         referenceTime: String,
         fields: String = DEFAULT_FIELDS
     ): List<ClimateObs> {
-        val stations = stationRepository.getNearestStation(
-            position.latitude,
-            position.longitude,
-            climateType
-        )
-
-        val sourceId = stations.firstOrNull()?.id
-            ?: throw NoAvailableTimeSeriesException("No nearby stations found")
-
         val result = climateDataSource.getClimateData(
             sourceId,
-            climateType.elementId,
+            elementId,
             referenceTime,
             fields
         )
         return result
+    }
+
+    suspend fun getClimateTimeSeries(sourceId: String, elementId: String, fields: String = "validFrom"): String {
+        try {
+            val result = climateDataSource.getClimateTimeSeries(sourceId, elementId, fields)
+            return result
+        } catch (e: Exception) { //TODO handle specific exceptions
+            throw e
+        }
     }
 
     /**
