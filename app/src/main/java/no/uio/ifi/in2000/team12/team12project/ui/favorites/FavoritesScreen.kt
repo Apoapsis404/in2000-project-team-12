@@ -51,39 +51,6 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
     var chosenlocation by remember { mutableStateOf<FavoriteLocation?>(null) }
     var selectedName by remember { mutableStateOf<String?>(null) }
 
-    /*
-    LaunchedEffect(uiState.favoritesLocationList) {
-
-        //dersom det ikke er noen favoritt, legges til default hardkodet plasser
-        if (uiState.favoritesLocationList.isEmpty()) {
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(1.1, 1.1),
-                "Pappas gård",
-                "Fadervegen 1"
-            )
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(1.1, 1.1),
-                "Bakgården",
-                "Bak huset"
-            )
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(1.1, 1.1),
-                "Skjærgården",
-                "Husmans gate 10"
-            )
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(1.1, 1.1),
-                "Forigården",
-                "Fortiden"
-            )
-            favoritesScreenViewModel.addFavoriteLocation(
-                location = LatLng(2.2, 2.2),
-                name = "Stellan Skaarsgården",
-                address = "Sverige"
-            )
-
-        }
-    */
     //check for newly added to favorites
     LaunchedEffect(favoritesScreenViewModel.lastfavoriteadded,uiState.favoritesLocationMap) {
         val newname = favoritesScreenViewModel.lastfavoriteadded
@@ -99,40 +66,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
         }
     }
 
-    /*
-    LaunchedEffect(Unit) {
-        favoritesScreenViewModel.lastfavoriteadded.collect{newname ->
-            val item = uiState.favoritesLocationMap.values.find {
-                it.name == newname
-            }
-            if(item != null){
-                chosenlocation = item
-                deleteplacebyname = item.name
-                changename = true
-                return
-            }
-
-        }
-    }*/
-    /*
-    LaunchedEffect(Unit) {
-        favoritesScreenViewModel.lastfavoriteadded.collect { newname ->
-            snapshotFlow { uiState.favoritesLocationMap }
-                .map { it.values.find { loc -> loc.name == newname } }
-                .filterNotNull()
-                .first()
-                .let { item ->
-                    chosenlocation = item
-                    deleteplacebyname = item.name
-                    selectedName = item.name
-                    changename = true
-                }
-        }
-    }*/
-
     Box(modifier = Modifier){
-
-        //val favoriteList = uiState.favoritesLocationMap.toList()
 
 
     LazyColumn(
@@ -141,7 +75,6 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
         {
 
         items(uiState.favoritesLocationMap.toList()) { (key, favoriteLocation) ->
-            //items(favoriteList) { (key, favoriteLocation) ->
 
             //var selectedbox = chosenlocation?.name == favoriteLocation.name
             val selectedbox = selectedName == favoriteLocation.name
@@ -152,12 +85,7 @@ fun FavoritesScreen(favoritesScreenViewModel: FavoritesScreenViewModel = viewMod
                     selectedName = favoriteLocation.name
                 }
                     .padding(6.dp)
-                    /*
-                    .border(
-                        width = if(selectedbox) 2.dp else 0.dp,
-                        color = if(selectedbox) sec2 else Color.Transparent,
-                        shape = RoundedCornerShape(20.dp)
-                    )*/
+
             ){
             FavoriteCard(
                 title = favoriteLocation.name,

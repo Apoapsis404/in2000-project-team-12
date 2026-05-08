@@ -103,12 +103,7 @@ fun NotesScreenContent(
                     Box(
                         modifier = Modifier
                             .padding(6.dp)
-                            /*
-                            .border(
-                                width = if (isSelected) 2.dp else 0.dp,
-                                color = if (isSelected) sec2 else Color.Transparent,
-                                shape = RoundedCornerShape(20.dp)
-                            )*/
+
                     ){
                         NoteItem(
                             note = note,
@@ -131,71 +126,7 @@ fun NotesScreenContent(
                         )
                     }
                     }
-                    /*
-                    val dismissState = rememberSwipeToDismissBoxState(
-                        confirmValueChange = { state ->
-                            if (state == SwipeToDismissBoxValue.EndToStart) {
-                                onRemoveNote(note)
-                                true
-                            } else {
-                                false
-                            }
-                        }
-                    )*/
-                    /*
-                    SwipeToDismissBox(
-                        state = dismissState,
-                        enableDismissFromStartToEnd = false,
-                        backgroundContent = {
-                            val color = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                                Color.Red.copy(alpha = 0.8f)
-                            } else Color.Transparent
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(color)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Delete",
-                                    tint = Color.White
 
-                                )
-                            }
-                        }
-                    ) {
-                        NoteItem(
-                            note,
-                            onClick = {
-                                editing = true
-                                selectedNote = note
-                            }, //
-                            onDeleteClick = {
-
-                            }
-                        )
-                    }*/
-                    //
-
-                    //
-                    /*
-                    NoteItem(
-                        note = note,
-                        /*
-                        //
-                        onClick = {
-                            //editing = true /hmmmmm
-                            selectedNote = note
-                        },*/ //
-                        onDeleteButtonClick = {
-                            selectedNote = note
-                            showDialog = true
-                        },
-                        onEditButtonClick = {
-                            editing = true
-                        }
-                    )
-                }*/
 
             }
             Button(

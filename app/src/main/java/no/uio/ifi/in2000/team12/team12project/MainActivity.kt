@@ -414,19 +414,6 @@ fun Header(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = "Favorite"
             )
-            /*
-            IconButton( //why not topbaricon
-                onClick = {
-                    askpermissonforlatlng = uiState.markerPosition
-                    askforpermission = true
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = "Add favorite",
-                    tint = MaterialTheme.colorScheme.secondary
-                )
-            }*/
 
         }
 

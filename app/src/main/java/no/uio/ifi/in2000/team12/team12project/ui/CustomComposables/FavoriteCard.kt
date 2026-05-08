@@ -17,6 +17,7 @@ package no.uio.ifi.in2000.team12.team12project.ui.CustomComposables
 //}
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -40,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -148,12 +150,26 @@ fun FavoriteCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
+                    modifier = Modifier
+                        .padding(6.dp),
+                    shape = ButtonDefaults.shape,
+                    border = BorderStroke(
+                        2.dp,
+                        MaterialTheme.colorScheme.onPrimary
+                    ),
                     onClick= onChangeNameButtonClick
                 ) {
-                    Text("add/change name")
+                    Text("change name")
                 }
 
                 Button(
+                    modifier = Modifier
+                        .padding(6.dp),
+                    shape = ButtonDefaults.shape,
+                    border = BorderStroke(
+                        2.dp,
+                        MaterialTheme.colorScheme.onPrimary
+                    ),
                     onClick = onDeleteButtonClick
                 ){
                     Text("delete")

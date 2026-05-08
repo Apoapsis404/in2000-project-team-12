@@ -153,46 +153,6 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel = viewModel(),favoritesS
             },
             uiSettings = mapUiSettings,
         ) {
-            /*
-            //
-            if(askforpermission == true && askpermissonforlatlng != null){
-                AlertDialog(
-                    onDismissRequest = {askforpermission = false},
-                    title = {Text(stringResource(R.string.favorites_popup_title))},
-                    text = {Text(stringResource(R.string.favorites_popup_question))},
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                            scope.launch {
-                                val tempname = "temp_${System.currentTimeMillis()}" //temporary name so it is easier to tell apart the diffrent adresses in order to rename
-
-                                val (name, address) = getNameandAdress( //name is no longer used
-                                    context,
-                                    askpermissonforlatlng!!.latitude,
-                                    askpermissonforlatlng!!.longitude
-                                )
-                                //navigates to favorite screen
-                                navHostController.navigate("favorites")
-
-                                favoritesScreenViewModel.addFavoriteLocation(
-                                location = askpermissonforlatlng!!,
-                                name = tempname , //"add name",//name.toString(), //add apart of the address. will later on add ability to change the name
-                                address = address.toString()
-                            )
-
-                            }
-                            askforpermission = false
-                        }) {
-                            Text(stringResource(R.string.yes))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = {askforpermission = false}) {
-                            Text(stringResource(R.string.no))
-                        }
-                    }
-                )
-            }*/
             AdvancedMarker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
                 title = uiState.markerTitle ,
