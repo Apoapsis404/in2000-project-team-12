@@ -40,6 +40,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -289,15 +290,17 @@ fun Header(
     // Put inside a viewModel?
     var showPopup by remember { mutableStateOf(false) }
 
-
-    scope.launch {
-        val (_, address) = getNameandAdress( //name is no longer used
-            context,
-            homeScreenViewModel.uiState.value.markerPosition.latitude,
-            homeScreenViewModel.uiState.value.markerPosition.longitude
-        )
-        homeScreenViewModel.updateAddress(address.toString())
+    LaunchedEffect(homeScreenViewModel.uiState.collectAsState().value.markerPosition) {
+        scope.launch {
+            val (_, address) = getNameandAdress( //name is no longer used
+                context,
+                homeScreenViewModel.uiState.value.markerPosition.latitude,
+                homeScreenViewModel.uiState.value.markerPosition.longitude
+            )
+            homeScreenViewModel.updateAddress(address.toString())
+        }
     }
+
 
     TopAppBar(
         {
