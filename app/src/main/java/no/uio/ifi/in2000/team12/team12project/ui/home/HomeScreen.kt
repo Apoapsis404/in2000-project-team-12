@@ -24,6 +24,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -246,7 +247,9 @@ fun HomeScreen(
                     ),
                     colors = TextFieldDefaults.colors(
                         unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White
+                        focusedContainerColor = Color.White,
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = MaterialTheme.colorScheme.primary,
                     ),
                     modifier = modifier
                         .fillMaxWidth()
@@ -262,6 +265,7 @@ fun HomeScreen(
                         uiState.suggestions.forEach { suggestion ->
                             Text(
                                 text = suggestion,
+                                color = MaterialTheme.colorScheme.primary,
                                 modifier = modifier
                                     .fillMaxWidth()
                                     .clickable {
