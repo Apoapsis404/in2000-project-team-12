@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- MONTHS -->
-    <string name="january">JANUAR</string>
-    <string name="february">FEBRUAR</string>
-    <string name="march">MARS</string>
-    <string name="april">APRIL</string>
-    <string name="may">MAI</string>
-    <string name="june">JUNI</string>
-    <string name="july">JULI</string>
-    <string name="august">AUGUST</string>
-    <string name="september">SEPTEMBER</string>
-    <string name="october">OKTOBER</string>
-    <string name="november">NOVEMBER</string>
-    <string name="december">DESEMBER</string>
 
     <!-- SETTINGS -->
     <string name="settingsTitle">Innstillinger</string>

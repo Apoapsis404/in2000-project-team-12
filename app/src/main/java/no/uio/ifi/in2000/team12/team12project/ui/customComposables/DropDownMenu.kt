@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,14 +29,18 @@ import kotlin.enums.enumEntries
 inline fun <reified E : Enum<E>> DropDown(
     defaultName: String,
     modifier: Modifier = Modifier,
-    crossinline onClick : (E) -> Unit
+    crossinline labelMapper: (E) -> String = { it.name },
+    crossinline onClick: (E) -> Unit
 ) {
-
     val options = enumEntries<E>()
     var expanded by remember { mutableStateOf(false) }
     val textFieldState = rememberTextFieldState(defaultName)
 
-    ExposedDropdownMenuBox (
+    LaunchedEffect(defaultName) {
+        textFieldState.setTextAndPlaceCursorAtEnd(defaultName)
+    }
+
+    ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
         modifier = modifier.heightIn(max = 280.dp),
@@ -47,7 +52,7 @@ inline fun <reified E : Enum<E>> DropDown(
             state = textFieldState,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(
-                focusedTextColor = MaterialTheme.colorScheme.secondary,
+                focusedTextColor = MaterialTheme.colorScheme.onPrimary,
                 focusedContainerColor = MaterialTheme.colorScheme.primary,
                 unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
                 unfocusedContainerColor = MaterialTheme.colorScheme.primary,
@@ -55,33 +60,31 @@ inline fun <reified E : Enum<E>> DropDown(
                 unfocusedIndicatorColor = MaterialTheme.colorScheme.onPrimary,
                 focusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
                 unfocusedTrailingIconColor = MaterialTheme.colorScheme.onPrimary,
-
             ),
             readOnly = true,
             lineLimits = TextFieldLineLimits.SingleLine,
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = {expanded = false},
+            onDismissRequest = { expanded = false },
             modifier = Modifier.background(MaterialTheme.colorScheme.primary)
         ) {
-            options.forEachIndexed { index, option ->
+            options.forEach { option ->
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = option.name,
+                            text = labelMapper(option),
                             color = MaterialTheme.colorScheme.onPrimary
                         )
-                           },
+                    },
                     onClick = {
                         onClick(option)
-                        textFieldState.setTextAndPlaceCursorAtEnd(option.toString())
+                        textFieldState.setTextAndPlaceCursorAtEnd(labelMapper(option))
                         expanded = false
                     },
                     modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-                    )
+                )
             }
         }
     }
 }
-

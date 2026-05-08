@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -39,21 +39,17 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
-import com.patrykandpatrick.vico.compose.cartesian.data.ColumnCartesianLayerModel
 import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
-import com.patrykandpatrick.vico.compose.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.common.Fill
-import com.patrykandpatrick.vico.compose.common.component.LineComponent
-import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.data.regression.LinearRegressionModel
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
+import no.uio.ifi.in2000.team12.team12project.model.frost.localizedName
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.DropDown
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.PlantPopup
 
@@ -141,11 +137,13 @@ fun GraphScreen(
 
             Spacer(modifier = modifier.height(10.dp))
 
-
-                DropDown<Months>(
-                    uiState.month.toString()) {
-                    graphScreenViewModel.setMonth(it)
-                }
+            val context = LocalContext.current
+            DropDown<Months>(
+                defaultName = uiState.month.localizedName(context),
+                labelMapper = { it.localizedName(context) }
+            ) {
+                graphScreenViewModel.setMonth(it)
+            }
 //                DropDown<ClimateType>(uiState.climateType.toString(), modifier = modifier.weight(1f)) {
 //                    graphScreenViewModel.setClimateType(it)
 //                    graphScreenViewModel.getClimateObs()
@@ -244,16 +242,16 @@ private val RangeProvider =
         override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) = maxY
     }
 
-private fun getColumnProvider(positive: LineComponent, negative: LineComponent) =
-    object : ColumnCartesianLayer.ColumnProvider {
-        override fun getColumn(
-            entry: ColumnCartesianLayerModel.Entry,
-            seriesIndex: Int,
-            extraStore: ExtraStore,
-        ) = if (entry.y >= 0) positive else negative
-
-        override fun getWidestSeriesColumn(seriesIndex: Int, extraStore: ExtraStore) = positive
-    }
+//private fun getColumnProvider(positive: LineComponent, negative: LineComponent) =
+//    object : ColumnCartesianLayer.ColumnProvider {
+//        override fun getColumn(
+//            entry: ColumnCartesianLayerModel.Entry,
+//            seriesIndex: Int,
+//            extraStore: ExtraStore,
+//        ) = if (entry.y >= 0) positive else negative
+//
+//        override fun getWidestSeriesColumn(seriesIndex: Int, extraStore: ExtraStore) = positive
+//    }
 
 @Composable
 private fun ComposeClimateGraph(
@@ -265,18 +263,18 @@ private fun ComposeClimateGraph(
     val axisLabelStyle = rememberTextComponent(
         TextStyle(color = MaterialTheme.colorScheme.onBackground)
     )
-    val positiveColumn =
-        rememberLineComponent(
-            fill = Fill(MaterialTheme.colorScheme.primary),
-            thickness = 8.dp,
-            shape = RoundedCornerShape(topStartPercent = 40, topEndPercent = 40),
-        )
-    val negativeColumn =
-        rememberLineComponent(
-            fill = Fill(MaterialTheme.colorScheme.tertiary),
-            thickness = 8.dp,
-            shape = RoundedCornerShape(bottomStartPercent = 40, bottomEndPercent = 40),
-        )
+//    val positiveColumn =
+//        rememberLineComponent(
+//            fill = Fill(MaterialTheme.colorScheme.primary),
+//            thickness = 8.dp,
+//            shape = RoundedCornerShape(topStartPercent = 40, topEndPercent = 40),
+//        )
+//    val negativeColumn =
+//        rememberLineComponent(
+//            fill = Fill(MaterialTheme.colorScheme.tertiary),
+//            thickness = 8.dp,
+//            shape = RoundedCornerShape(bottomStartPercent = 40, bottomEndPercent = 40),
+//        )
     CartesianChartHost(
         chart =
             rememberCartesianChart(
