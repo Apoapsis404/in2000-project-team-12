@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.DataThresholding
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -77,6 +78,7 @@ import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModelFacto
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
+import no.uio.ifi.in2000.team12.team12project.ui.theme.precipiationBlue
 import java.util.Locale
 
 
@@ -358,9 +360,17 @@ fun Header(
 
     )
     if(showPopup) {
+        // Modal bottom sheet for info button
         ModalBottomSheet(
-            onDismissRequest = {showPopup = false},
-        ){
+            onDismissRequest = { showPopup = false },
+            containerColor = MaterialTheme.colorScheme.background,
+
+            dragHandle = {
+                BottomSheetDefaults.DragHandle(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        ) {
             InfoPopup(if (currentRoute == "graph") "graph" else "home")
         }
     }
@@ -380,6 +390,3 @@ fun TopBarIcon(
         )
     }
 }
-
-
-
