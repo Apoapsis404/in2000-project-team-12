@@ -47,7 +47,7 @@ data class GraphScreenUiState(
     val predictedTemperature: Float = 15f,
     val predictedHumidity: Float = 100f,
     val predictedSunshine: Float = 100f,
-    val predictedPrecipitation: Float = 100f,
+    val predictedPrecipitation: Float? = 100f,
 )
 
 
@@ -190,7 +190,14 @@ class GraphScreenViewModel(
             tempRegressionModel = LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
 
             val precData = getClimateChartData(ClimateType.PRECIPITATION, month = uiState.value.month)!!
-            precRegressionModel = LinearRegressionModel(precData.years.toDoubleArray(), precData.values.toDoubleArray())
+            if (precData.years.size < 10) {
+                precRegressionModel = null
+            } else {
+                precRegressionModel = LinearRegressionModel(
+                    precData.years.toDoubleArray(),
+                    precData.values.toDoubleArray()
+                )
+            }
 
         }catch (
             e: Exception
@@ -205,7 +212,7 @@ class GraphScreenViewModel(
                 predictedTemperature = tempRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 0f,
                 predictedHumidity = getMean(ClimateType.RELATIVE_HUMIDITY, uiState.value.month)?.toFloat() ?: 0f,
                 predictedSunshine = getMean(ClimateType.DURATION_OF_SUN, uiState.value.month)?.toFloat() ?: 0f,
-                predictedPrecipitation = precRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 0f,
+                predictedPrecipitation = precRegressionModel?.predict(it.yearSelected.toInt())?.toFloat(),
             )
         }
     }
@@ -226,7 +233,7 @@ class GraphScreenViewModel(
         targetTemp: Float,
         targetHumidity: Float = 50f,
         targetSunshine: Float = 7f,
-        targetPrecipitation: Float = 5f
+        targetPrecipitation: Float? = 5f
     ): PriorityQueue<Plant> {
         return plantsRepository.getBestPlantsPriorityQueue(
             targetTemp, targetHumidity, targetSunshine, targetPrecipitation
