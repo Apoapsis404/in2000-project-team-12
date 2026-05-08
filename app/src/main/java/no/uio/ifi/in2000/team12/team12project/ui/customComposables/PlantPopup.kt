@@ -13,11 +13,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
+import no.uio.ifi.in2000.team12.team12project.model.frost.localizedName
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenUiState
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
 
@@ -42,8 +44,10 @@ fun PlantPopup(
         Text(
             stringResource(R.string.plant_popup_header),
         )
+        val context = LocalContext.current
         DropDown<Months>(
-            uiState.month.toString(),
+            defaultName = uiState.month.localizedName(context),
+            labelMapper = { it.localizedName(context) },
             onClick = {
                 graphScreenViewModel.setMonth(it)
                 graphScreenViewModel.updatePredictedClimate()},
