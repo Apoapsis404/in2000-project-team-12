@@ -17,9 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 
 
@@ -133,15 +135,15 @@ fun NotesScreenContent(
                     selectedNote = Note(content = "")
                 }
             ) {
-                Text("Add note")
+                Text(stringResource(R.string.add_note))
             }
         }
     }
     if(showDialog && selectedNote != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Delete note") },
-            text = { Text("Do wish to delete this note?") },
+            title = { Text(stringResource(R.string.delete_pop_up_header)) },
+            text = { Text(stringResource(R.string.delete_pop_up_body)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -153,7 +155,7 @@ fun NotesScreenContent(
                         showDialog = false
                     }
                 ){
-                    Text("delete", color = Color.Red)
+                    Text(stringResource(R.string.delete_pop_up_delete), color = Color.Red)
                 }
             },
             dismissButton = {
@@ -162,7 +164,7 @@ fun NotesScreenContent(
                         showDialog = false
                     }
                 ) {
-                    Text("cancel")
+                    Text(stringResource(R.string.delete_pop_up_cancel))
                 }
             }
         )

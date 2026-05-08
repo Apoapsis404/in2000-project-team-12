@@ -46,7 +46,7 @@ fun SettingsScreen(
         )
 
         ToggleSetting(
-            stringResource(R.string.darkModeSwitch, if (darkmodeBool) "dark" else "light"),
+            stringResource(R.string.darkModeSwitch, if (darkmodeBool) stringResource(R.string.dark_mode) else stringResource(R.string.light_mode)),
             checked = darkmodeBool,
         ) {
             settingsScreenViewModel.toggleTheme()

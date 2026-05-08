@@ -6,6 +6,8 @@
     <string name="settingsTitle">Settings</string>
     <string name="darkModeSwitch">Switch to %1$s</string>
     <string name="language">Language</string>
+    <string name="dark_mode">dark mode</string>
+    <string name="light_mode">light mode</string>
 
     <!-- LOADING SCREEN -->
     <string name="loading_map">Loading map…</string>
@@ -33,6 +35,15 @@
     <string name="no_result">No results</string>
     <string name="cont_desc_return_to_current_position">return to current position</string>
     <string name="navigate_to_graph_screen">Show me the numbers!</string>
+
+    <!-- NOTES -->
+    <string name="delete_pop_up_header">Delete note?"</string>
+    <string name="delete_pop_up_body">Do you want to delete this note?"</string>
+    <string name="delete_pop_up_cancel">Cancel</string>
+    <string name="delete_pop_up_delete">Delete"</string>
+    <string name="add_note">Add note</string>
+    <string name="save_note">Save</string>
+    <string name="write_note">Write a note</string>
 
 
     <!-- HEADER AND MENU -->
