@@ -20,15 +20,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
-import androidx.sqlite.throwSQLiteException
 
 
 @Composable
@@ -69,40 +66,40 @@ fun PlantCard(
                 stringResource(R.string.plant_card_ideal_temp),
                 stringResource(
                     R.string.temp_range,
-                    plant.optimal_temp_min.toInt(),
-                    plant.optimal_temp_max.toInt()
+                    plant.optimalTempMin.toInt(),
+                    plant.optimalTempMax.toInt()
                 ),
             )
             PlantInfoRow(
                 stringResource(R.string.plant_card_tolerance_range),
                 stringResource(
                     R.string.temp_range,
-                    plant.temp_min.toInt(),
-                    plant.temp_max.toInt()
+                    plant.tempMin.toInt(),
+                    plant.tempMax.toInt()
                 )
             )
             PlantInfoRow(
                 stringResource(R.string.plant_card_humidity),
                 stringResource(
                     R.string.humidity_range,
-                    plant.humidity_min.toInt(),
-                    plant.humidity_max.toInt()
+                    plant.humidityMin.toInt(),
+                    plant.humidityMax.toInt()
                 )
             )
             PlantInfoRow(
                 stringResource(R.string.plant_card_sunshine),
                 stringResource(
                     R.string.sunshine_range,
-                    plant.sunshine_min.toInt(),
-                    plant.sunshine_max.toInt()
+                    plant.sunshineMin.toInt(),
+                    plant.sunshineMax.toInt()
                 )
             )
             PlantInfoRow(
                 stringResource(R.string.plant_card_precipitation),
                 stringResource(
                     R.string.precipitation_range,
-                    plant.precipitation_min.toInt() * 30, // mm/d to mm/month
-                    plant.precipitation_max.toInt() * 30
+                    plant.precipitationMin.toInt() * 30, // mm/d to mm/month
+                    plant.precipitationMax.toInt() * 30
                 )
             )
         }

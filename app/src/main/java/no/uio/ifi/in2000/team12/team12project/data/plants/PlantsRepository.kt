@@ -39,17 +39,17 @@ class PlantsRepository(private val context: Context){
         val plantList = if (currentLanguage == "en") plantListEn else plantListNb
 
         // sort by optimal_temp, then humidity, then sunshine, then precipitation
-        var comparator = compareBy<Plant> { kotlin.math.abs(((it.optimal_temp_min + it.optimal_temp_max) / 2.0) - targetTemp) }
-            .thenBy { kotlin.math.abs(((it.humidity_min + it.humidity_max) / 2.0) - targetHumidity) }
-            .thenBy { kotlin.math.abs(((it.sunshine_min + it.sunshine_max) / 2.0) - targetSunshine) }
+        var comparator = compareBy<Plant> { kotlin.math.abs(((it.optimalTempMin + it.optimalTempMax) / 2.0) - targetTemp) }
+            .thenBy { kotlin.math.abs(((it.humidityMin + it.humidityMax) / 2.0) - targetHumidity) }
+            .thenBy { kotlin.math.abs(((it.sunshineMin + it.sunshineMax) / 2.0) - targetSunshine) }
 
         if (targetPrecipitation != null) {
-            comparator = comparator.thenBy { kotlin.math.abs(((it.precipitation_min + it.precipitation_max) / 2.0) - targetPrecipitation) }
+            comparator = comparator.thenBy { kotlin.math.abs(((it.precipitationMin + it.precipitationMax) / 2.0) - targetPrecipitation) }
         }
         val pq = PriorityQueue(comparator)
         //filter out plants that cannot survive
         plantList
-            .filter { targetTemp >= it.temp_min && targetTemp <= it.temp_max }
+            .filter { targetTemp >= it.tempMin && targetTemp <= it.tempMax }
             .forEach { pq.add(it) }
         return pq
     }
