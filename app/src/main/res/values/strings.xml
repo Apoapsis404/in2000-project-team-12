@@ -77,6 +77,32 @@
     <string name="favorite_edit_name">Edit name</string>
     <string name="favorite_delete">Delete</string>
     <string name="cont_desc_favorite_graph_icon">Navigate to graph screen</string>
+    <string name="info_home_title">The Home Screen:</string>
+    <string name="info_home_rain">Area prone to torrential rain</string>
+    <string name="info_home_wind">Area prone to extreme wind</string>
+    <string name="info_home_flood">Area prone to flooding. Area has had flood warnings of level 4 more that 8 times during the last 10 years</string>
+    <string name="info_home_graph">View climate graph for the selected location</string>
+    <string name="info_home_favorites">Add markers location to favorites</string>
+    <string name="info_home_my_location">Center map to your current location</string>
+    <string name="info_home_zoom_in">Zoom in on the map</string>
+    <string name="info_home_zoom_out">Zoom out of the map</string>
+    <string name="info_graph_title">The Graph Screen:</string>
+    <string name="info_graph_map">Return to the map</string>
+    <string name="info_graph_blue_line">The blue line in the graph displays the data for the chosen climate type for the selected month for all years with data available.</string>
+    <string name="info_graph_regression">The green line graph displays a linear regression of the blue line.</string>
+    <string name="info_graph_climate_type_boxes">The climate boxes shows the mean data for the selected month over the years in the graph.</string>
+    <string name="info_graph_plant_sub_title">Plant Prognosis</string>
+    <string name="info_graph_plant_slider">The slider allows you to select the year into the future you want to see the prediction for</string>
+    <string name="info_graph_plant_plant_row">The plants shows the top 3 plants that can be cultivated during the selected month and year, based on the regression in the graph.</string>
+    <string name="info_favorite_title">The Favorite Screen:</string>
+    <string name="info_favorite_graph_symbol">Icon on card to navigate to the graph screen to show data on favorite location</string>
+    <string name="info_favorite_card">Click on card to edit or delete favorite</string>
+    <string name="info_settings_title">The Settings Screen</string>
+    <string name="info_settings_toggle_theme">Change between light/dark mode</string>
+    <string name="info_settings_language">Change language</string>
+    <string name="info_notes_title">The Notes Screen:</string>
+    <string name="info_notes_edit_delete">Click on card to edit or delete note</string>
+    <string name="info_notes_add_note">Click on \'add note\' to add new note</string>
 
 
 </resources>

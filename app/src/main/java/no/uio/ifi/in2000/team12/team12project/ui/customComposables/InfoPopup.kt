@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.DataThresholding
 import androidx.compose.material.icons.filled.DragHandle
@@ -23,10 +21,7 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Square
 import androidx.compose.material.icons.filled.ToggleOn
 import androidx.compose.material.icons.outlined.AddCircleOutline
-import androidx.compose.material.icons.outlined.AddLocation
-import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material.icons.outlined.DataThresholding
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,8 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.key.Key.Companion.Symbol
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,63 +51,59 @@ fun InfoPopup(
             .padding(16.dp)
             .verticalScroll(verticalScrollState)
     ) {
-        if (currentScreen == "home") {
-            // INFO SCREEN FOR MAP
-            Text("The Home Screen:", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        when (currentScreen) {
+            "home" -> {
+                // INFO SCREEN FOR MAP
+                Text(stringResource(R.string.info_home_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                SymbolBulletPoint(painterResource(R.drawable.outline_rainy_24), stringResource(R.string.info_home_rain))
+                SymbolBulletPoint(painterResource(R.drawable.baseline_air_24), stringResource(R.string.info_home_wind))
+                SymbolBulletPoint(painterResource(R.drawable.baseline_water_24), stringResource(R.string.info_home_flood))
+                Spacer(modifier = Modifier.height(10.dp))
+                SymbolBulletPoint(Icons.Outlined.DataThresholding, stringResource(R.string.info_home_graph))
+                SymbolBulletPoint(Icons.Default.FavoriteBorder, stringResource(R.string.info_home_favorites))
+                SymbolBulletPoint(Icons.Default.MyLocation, stringResource(R.string.info_home_my_location))
+                SymbolBulletPoint(Icons.Outlined.AddCircleOutline, stringResource(R.string.info_home_zoom_in))
+                SymbolBulletPoint(Icons.Outlined.AddCircleOutline, stringResource(R.string.info_home_zoom_out))
+            }
 
-            // Symbolene på kartet
-            Symbol(painterResource(R.drawable.outline_rainy_24), "Area prone to torrential rain")
-            Symbol(painterResource(R.drawable.baseline_air_24), "Area prone to extreme wind")
-            Symbol(painterResource(R.drawable.baseline_water_24), "Area prone to flooding. Area has had flood warnings of level 4 more that 8 times during the last 10 years")
+            "graph" -> {
+                // INFO SCREEN FOR GRAPH
+                Text(stringResource(R.string.info_graph_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                SymbolBulletPoint(Icons.Outlined.Map, stringResource(R.string.info_graph_map))
+                SymbolBulletPoint(Icons.Filled.Circle, stringResource(R.string.info_graph_blue_line), Color.Blue)
+                SymbolBulletPoint(Icons.Filled.Circle, stringResource(R.string.info_graph_regression), Color.Green)
+                SymbolBulletPoint(Icons.Filled.Square, stringResource(R.string.info_graph_climate_type_boxes))
+                //plant-prognosis
+                Text(stringResource(R.string.info_graph_plant_sub_title), textAlign = TextAlign.Center)
+                SymbolBulletPoint(Icons.Filled.DragHandle, stringResource(R.string.info_graph_plant_slider))
+                SymbolBulletPoint(Icons.Filled.Grass, stringResource(R.string.info_graph_plant_plant_row))
+            }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            "favorites" -> {
+                // INFO SCREEN FOR FAVORITES
+                Text(stringResource(R.string.info_favorite_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                SymbolBulletPoint(Icons.Filled.DataThresholding, stringResource(R.string.info_favorite_graph_symbol))
+                SymbolBulletPoint(Icons.Filled.Square, stringResource(R.string.info_favorite_card))
+            }
 
-            //Knapper
-            Symbol(Icons.Outlined.DataThresholding, "View climate graph for the selected location")
-            Symbol(Icons.Default.FavoriteBorder, "Add markers location to favorites")
-            Symbol(Icons.Default.MyLocation, "Center map to your current location")
-            Symbol(Icons.Outlined.AddCircleOutline, "Zoom in on the map")
-            Symbol(Icons.Outlined.AddCircleOutline, "Zoom out of the map")
+            "settings" -> {
+                //INFO SCREEN FOR SETTINGS
+                Text(stringResource(R.string.info_settings_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                SymbolBulletPoint(Icons.Filled.ToggleOn, stringResource(R.string.info_settings_toggle_theme))
+                SymbolBulletPoint(Icons.Filled.ArrowDropDown, stringResource(R.string.info_settings_language))
+            }
 
-        } else if (currentScreen == "graph") {
-            // INFO SCREEN FOR GRAPH
-            Text("The Graph Screen:", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Symbol(Icons.Outlined.Map, "Return to the map") // eller home screen
-//            Text("The graph displays the chosen climate variable for the selected month. " +
-//                    "\nThe graph will start with displaying temperature data for the month of January. " +
-//                    "\n\nThe button 'Plant prognosis' will give you a pop-up of plants that can be cultivated during the selected month. The slider chooses which year into the future you want to see the prediction for.", fontSize = 14.sp, modifier = Modifier.padding(8.dp))
-
-            Symbol(Icons.Filled.Circle, "The blue line in the graph displays the data for the chosen climate type for the selected month for all years with data available.", Color.Blue)
-            Symbol(Icons.Filled.Circle, "The green line graph displays a linear regression of the blue line.", Color.Green)
-            Symbol(Icons.Filled.Square,"The climate boxes shows the mean data for the selected month over the years in the graph.")
-
-
-            Text("Plant Prognosis", textAlign = TextAlign.Center)
-            Symbol(Icons.Filled.DragHandle, "The slider allows you to select the year into the future you want to see the prediction for")
-            Symbol(Icons.Filled.Grass, "The plants shows the top 3 plants that can be cultivated during the selected month and year, based on the regression in the graph.")
-
-        } else if (currentScreen == "favorites") {
-            Text("The Favorite Screen:", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Symbol(Icons.Filled.DataThresholding, "Icon on card to navigate to the graph screen to show data on favorite location")
-            Symbol(Icons.Filled.Square,"Click on card to edit or delete favorite")
-        } else if (currentScreen == "settings") {
-        Text(
-            "The Settings Screen",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
-            Symbol(Icons.Filled.ToggleOn, "Change between light/dark mode")
-            Symbol(Icons.Filled.ArrowDropDown, "Change language")
-    } else if (currentScreen == "notes") {
-        Text("The Notes Screen:", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-        Symbol(Icons.Filled.Square,"Click on card to edit or delete note")
-        Symbol(Icons.Filled.Circle,"Click on 'add note' to add new note")
-
+            "notes" -> {
+                //INFO SCREEN FOR NOTES
+                Text(stringResource(R.string.info_notes_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                SymbolBulletPoint(Icons.Filled.Square, stringResource(R.string.info_notes_edit_delete))
+                SymbolBulletPoint(Icons.Filled.Circle, stringResource(R.string.info_notes_add_note))
+            }
         }
     }
 }
 @Composable
-fun Symbol(icon: ImageVector, text: String, tint: Color = MaterialTheme.colorScheme.primary) {
+fun SymbolBulletPoint(icon: ImageVector, text: String, tint: Color = MaterialTheme.colorScheme.primary) {
     Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = Modifier.padding(8.dp)
@@ -129,7 +120,7 @@ fun Symbol(icon: ImageVector, text: String, tint: Color = MaterialTheme.colorSch
 }
 
 @Composable
-fun Symbol(painter: Painter, text: String){
+fun SymbolBulletPoint(painter: Painter, text: String){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(8.dp)
