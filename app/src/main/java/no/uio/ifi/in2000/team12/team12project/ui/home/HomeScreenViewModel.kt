@@ -107,7 +107,11 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
             try {
                 val warnings = nveRepository.getFloodWarnings()
                 val latLngs = warnings.flatMap { warning ->
-                    warning.municipalityList.map { LatLng(it.lat!!, it.lon!!) }
+                    warning.municipalityList.mapNotNull { municipality ->
+                        val lat = municipality.lat
+                        val lon = municipality.lon
+                        if (lat != null && lon != null) LatLng(lat, lon) else null
+                    }
                 }
                 _uiState.update { it.copy(flomList = latLngs) }
             } catch (e: Exception) {
