@@ -83,6 +83,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.InfoPopup
+import no.uio.ifi.in2000.team12.team12project.ui.customComposables.NavigationDrawer
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
@@ -172,103 +173,10 @@ fun MainComp(
         drawerState = drawerState,
         gesturesEnabled = false,
         drawerContent = {
-            ModalDrawerSheet(
-                drawerContainerColor = MaterialTheme.colorScheme.primary,
-                drawerContentColor = MaterialTheme.colorScheme.onPrimary,
-            ) {
-                Row {
-                    Text(stringResource(R.string.menu),
-                        modifier = Modifier.padding(16.dp),
-                        fontSize = 24.sp,
-                        fontWeight = Bold)
-
-                    //spacer
-                    Spacer(modifier = Modifier.weight(1f))
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .size(42.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                            .clickable {
-                                scope.launch { drawerState.close() }
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(R.string.cont_desc_exit),
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-
-                }
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.secondary
-                )
-                NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.home),
-                        fontWeight = Medium,
-                        fontSize = 18.sp
-                    ) },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("home")
-                        scope.launch { drawerState.close() }
-                    },
-                    colors = drawerItemColors
-                )
-                NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.climate_graph),
-                        fontWeight = Medium,
-                        fontSize = 18.sp
-                    ) },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("graph")
-                        scope.launch { drawerState.close() }
-                    },
-                    colors = drawerItemColors
-                )
-                NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.favorites),
-                        fontWeight = Medium,
-                        fontSize = 18.sp
-                    ) },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("favorites")
-                        scope.launch { drawerState.close() }
-                    },
-                    colors = drawerItemColors
-                )
-                NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.notes),
-                        fontWeight = Medium,
-                        fontSize = 18.sp
-                    ) },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("notes")
-                        scope.launch { drawerState.close() }
-                    },
-                    colors = drawerItemColors
-                )
-                NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.settings),
-                        fontWeight = Medium,
-                        fontSize = 18.sp
-                    ) },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("settings")
-                        scope.launch { drawerState.close() }
-                    },
-                    colors = drawerItemColors
-
-                )
-            }
+            NavigationDrawer(
+                onNavigate = {route -> navController.navigate(route = route)},
+                onClose = {scope.launch { drawerState.close() }}
+            )
         }
     ) {
         Scaffold(
