@@ -3,11 +3,9 @@ package no.uio.ifi.in2000.team12.team12project.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreen
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreen
@@ -22,24 +20,20 @@ import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewMode
 @Composable
 fun Navigator(
     modifier: Modifier = Modifier,
-    homeViewModel: HomeScreenViewModel,// = viewModel(),
-    graphViewModel: GraphScreenViewModel = viewModel(),
+    homeViewModel: HomeScreenViewModel,
+    graphViewModel: GraphScreenViewModel,
     settingsViewModel: SettingsScreenViewModel,
-    favoritesViewModel: FavoritesScreenViewModel = viewModel(),
+    favoritesViewModel: FavoritesScreenViewModel,
     notesScreenViewModel: NotesScreenViewModel,
     navController: NavHostController,
 ){
-    homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
     NavHost(
         navController = navController,
         startDestination = "home",
         modifier = modifier
     ){
-        composable(
-            route = "home"
-        ) {
+        composable(route = "home") {
             HomeScreen(
-                modifier = Modifier,
                 homeScreenViewModel = homeViewModel,
                 favoritesScreenViewModel = favoritesViewModel,
                 navHostController = navController,
@@ -51,20 +45,17 @@ fun Navigator(
             }
             GraphScreen(graphScreenViewModel = graphViewModel)
         }
-        composable  (
-            route = "settings"
-        ){
+        composable(route = "settings") {
             SettingsScreen(settingsScreenViewModel = settingsViewModel)
         }
-        composable  (
-            route = "favorites"
-        ){
-            FavoritesScreen(favoritesScreenViewModel = favoritesViewModel, graphViewModel,homeViewModel, navController)
+        composable(route = "favorites") {
+            FavoritesScreen(favoritesScreenViewModel = favoritesViewModel,
+                homeScreenViewModel = homeViewModel,
+                navHostController = navController)
         }
-        composable (
-            route = "notes",
-        ){
-            NotesScreen(notesScreenViewModel = notesScreenViewModel, navController)
+        composable(route = "notes") {
+            NotesScreen(notesScreenViewModel = notesScreenViewModel,
+                navHostController = navController)
         }
     }
 }

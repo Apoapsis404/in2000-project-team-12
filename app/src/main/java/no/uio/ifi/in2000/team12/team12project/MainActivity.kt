@@ -78,6 +78,7 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.InfoPopup
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModelFactory
+import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.home.getNameAndAddress
 import no.uio.ifi.in2000.team12.team12project.ui.navigation.Navigator
@@ -120,13 +121,20 @@ class MainActivity : ComponentActivity() {
             val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoriteDao()))
             val notesScreenViewModel : NotesScreenViewModel = viewModel(factory = NotesScreenViewModelFactory(app.database.notesDao()))
             val homeScreenViewModel : HomeScreenViewModel = viewModel()
+            val graphScreenViewModel : GraphScreenViewModel = viewModel()
             //HomeScreen()
             //GraphScreen()
             Team12ProjectTheme(
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
             ) {
-                MainComp(settingsViewModel, favoritesViewModel, notesScreenViewModel, homeScreenViewModel)
+                MainComp(
+                    settingsViewModel,
+                    favoritesViewModel,
+                    notesScreenViewModel,
+                    homeScreenViewModel,
+                    graphScreenViewModel = graphScreenViewModel
+                )
             }
         }
     }
@@ -145,6 +153,7 @@ fun MainComp(
     favoriteScreenViewModel: FavoritesScreenViewModel,
     notesScreenViewModel: NotesScreenViewModel,
     homeScreenViewModel: HomeScreenViewModel,
+    graphScreenViewModel: GraphScreenViewModel
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -286,7 +295,9 @@ fun MainComp(
                 homeViewModel = homeScreenViewModel,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding()), navController = navController
+                    .padding(top = innerPadding.calculateTopPadding()),
+                navController = navController,
+                graphViewModel = graphScreenViewModel
             )
 
         }
@@ -388,8 +399,7 @@ fun MainComp(
     }
 }
 
-@SuppressLint("CoroutineCreationDuringComposition") // To get address string in title using coroutine
-@OptIn(ExperimentalMaterial3Api::class)     // må vi forsvare denne?
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Header(
     modifier: Modifier = Modifier,
@@ -397,27 +407,24 @@ fun Header(
     homeScreenViewModel: HomeScreenViewModel,
     navHostController: NavHostController,
     onFavoriteButtonClick: () -> Unit
-){
+) {
     val titleColors = MaterialTheme.colorScheme.onPrimary
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val addressTitle = homeScreenViewModel.uiState.collectAsState().value.address
 
     val navStackBackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navStackBackEntry?.destination?.route
 
-    // Put inside a viewModel?
     var showPopup by remember { mutableStateOf(false) }
 
-    LaunchedEffect(homeScreenViewModel.uiState.collectAsState().value.markerPosition) {
-        scope.launch {
-            val (_, address) = getNameAndAddress(
-                context,
-                homeScreenViewModel.uiState.value.markerPosition.latitude,
-                homeScreenViewModel.uiState.value.markerPosition.longitude
-            )
-            homeScreenViewModel.updateAddress(address.toString())
-        }
+    val uiState by homeScreenViewModel.uiState.collectAsState()
+    LaunchedEffect(uiState.markerPosition) {
+        val (_, address) = getNameAndAddress(
+            context,
+            uiState.markerPosition.latitude,
+            uiState.markerPosition.longitude
+        )
+        homeScreenViewModel.updateAddress(address.toString())
     }
 
     TopAppBar(
