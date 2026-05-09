@@ -42,12 +42,14 @@ fun PlantPopup(
        modifier =  Modifier
            .fillMaxWidth()
            .verticalScroll(verticalScrollState)
-           .padding(16.dp),
+           .padding(bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
             stringResource(R.string.plant_popup_header),
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         val context = LocalContext.current
         DropDown<Months>(
@@ -113,8 +115,9 @@ fun PlantPopup(
             horizontalArrangement = Arrangement.Center,
         ){
 
-            for (i in 1..3) {
-                if (!plantPq.isEmpty()) {
+            // shows 3 best plant card
+            repeat(3) {
+                if (plantPq.isNotEmpty()) {
                     PlantCard(plantPq.poll()!!)
                 }
             }
