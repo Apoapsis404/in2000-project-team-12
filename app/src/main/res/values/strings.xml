@@ -74,9 +74,9 @@
     <string name="favorites">Favorites</string>
     <string name="settings">Settings</string>
     <string name="notes">Notes</string>
-
-
-
+    <string name="favorite_edit_name">Edit name</string>
+    <string name="favorite_delete">Delete</string>
+    <string name="cont_desc_favorite_graph_icon">Navigate to graph screen</string>
 
 
 </resources>
