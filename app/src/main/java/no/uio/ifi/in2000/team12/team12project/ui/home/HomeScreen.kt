@@ -127,7 +127,7 @@ fun HomeScreen(
 
     if (askForPermission && askPermissionForLatLng != null) {
         AlertDialog(
-            onDismissRequest = { askForPermission = false },
+            onDismissRequest = { },
             title = { Text(stringResource(R.string.favorites_popup_title)) },
             text = { Text(stringResource(R.string.favorites_popup_question)) },
             confirmButton = {
