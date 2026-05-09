@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.team12.team12project.data.plants
 
 import android.content.Context
+import android.util.Log
+import androidx.core.os.LocaleListCompat
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
@@ -8,7 +10,7 @@ import java.util.PriorityQueue
 
 class PlantsRepository(private val context: Context){
 
-    private val plantList = getPlantData()
+    private var plantList = getPlantData()
 
     private fun getTextFromResources(resourceId: Int): String{
         return context.resources.openRawResource(resourceId)
@@ -19,7 +21,9 @@ class PlantsRepository(private val context: Context){
     }
 
     private fun getPlantData(): List<Plant>{
-        val jsonString = getTextFromResources(R.raw.plants_datav2)
+        val currentLanguage = LocaleListCompat.getAdjustedDefault()[0]?.language ?: "en"
+        val jsonResource = if (currentLanguage == "en") R.raw.plants_datav2 else R.raw.plants_datav2_norwegian
+        val jsonString = getTextFromResources(jsonResource)
         return Json.decodeFromString(jsonString)
     }
 
@@ -40,8 +44,10 @@ class PlantsRepository(private val context: Context){
         return bestList
     }
 
-
+    // Returns a priority queue of plants with optimal_temp average closest to <targetTemp>, then humidity average closest to <targetHumidity>, then sunshine average closest to <targetSunshine>, then precipitation average closest to <targetPrecipitation>
     fun getBestPlantsPriorityQueue(targetTemp: Float, targetHumidity: Float, targetSunshine: Float, targetPrecipitation: Float?): PriorityQueue<Plant>{
+        plantList = getPlantData()
+        Log.v("PLANTE", "Første plante er ${plantList[0].name}, language is ${LocaleListCompat.getAdjustedDefault()[0]?.language ?: "en"}")
         var comparator = compareBy<Plant> { kotlin.math.abs(((it.optimal_temp_min + it.optimal_temp_max) / 2.0) - targetTemp) }
             .thenBy { kotlin.math.abs(((it.humidity_min + it.humidity_max) / 2.0) - targetHumidity) }
             .thenBy { kotlin.math.abs(((it.sunshine_min + it.sunshine_max) / 2.0) - targetSunshine) }
