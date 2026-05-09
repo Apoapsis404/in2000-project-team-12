@@ -44,6 +44,7 @@
     <string name="cont_desc_downpour_marker">Nedbør</string>
     <string name="cont_desc_wind_marker">Vind</string>
     <string name="cont_desc_flood_marker">Flom</string>
+    <string name="your_position">Din posisjon</string>
 
 
     <!-- NOTES -->

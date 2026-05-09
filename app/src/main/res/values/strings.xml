@@ -58,6 +58,8 @@
     <string name="cont_desc_downpour_marker">downpour</string>
     <string name="cont_desc_wind_marker">Wind</string>
     <string name="cont_desc_flood_marker">Flood</string>
+    <string name="your_position">Your position</string>
+
 
 
 
