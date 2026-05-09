@@ -49,10 +49,7 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
     private val nveRepository : NVERepository = NVERepository(NVEDataSource(application))
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState = _uiState.asStateFlow()
-
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
-
-
     private val placesClient = Places.createClient(application)
     private val sessionToken = AutocompleteSessionToken.newInstance()
 
@@ -179,8 +176,7 @@ class HomeScreenViewModel(application : Application) : AndroidViewModel(applicat
         _uiState.update {
             it.copy(
                 markerPosition = latLng,
-                searchQuery = "",
-                markerTitle = ""
+                markerTitle = "",
             )
         }
     }

@@ -39,10 +39,10 @@ fun Navigator(
             route = "home"
         ) {
             HomeScreen(
-                homeViewModel,
+                modifier = Modifier,
+                homeScreenViewModel = homeViewModel,
                 favoritesScreenViewModel = favoritesViewModel,
-                navController,
-                modifier = Modifier
+                navHostController = navController,
             )
         }
         composable(route = "graph") {

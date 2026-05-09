@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team12.team12project.ui.home
 
 import android.Manifest
 import android.location.Geocoder
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
@@ -39,8 +39,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -60,35 +62,37 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import java.util.Locale
+import kotlin.coroutines.resume
 
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier,
     homeScreenViewModel: HomeScreenViewModel = viewModel(),
     favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(),
     navHostController: NavHostController,
-    modifier : Modifier = Modifier
 ) {
     val uiState by homeScreenViewModel.uiState.collectAsState()
-
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val scope = rememberCoroutineScope()
+    val localFocusManager = LocalFocusManager.current
+    var isSearchFocused by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(uiState.markerPosition, 10f)
     }
     val mapUiSettings = remember { MapUiSettings(zoomControlsEnabled = false) }
 
-    val scope = rememberCoroutineScope()
-
     val locationPermissionRequest = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false)) {
-            if(!homeScreenViewModel.uiState.value.hasInitialLocationBeenSet) {
+            if (!homeScreenViewModel.uiState.value.hasInitialLocationBeenSet) {
                 @Suppress("MissingPermission")
                 homeScreenViewModel.fetchCurrentLocation { pos ->
                     cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(pos, 15f))
@@ -100,123 +104,118 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        locationPermissionRequest.launch(arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ))
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 
-    //variables with the changed location on the map and to ask if user wants to add location to favorites
-    var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
-    var askforpermission by remember { mutableStateOf(false)}
-
+    var askPermissionForLatLng by remember { mutableStateOf<LatLng?>(null) }
+    var askForPermission by remember { mutableStateOf(false) }
 
     fun searchLocation(query: String) {
-        val geocoder = Geocoder(context, Locale.getDefault())
-        val results = geocoder.getFromLocationName(query, 1)
-        if (!results.isNullOrEmpty()) {
-            val location = results[0]
-            val latLng = LatLng(location.latitude, location.longitude)
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 20f)
-            homeScreenViewModel.onSearchedLocation(query, latLng)
+        scope.launch {
+            val latLng = getLatLngFromLocationName(context, query)
+            latLng?.let {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
+                homeScreenViewModel.onSearchedLocation(query, it)
+            }
         }
     }
 
+    if (askForPermission && askPermissionForLatLng != null) {
+        AlertDialog(
+            onDismissRequest = { askForPermission = false },
+            title = { Text(stringResource(R.string.favorites_popup_title)) },
+            text = { Text(stringResource(R.string.favorites_popup_question)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            val tempName = "temp_${System.currentTimeMillis()}"
+                            val (_, address) = getNameAndAddress(
+                                context,
+                                askPermissionForLatLng!!.latitude,
+                                askPermissionForLatLng!!.longitude
+                            )
+                            navHostController.navigate("favorites")
+                            favoritesScreenViewModel.addFavoriteLocation(
+                                location = askPermissionForLatLng!!,
+                                name = tempName,
+                                address = address.toString()
+                            )
+                        }
+
+                    }
+                ) {
+                    Text(stringResource(R.string.yes))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {  }) {
+                    Text(stringResource(R.string.no))
+                }
+            }
+        )
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
-
         GoogleMap(
             modifier = modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = { latLng ->
-
-                homeScreenViewModel.onMapClick(latLng)  //updates marker position
-                println(uiState.markerPosition)
-
-                askpermissonforlatlng = latLng
-
+                homeScreenViewModel.onMapClick(latLng)
+                askPermissionForLatLng = latLng
+                localFocusManager.clearFocus()
+                keyboardController?.hide()
             },
             googleMapOptionsFactory = {
-                GoogleMapOptions().mapId( "48427ab8c098a917274af32e")
+                GoogleMapOptions().mapId("48427ab8c098a917274af32e")
             },
             uiSettings = mapUiSettings,
         ) {
-            //
-            if(askforpermission && askpermissonforlatlng != null){
-                AlertDialog(
-                    onDismissRequest = {askforpermission = false},
-                    title = {Text(stringResource(R.string.favorites_popup_title))},
-                    text = {Text(stringResource(R.string.favorites_popup_question))},
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                            scope.launch {
-                                val tempname = "temp_${System.currentTimeMillis()}" //temporary name so it is easier to tell apart the diffrent adresses in order to rename
-
-                                val (name, address) = getNameandAdress( //name is no longer used
-                                    context,
-                                    askpermissonforlatlng!!.latitude,
-                                    askpermissonforlatlng!!.longitude
-                                )
-                                //navigates to favorite screen
-                                navHostController.navigate("favorites")
-
-                                favoritesScreenViewModel.addFavoriteLocation(
-                                location = askpermissonforlatlng!!,
-                                name = tempname , //"add name",//name.toString(), //add apart of the address. will later on add ability to change the name
-                                address = address.toString()
-                            )
-
-                            }
-                            askforpermission = false
-                        }) {
-                            Text(stringResource(R.string.yes))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = {askforpermission = false}) {
-                            Text(stringResource(R.string.no))
-                        }
-                    }
-                )
-            }
             AdvancedMarker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
-                title = uiState.markerTitle ,
-                onClick = {
-                    true
-                    //println("marker clicked at ${uiState.markerPosition}") ; true}
-                },
+                title = uiState.markerTitle,
+                onClick = { true },
                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
             )
-
             uiState.downpourList.forEach {
                 AdvancedMarker(
-                    state = remember{MarkerState(it)},
-                    contentDescription = "",
+                    state = remember { MarkerState(it) },
+                    contentDescription = stringResource(R.string.cont_desc_downpour_marker),
                     collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                    icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.outline_rainy_24),
+                    icon = homeScreenViewModel.vectorToBitMap(
+                        LocalContext.current,
+                        R.drawable.outline_rainy_24
                     )
+                )
             }
             uiState.extremeWindList.forEach {
                 AdvancedMarker(
-                    state = remember{MarkerState(it)},
-                    contentDescription = "",
+                    state = remember { MarkerState(it) },
+                    contentDescription = stringResource(R.string.cont_desc_wind_marker),
                     collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                    icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.baseline_air_24)
+                    icon = homeScreenViewModel.vectorToBitMap(
+                        LocalContext.current,
+                        R.drawable.baseline_air_24
+                    )
                 )
             }
             uiState.flomList.forEach {
                 AdvancedMarker(
-                    state = remember{MarkerState(it)},
-                    contentDescription = "",
+                    state = remember { MarkerState(it) },
+                    contentDescription = stringResource(R.string.cont_desc_flood_marker),
                     collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                    icon = homeScreenViewModel.vectorToBitMap(LocalContext.current, R.drawable.baseline_water_24),
-                    //onClick = {}
+                    icon = homeScreenViewModel.vectorToBitMap(
+                        LocalContext.current,
+                        R.drawable.baseline_water_24
+                    )
                 )
             }
-
         }
 
         Column(
@@ -225,28 +224,20 @@ fun HomeScreen(
                 .padding(8.dp)
                 .navigationBarsPadding()
         ) {
-            Column(
-                modifier = modifier
-                    .fillMaxWidth()
-            ) {
+            Column(modifier = modifier.fillMaxWidth()) {
                 TextField(
-                    value = uiState.searchQuery,    // value is read from uiState
-                    onValueChange = {
-                        homeScreenViewModel.setSearchQuery(it)
-                        //DENNE MÅ REAKTIVERES FOR Å FÅ FORSLAG PÅ SØK
-                        // homeScreenViewModel.fetchSuggestions(it)
-                    },
+                    value = uiState.searchQuery,
+                    onValueChange = { homeScreenViewModel.setSearchQuery(it)
+                                    //homeScreenViewModel.fetchSuggestions(it)  ACTIVATE BEFORE DEADLINE
+                         },
                     placeholder = { Text(stringResource(R.string.search_location)) },
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Search,
-                        //'autoCorrect = false
-                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(
                         onSearch = {
                             searchLocation(uiState.searchQuery)
                             keyboardController?.hide()
-
+                            localFocusManager.clearFocus()
                         }
                     ),
                     colors = TextFieldDefaults.colors(
@@ -257,15 +248,16 @@ fun HomeScreen(
                     ),
                     modifier = modifier
                         .fillMaxWidth()
-                       // .padding(16.dp)
+                        .onFocusChanged{ isSearchFocused = it.isFocused }
+
                 )
 
-                if (uiState.suggestions.isNotEmpty() && uiState.searchQuery.isNotEmpty()){
+                if (uiState.suggestions.isNotEmpty() && uiState.searchQuery.isNotEmpty() && isSearchFocused) {
                     Column(
                         modifier = modifier
                             .fillMaxWidth()
                             .background(Color.White)
-                    ){
+                    ) {
                         uiState.suggestions.forEach { suggestion ->
                             Text(
                                 text = suggestion,
@@ -276,6 +268,7 @@ fun HomeScreen(
                                         searchLocation(suggestion)
                                         homeScreenViewModel.clearSuggestions()
                                         keyboardController?.hide()
+                                        localFocusManager.clearFocus()
                                     }
                                     .padding(12.dp)
                             )
@@ -283,12 +276,12 @@ fun HomeScreen(
                         }
                     }
                 }
-                if (uiState.searchQuery.isNotEmpty() && uiState.suggestions.isEmpty()){
+
+                if (uiState.searchQuery.isNotEmpty() && uiState.suggestions.isEmpty() && isSearchFocused) {
                     Column(
                         modifier = modifier
                             .fillMaxWidth()
                             .background(Color.White)
-
                     ) {
                         Text(
                             text = stringResource(R.string.no_result),
@@ -299,18 +292,14 @@ fun HomeScreen(
                     }
                 }
             }
+
             Spacer(modifier = modifier.weight(1f))
 
             Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .navigationBarsPadding(),
+                modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomEnd
             ) {
-                Column{
-                    // Favorite button
-
-                    // My location button
+                Column {
                     FilledIconButton(
                         onClick = {
                             val fineLocationGranted =
@@ -318,7 +307,6 @@ fun HomeScreen(
                                         androidx.core.content.ContextCompat.checkSelfPermission(
                                             context, Manifest.permission.ACCESS_FINE_LOCATION
                                         )
-
                             if (fineLocationGranted) {
                                 @Suppress("MissingPermission")
                                 homeScreenViewModel.fetchCurrentLocation { position ->
@@ -336,87 +324,86 @@ fun HomeScreen(
                                     )
                                 )
                             }
-                        },
-                        //contentPadding = PaddingValues(8.dp),
-                        //shape = CircleShape
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.MyLocation,
-                            contentDescription = "return to my location",
+                            contentDescription = stringResource(R.string.cont_desc_return_to_current_position)
                         )
                     }
                     FilledIconButton(
                         onClick = {
-                            scope.launch {
-                                cameraPositionState.animate(CameraUpdateFactory.zoomIn())
-                            }
+                            scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomIn()) }
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.AddCircleOutline,
-                            contentDescription = "zoom in",
+                            contentDescription = stringResource(R.string.cont_desc_zoom_in)
                         )
                     }
                     FilledIconButton(
                         onClick = {
-                            scope.launch {
-                                cameraPositionState.animate(CameraUpdateFactory.zoomOut())
-                            }
+                            scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomOut()) }
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.RemoveCircleOutline,
-                            contentDescription = "zoom out",
+                            contentDescription = stringResource(R.string.cont_desc_zoom_out)
                         )
                     }
-
-
                 }
             }
-
         }
-        if (!uiState.isMapReady){
+
+        if (!uiState.isMapReady) {
             LoadingScreen()
         }
-
     }
 }
 
-suspend fun getNameandAdress(
+suspend fun getLatLngFromLocationName(
     context: android.content.Context,
-    //geocoder: Geocoder,
-    lat: Double,
-    long: Double
-): Pair<String?,String?> = withContext(Dispatchers.IO){
-    try {
-        val geocoder = Geocoder(context,Locale.getDefault())
-        val locationdetails = geocoder.getFromLocation(lat,long,1)
-        if(!locationdetails.isNullOrEmpty()){
-            val locationobject = locationdetails[0]
-            val name = locationobject.featureName
-            val address = locationobject.getAddressLine(0)
-            return@withContext name to address
+    query: String
+): LatLng? = withContext(Dispatchers.IO) {
+    val geocoder = Geocoder(context, Locale.getDefault())
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        suspendCancellableCoroutine { continuation ->
+            geocoder.getFromLocationName(query, 1) { addresses ->
+                continuation.resume(
+                    addresses.firstOrNull()?.let { LatLng(it.latitude, it.longitude) }
+                )
+            }
         }
-    }catch (e : Exception){
-        e.printStackTrace()
+    } else {
+        @Suppress("DEPRECATION")
+        geocoder.getFromLocationName(query, 1)?.firstOrNull()?.let {
+            LatLng(it.latitude, it.longitude)
+        }
     }
-    null to null
-
 }
 
-
-
-/*
-TODO
-- Bedre symboler
-- Collision handling - Check!
-- Pop up
-- Clean up, kankje lag egen klasse elns, så alle plasser kan ligge i samme liste
-- API
-- Tegne område rundt?
-
-
-
-
-
- */
+suspend fun getNameAndAddress(
+    context: android.content.Context,
+    lat: Double,
+    lon: Double
+): Pair<String?, String?> = withContext(Dispatchers.IO) {
+    val geocoder = Geocoder(context, Locale.getDefault())
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        suspendCancellableCoroutine { continuation ->
+            geocoder.getFromLocation(lat, lon, 1) { addresses ->
+                val address = addresses.firstOrNull()
+                continuation.resume(address?.featureName to address?.getAddressLine(0))
+            }
+        }
+    } else {
+        try {
+            @Suppress("DEPRECATION")
+            val results = geocoder.getFromLocation(lat, lon, 1)
+            val address = results?.firstOrNull()
+            address?.featureName to address?.getAddressLine(0)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null to null
+        }
+    }
+}

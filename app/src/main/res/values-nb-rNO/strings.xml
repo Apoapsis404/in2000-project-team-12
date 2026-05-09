@@ -39,7 +39,12 @@
     <string name="search_location">Søk i kart</string>
     <string name="no_result">Ingen resultater</string>
     <string name="cont_desc_return_to_current_position">Gå tilbake til nåværende posisjon</string>
-    <string name="navigate_to_graph_screen">Vis meg tallene!</string>
+    <string name="cont_desc_zoom_in">Zoom inn</string>
+    <string name="cont_desc_zoom_out">Zoom ut</string>
+    <string name="cont_desc_downpour_marker">Nedbør</string>
+    <string name="cont_desc_wind_marker">Vind</string>
+    <string name="cont_desc_flood_marker">Flom</string>
+
 
     <!-- NOTES -->
     <string name="delete_pop_up_header">Slett notat?"</string>

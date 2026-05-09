@@ -50,10 +50,16 @@
     <string name="favorites_popup_question">do you want this location added to your favorites?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="search_location">Search location...</string>
+    <string name="search_location">Search location…</string>
     <string name="no_result">No results</string>
     <string name="cont_desc_return_to_current_position">return to current position</string>
-    <string name="navigate_to_graph_screen">Show me the numbers!</string>
+    <string name="cont_desc_zoom_in">zoom in</string>
+    <string name="cont_desc_zoom_out">zoom out</string>
+    <string name="cont_desc_downpour_marker">downpour</string>
+    <string name="cont_desc_wind_marker">Wind</string>
+    <string name="cont_desc_flood_marker">Flood</string>
+
+
 
     <!-- NOTES -->
     <string name="delete_pop_up_header">Delete note?"</string>
