@@ -110,7 +110,7 @@ fun SymbolBulletPoint(icon: ImageVector, text: String, tint: Color = MaterialThe
     ){
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = icon.name,
             modifier = Modifier.size(25.dp),
             tint = tint
         )
@@ -127,7 +127,7 @@ fun SymbolBulletPoint(painter: Painter, text: String){
     ){
         Icon(
             painter = painter,
-            contentDescription = null,
+            contentDescription = painter.toString(),
             modifier = Modifier.size(25.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
