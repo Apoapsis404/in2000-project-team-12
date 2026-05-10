@@ -20,7 +20,7 @@ class TestAPIExceptionHandling {
 
     @Test
     fun testUnauthorizedException() = runTest {
-        val dataSource = ObsStationsDataSource()
+        val dataSource = ObsStationDataSource()
         assertFailsWith<UnauthorizedException> {
             dataSource.getNearestStation(59.9423, 10.72, clientId = "invalid", clientSecret = "invalid");
         }
@@ -28,7 +28,7 @@ class TestAPIExceptionHandling {
 
     @Test
     fun testNoDataException() = runTest {
-        val dataSource = ObsStationsDataSource()
+        val dataSource = ObsStationDataSource()
         assertFailsWith<NoDataException> {
             dataSource.getNearestStation(59.9423, 10.72, maxCount = 0);
         }

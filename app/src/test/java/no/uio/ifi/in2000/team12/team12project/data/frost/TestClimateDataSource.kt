@@ -9,12 +9,12 @@ import org.junit.Test
 class TestClimateDataSource {
 
     private lateinit var climateDataSource: ClimateDataSource
-    private lateinit var obsDataSource: ObsStationsDataSource
+    private lateinit var obsDataSource: ObsStationDataSource
 
     @Before
     fun setUp() {
         climateDataSource = ClimateDataSource()
-        obsDataSource = ObsStationsDataSource()
+        obsDataSource = ObsStationDataSource()
     }
 
     @Test

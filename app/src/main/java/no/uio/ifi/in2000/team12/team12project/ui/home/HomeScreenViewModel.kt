@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationsDataSource
+import no.uio.ifi.in2000.team12.team12project.data.frost.ObsStationDataSource
 import no.uio.ifi.in2000.team12.team12project.data.frost.TorrentialRain
 import no.uio.ifi.in2000.team12.team12project.data.frost.getStationIdsFromList
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
@@ -45,7 +45,7 @@ data class HomeScreenUiState(
 
 class HomeScreenViewModel(application : Application) : AndroidViewModel(application){
     private val torrentialRain = TorrentialRain()
-    private val obsStationsDataSource : ObsStationsDataSource = ObsStationsDataSource()
+    private val obsStationsDataSource : ObsStationDataSource = ObsStationDataSource()
     private val nveRepository : NVERepository = NVERepository(NVEDataSource(application))
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState = _uiState.asStateFlow()

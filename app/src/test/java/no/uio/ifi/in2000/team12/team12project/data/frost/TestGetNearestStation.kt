@@ -9,7 +9,7 @@ class GetNearestStationTest {
 
     @Test
     fun testGetNearestStation() = runTest {
-        val dataSource = ObsStationsDataSource()
+        val dataSource = ObsStationDataSource()
 
         launch {
             val station = dataSource.getNearestStation(59.9423, 10.72)
@@ -19,7 +19,7 @@ class GetNearestStationTest {
 
     @Test
     fun testGetStationIdsFromList() = runTest {
-        val dataSource = ObsStationsDataSource()
+        val dataSource = ObsStationDataSource()
 
         launch {
             val station = dataSource.getNearestStation(59.9423, 10.72)
@@ -31,7 +31,7 @@ class GetNearestStationTest {
 
     @Test
     fun testGetMetStation() = runTest {
-        val dataSource = ObsStationsDataSource()
+        val dataSource = ObsStationDataSource()
 
         val stations = dataSource.getMetStations()
         println(stations)

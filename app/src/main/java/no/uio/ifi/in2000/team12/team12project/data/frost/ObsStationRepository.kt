@@ -7,7 +7,7 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 
 class ObsStationRepository {
 
-    private val obsStationDataSource = ObsStationsDataSource()
+    private val obsStationDataSource = ObsStationDataSource()
     private val cachedStations = mutableMapOf<Pair<LatLng, ClimateType>, ObsStation>()
 
     suspend fun getNearestStation(latitude: Double, longitude: Double, climateType: ClimateType, maxDist: Double = 5.0, maxCount: Int = 5): List<ObsStation> {
