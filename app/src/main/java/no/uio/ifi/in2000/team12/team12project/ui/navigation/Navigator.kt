@@ -16,6 +16,7 @@ import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreen
 import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreen
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun Navigator(
@@ -37,9 +38,10 @@ fun Navigator(
                 homeScreenViewModel = homeViewModel
             )
         }
+        // To display climate data, the marker position is passed to the graph screen
         composable(route = "graph") {
-            LaunchedEffect(homeViewModel.getMarkerPosition()) {
-                graphViewModel.setMarkerPositionAndFetch(homeViewModel.getMarkerPosition())
+            LaunchedEffect(homeViewModel.uiState.collectAsState().value.markerPosition) {
+                graphViewModel.setMarkerPositionAndFetch(homeViewModel.uiState.value.markerPosition)
             }
             GraphScreen(graphScreenViewModel = graphViewModel)
         }

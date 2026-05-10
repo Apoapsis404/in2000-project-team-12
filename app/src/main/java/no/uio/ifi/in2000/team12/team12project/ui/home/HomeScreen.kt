@@ -90,7 +90,7 @@ fun HomeScreen(
                 @Suppress("MissingPermission")
                 homeScreenViewModel.fetchCurrentLocation { pos ->
                     cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(pos, 15f))
-                    homeScreenViewModel.onMapClick(pos)
+                    homeScreenViewModel.setMarkerPosition(pos)
                     homeScreenViewModel.setInitialLocationFlag()
                 }
             }
@@ -105,7 +105,7 @@ fun HomeScreen(
             )
         )
     }
-
+    // Fetches location based on query and updates the map and marker position
     fun searchLocation(query: String) {
         scope.launch {
             val latLng = getLatLngFromLocationName(context, query)
@@ -131,12 +131,14 @@ fun HomeScreen(
             },
             uiSettings = mapUiSettings,
         ) {
+            // Position marker
             AdvancedMarker(
                 state = remember(uiState.markerPosition) { MarkerState(uiState.markerPosition) },
                 title = uiState.markerTitle,
                 onClick = { true },
                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
             )
+            // Hazard markers for extreme downpour
             uiState.downpourList.forEach {
                 AdvancedMarker(
                     state = remember { MarkerState(it) },
@@ -148,6 +150,7 @@ fun HomeScreen(
                     )
                 )
             }
+            // Hazard markers for extreme wind speed
             uiState.extremeWindList.forEach {
                 AdvancedMarker(
                     state = remember { MarkerState(it) },
@@ -159,7 +162,8 @@ fun HomeScreen(
                     )
                 )
             }
-            uiState.flomList.forEach {
+            // Hazard markers for flood warnings
+            uiState.floodList.forEach {
                 AdvancedMarker(
                     state = remember { MarkerState(it) },
                     contentDescription = stringResource(R.string.cont_desc_flood_marker),
@@ -179,9 +183,12 @@ fun HomeScreen(
                 .navigationBarsPadding()
         ) {
             Column(modifier = modifier.fillMaxWidth()) {
+                // Search field for locations
                 TextField(
                     value = uiState.searchQuery,
-                    onValueChange = { homeScreenViewModel.setSearchQuery(it) },
+                    onValueChange = { homeScreenViewModel.setSearchQuery(it)
+                                   // homeScreenViewModel.fetchSuggestions(it) // HAS TO BE REACTIVATED BEFORE DELIVERY
+                                    },
                     placeholder = { Text(stringResource(R.string.search_location)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -202,7 +209,7 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .onFocusChanged { isSearchFocused = it.isFocused }
                 )
-
+                // Suggestions for locations, only shows if search field is focused and query and suggestions are not empty
                 if (uiState.suggestions.isNotEmpty() && uiState.searchQuery.isNotEmpty() && isSearchFocused) {
                     Column(
                         modifier = modifier
@@ -227,7 +234,7 @@ fun HomeScreen(
                         }
                     }
                 }
-
+                // Shows no available results if search field is focused, query is not empty and suggestions are empty
                 if (uiState.searchQuery.isNotEmpty() && uiState.suggestions.isEmpty() && isSearchFocused) {
                     Column(
                         modifier = modifier
@@ -250,6 +257,7 @@ fun HomeScreen(
                 modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomEnd
             ) {
+                // Buttons in bottom right corner
                 Column {
                     FilledIconButton(
                         onClick = {

@@ -36,7 +36,7 @@ data class HomeScreenUiState(
     val suggestions: List<String> = emptyList(),
     val downpourList: List<LatLng> = emptyList(),
     val extremeWindList: List<LatLng> = emptyList(),
-    val flomList: List<LatLng> = emptyList()
+    val floodList: List<LatLng> = emptyList()
 )
 
 class HomeScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -45,7 +45,10 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     private val nveRepository = NVERepository(NVEDataSource(application))
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
     private val placesClient = Places.createClient(application)
-    private val sessionToken = AutocompleteSessionToken.newInstance()
+
+    private var sessionToken = AutocompleteSessionToken.newInstance()
+    private val bitmapCache = mutableMapOf<Int, BitmapDescriptor>()
+
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -54,6 +57,7 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
         fetchFloodWarnings()
     }
 
+    // Fetches suggestions from google places based on the query in the TextField
     fun fetchSuggestions(query: String) {
         if (query.isBlank()) {
             _uiState.update { it.copy(suggestions = emptyList()) }
@@ -74,11 +78,13 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
                 _uiState.update { it.copy(suggestions = emptyList()) }
             }
     }
-
+    // Clears suggestions from the textfield, used when a suggestion is selected
     fun clearSuggestions() {
         _uiState.update { it.copy(suggestions = emptyList()) }
+        sessionToken = AutocompleteSessionToken.newInstance()
     }
 
+    // Fetches the location of the device if the user has given location permission
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     fun fetchCurrentLocation(onLocationFound: (LatLng) -> Unit) {
         val locationRequest = CurrentLocationRequest.Builder()
@@ -102,6 +108,7 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
             }
     }
 
+    // Fetches historical flood data from NVE and updates the uiState with flood warnings
     private fun fetchFloodWarnings() {
         viewModelScope.launch {
             try {
@@ -113,27 +120,29 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
                         if (lat != null && lon != null) LatLng(lat, lon) else null
                     }
                 }
-                _uiState.update { it.copy(flomList = latLngs) }
+                _uiState.update { it.copy(floodList = latLngs) }
             } catch (e: Exception) {
                 Log.e("HomeScreenViewModel", "Error fetching flood warnings", e)
             }
         }
     }
 
+    // Updates the marker position in the uiState
     fun setMarkerPosition(position: LatLng) {
         _uiState.update { it.copy(markerPosition = position) }
     }
 
+    // Updates the address in the uiState
     fun updateAddress(address: String) {
         _uiState.update { it.copy(address = address) }
     }
 
+    // Updates the search query in the uiState
     fun setSearchQuery(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
     }
 
-    fun getMarkerPosition(): LatLng = _uiState.value.markerPosition
-
+    // Updates the serch query and marker title in the uiState
     fun onSearchedLocation(query: String, position: LatLng) {
         _uiState.update {
             it.copy(
@@ -142,8 +151,10 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
                 markerPosition = position
             )
         }
+        sessionToken = AutocompleteSessionToken.newInstance()
     }
 
+    // Updates the marker position and title in the uiState based on mapClicks
     fun onMapClick(latLng: LatLng) {
         _uiState.update {
             it.copy(
@@ -152,25 +163,30 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
             )
         }
     }
-
+    // Updates the isMapReady in the uiState, used to end displaying of the loading screen
     fun onMapReady() {
         _uiState.update { it.copy(isMapReady = true) }
     }
 
+    // Converts a vector drawable to a bitmap descriptor
     fun vectorToBitMap(
         context: Context,
         vectorResId: Int,
         targetWidth: Int = 150,
         targetHeight: Int = 150
     ): BitmapDescriptor? {
+        bitmapCache[vectorResId]?.let { return it }
         val drawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
         drawable.setBounds(0, 0, targetWidth, targetHeight)
         val bitmap = createBitmap(targetWidth, targetHeight)
         val canvas = android.graphics.Canvas(bitmap)
         drawable.draw(canvas)
-        return BitmapDescriptorFactory.fromBitmap(bitmap)
+        return BitmapDescriptorFactory.fromBitmap(bitmap).also {
+            bitmapCache[vectorResId] = it
+        }
     }
 
+    // Updates the uiState with the position of hazard markers
     private fun loadHazardMarkers() {
         val context = getApplication<Application>().applicationContext
         val downpourMarkers = torrentialRain.readLatLngFromJson(context, "torrential_rain_stations.json")
@@ -183,6 +199,7 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    // Updates the uiState if the user has given location permission
     fun setInitialLocationFlag() {
         _uiState.update { it.copy(hasInitialLocationBeenSet = true) }
     }
