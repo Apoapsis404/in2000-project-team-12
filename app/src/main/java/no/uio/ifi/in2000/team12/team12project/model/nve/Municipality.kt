@@ -9,6 +9,6 @@ data class Municipality(
     val id: Int,
     @SerialName("Name")
     val name: String,
-    val lat: Double? = null,   //sendes ikke inn med kordinater så må kunne være null
+    val lat: Double? = null,
     val lon: Double? = null
 )

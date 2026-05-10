@@ -15,7 +15,7 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 import androidx.core.content.edit
 
 data class SettingsScreenUiState(
-    val lightmode: Boolean = true,
+    val lightMode: Boolean = true,
     val language: Languages = Languages.ENGLISH
 )
 class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
@@ -28,51 +28,42 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
             initialValue = SettingsScreenUiState()
         )
 
+    fun toggleTheme(){
+        updateConfig { currentState ->
+            currentState.copy(lightMode = !currentState.lightMode)
+        }
+    }
+
+    fun switchLanguage(newLanguage: Languages){
+        updateConfig { currentState ->
+            currentState.copy(language = newLanguage)
+        }
+    }
+
     private fun updateConfig(transform: (SettingsScreenUiState) -> SettingsScreenUiState) {
         viewModelScope.launch {
             val current = uiState.value
             dao.saveSettings(transform(current).toEntity())
         }
     }
-
-    fun toggleTheme(){
-        updateConfig {
-            it.copy(lightmode = !it.lightmode)
-        }
-    }
-
-    fun switchLanguage(newLanguage: Languages, activity: Activity){
-        val localeCode = when (newLanguage) {
-            Languages.ENGLISH -> "en"
-            Languages.NORSK -> "nb"
-
-        }
-
-        val prefs = activity.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        prefs.edit { putString("language", localeCode) }
-        updateConfig {
-            it.copy(language = newLanguage)
-        }
-
-        // To see changes in the app instant
-        activity.recreate()
-    }
-
 }
 
 fun SettingsEntity?.toUiState(): SettingsScreenUiState {
+    val languageEnum = try{
+        this?.language?.let {Languages.valueOf(it)} ?: Languages.ENGLISH
+    } catch (e: IllegalArgumentException){
+        Languages.ENGLISH
+    }
     return SettingsScreenUiState(
-        lightmode = this?.lightMode ?: true,
-        language = this?.language?.let { Languages.valueOf(it) } ?: Languages.ENGLISH
-        //Add additional settings here
+        lightMode = this?.lightMode ?: true,
+        language = languageEnum
     )
 }
 
 fun SettingsScreenUiState.toEntity(): SettingsEntity {
     return SettingsEntity(
         id = 0,
-        lightMode = this.lightmode,
+        lightMode = this.lightMode,
         language = this.language.name
-        //Add additional settings here
     )
 }

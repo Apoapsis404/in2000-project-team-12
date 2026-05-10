@@ -10,71 +10,68 @@ import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
 import no.uio.ifi.in2000.team12.team12project.model.nve.FloodWarning
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import kotlin.collections.map
 import android.content.Context
 
 class NVEDataSource(val context: Context){
-    val url: String = "https://api01.nve.no/hydrology/forecast/flood/v1.0.10/api/Warning/1/2016-01-01/2026-01-01"     //legge inn data for en dato hvis det ikke er noen varseler med /startdato på slutten
+    private val url: String = "https://api01.nve.no/hydrology/forecast/flood/v1.0.10/api/Warning/1/2016-01-01/2026-01-01"
+    private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun getFloodWarning(): List<FloodWarning> {
+    /*
+    * Denne metoden henter varslinger fra NVE. Den flitrerer for kommuner som har hatt varselsnivå 4 mer enn 7 ganger.
+    *Den returnerer em liste med FloodWarning objekter fra kommunene som oppfyller kravene
+    * */
+    suspend fun getFloodWarning(): List<FloodWarning> = withContext(Dispatchers.IO) {
         val response: HttpResponse = KtorClient.client.get(url)
+
+        if (response.status.value !in 200..299) {
+            throw Exception("Error getting flood warnings: ${response.status}")
+        }
         val responseBodyString = response.bodyAsText()
+        val allWarnings = json.decodeFromString<List<FloodWarning>>(responseBodyString)
 
-        if (response.status.value in 200..299) {
-            val allWarnings = Json { ignoreUnknownKeys = true }
-                .decodeFromString<List<FloodWarning>>(responseBodyString)
+        val coordinateMap = loadCoordinates()
 
+        val relevantEventIds = allWarnings
+            .filter { it.activityLevel == 4 }
+            .groupBy { it.eventId }
+            .filter { it.value.size >= 8 }
+            .keys
 
-            return withContext(Dispatchers.Default) {
-                val coordinateMap = loadCoordinates()
-
-                // vil sortere etter de som har hatt flom med farenivå som 4 eller mer hvertfall 8 ganger. Den henter bare fra siste 15 år
-                val relevantEventIds = allWarnings
-                    .filter { it.activityLevel >= 4 }
-                    .groupBy { it.eventId }
-                    .filter { it.value.size >= 8 }
-                    .keys
-
-                val filtered = allWarnings.filter { it.eventId in relevantEventIds }
-                println("filtered warnings: ${filtered.size}")
-
-                filtered.map { warning ->
-                        warning.copy(
-                            municipalityList = warning.municipalityList.mapNotNull { municipality ->
-                                val coordinates = coordinateMap[municipality.id]
-                                coordinates?.let {(lat, lon) ->
+        allWarnings
+            .filter { it.eventId in relevantEventIds }
+            .map { warning ->
+                warning.copy(
+                    municipalityList = warning.municipalityList.mapNotNull { municipality ->
+                                coordinateMap[municipality.id]?.let{(lat, lon) ->
                                     municipality.copy(lat = lat, lon = lon)
                                 }
                             }
                         )
-                }
             }
-        } else {
-            throw Exception("Error getting flood warnings: ${response.status}")
-        }
     }
 
+    /*
+    * Denne metoden leser kordinatene til de forskjellige kommunene og lagrer dem i en Map, som så blir returnert.
+    * */
     fun loadCoordinates(): Map<Int, Pair<Double, Double>> {
         val coordinateMap = mutableMapOf<Int, Pair<Double, Double>>()
         try {
-            val inputStream = context.assets.open("kommuner.csv")
-            BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                reader.forEachLine { line ->
-                    val part = line.split("\t")
-                    if (part.size >= 4) {
-                        try {
-                            val id = part[0].toInt()
-                            val name = part[1].trim()
-                            val lat = part[2].toDouble()
-                            val lon = part[3].toDouble()
+            context.assets.open("municipalities.csv").use { inputStream ->
+                BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                    reader.forEachLine { line ->
+                        val parts = line.split("\t")
+                        if (parts.size >= 4) {
+                            val id = parts[0].toInt()
+                            val lat = parts[2].toDouble()
+                            val lon = parts[3].toDouble()
 
                             coordinateMap[id] = Pair(lat, lon)
-                        } catch (e: Exception) {
                         }
                     }
                 }
             }
         } catch (e: Exception) {
+            println("Error loading coordinates: ${e.message}")
             e.printStackTrace()
         }
         return coordinateMap
