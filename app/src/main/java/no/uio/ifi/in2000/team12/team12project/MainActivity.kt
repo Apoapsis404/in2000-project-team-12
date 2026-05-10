@@ -4,31 +4,17 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.DataThresholding
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
@@ -36,15 +22,11 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -62,17 +44,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
-import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -94,7 +72,6 @@ import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModelFacto
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
-import no.uio.ifi.in2000.team12.team12project.ui.theme.precipiationBlue
 import java.util.Locale
 
 
@@ -129,22 +106,21 @@ class MainActivity : ComponentActivity() {
             val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoriteDao()))
             val notesScreenViewModel : NotesScreenViewModel = viewModel(factory = NotesScreenViewModelFactory(app.database.notesDao()))
             val homeScreenViewModel : HomeScreenViewModel = viewModel()
-            //HomeScreen()
-            //GraphScreen()
+
             Team12ProjectTheme(
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
             ) {
-                MainComp(settingsViewModel, favoritesViewModel, notesScreenViewModel, homeScreenViewModel)
+                MainComp(
+                    settingsViewModel,
+                    favoritesViewModel,
+                    notesScreenViewModel,
+                    homeScreenViewModel,
+                )
             }
         }
     }
 
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        val app = applicationContext as Team12Application
-//        app.database.close()
-//    }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -160,14 +136,11 @@ fun MainComp(
     val navController = rememberNavController()
     //variables with the changed location on the map and to ask if user wants to add location to favorites
     var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
-    var askforpermission by remember { mutableStateOf(false)}
+    var showFavoritesAlertDialog by remember { mutableStateOf(false)}
 
     val context = LocalContext.current
 
-    val drawerItemColors = NavigationDrawerItemDefaults.colors(
-        unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
-        selectedTextColor = MaterialTheme.colorScheme.onPrimary
-    )
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -186,11 +159,8 @@ fun MainComp(
                     homeScreenViewModel = homeScreenViewModel,
                     navHostController = navController,
                     onFavoriteButtonClick = {
-
-                        askpermissonforlatlng =
-                            homeScreenViewModel.uiState.value.markerPosition
-
-                        askforpermission = true
+                        askpermissonforlatlng = homeScreenViewModel.uiState.value.markerPosition
+                        showFavoritesAlertDialog = true
                     }
                 )
             },
@@ -206,57 +176,57 @@ fun MainComp(
             )
 
         }
-        if(askforpermission && askpermissonforlatlng != null){
+        if(showFavoritesAlertDialog && askpermissonforlatlng != null){
             AlertDialog(
-                onDismissRequest = {
-                    askforpermission = false
-                },
-
-                title = {
-                    Text(stringResource(R.string.favorites_popup_title))
-                },
-
-                text = {
-                    Text(stringResource(R.string.favorites_popup_question))
-                },
-
+                onDismissRequest = { showFavoritesAlertDialog = false },
+                title = { Text(stringResource(R.string.favorites_popup_title)) },
+                text = { Text(stringResource(R.string.favorites_popup_question)) },
                 confirmButton = {
-
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-
+                        // Decline button
                         TextButton(
-                            onClick = {
-                                askforpermission = false
-                            }
+                            onClick = { showFavoritesAlertDialog = false }
                         ) {
                             Text(stringResource(R.string.no))
                         }
-
+                        // Confirm button
                         TextButton(
                             onClick = {
-                                scope.launch {
+                                //GAMMEL (FØR ADRESSE I HOMSCREENVIEWMODEL)
 
-                                    val tempname = "temp_${System.currentTimeMillis()}"
+//                                scope.launch {
+//                                    val tempname = "temp_${System.currentTimeMillis()}"
+//
+//                                    val (name, address) = getNameandAdress(
+//                                        context,
+//                                        askpermissonforlatlng!!.latitude,
+//                                        askpermissonforlatlng!!.longitude
+//                                    )
+//
+//                                    navController.navigate("favorites")
+//
+//                                    favoriteScreenViewModel.addFavoriteLocation(
+//                                        location = askpermissonforlatlng!!,
+//                                        name = tempname,
+//                                        address = address.toString()
+//                                    )
+//                                }
+//
+//                                showFavoritesAlertDialog = false
 
-                                    val (name, address) = getNameandAdress(
-                                        context,
-                                        askpermissonforlatlng!!.latitude,
-                                        askpermissonforlatlng!!.longitude
-                                    )
+                            // NY
+                                // Trenger ikke oversette addresse lenger, da den allerede er lagret i homeScreenViewModel
+                                navController.navigate("favorites")
 
-                                    navController.navigate("favorites")
-
-                                    favoriteScreenViewModel.addFavoriteLocation(
-                                        location = askpermissonforlatlng!!,
-                                        name = tempname,
-                                        address = address.toString()
-                                    )
-                                }
-
-                                askforpermission = false
+                                favoriteScreenViewModel.addFavoriteLocation(
+                                    location = askpermissonforlatlng!!,
+                                    name = "temp_${System.currentTimeMillis()}",
+                                    address = homeScreenViewModel.uiState.value.address
+                                )
+                                showFavoritesAlertDialog = false
                             }
                         ) {
                             Text(stringResource(R.string.yes))
@@ -264,48 +234,12 @@ fun MainComp(
                     }
                 }
             )
-            /*AlertDialog(
-                onDismissRequest = {askforpermission = false},
-                title = {Text(stringResource(R.string.favorites_popup_title))},
-                text = {Text(stringResource(R.string.favorites_popup_question))},
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            scope.launch {
-                                val tempname = "temp_${System.currentTimeMillis()}" //temporary name so it is easier to tell apart the diffrent adresses in order to rename
-
-                                val (name, address) = getNameandAdress( //name is no longer used
-                                    context,
-                                    askpermissonforlatlng!!.latitude,
-                                    askpermissonforlatlng!!.longitude
-                                )
-                                //navigates to favorite screen
-                                navController.navigate("favorites")
-
-                                favoriteScreenViewModel.addFavoriteLocation(
-                                    location = askpermissonforlatlng!!,
-                                    name = tempname , //"add name",//name.toString(), //add apart of the address. will later on add ability to change the name
-                                    address = address.toString()
-                                )
-
-                            }
-                            askforpermission = false
-                        }) {
-                        Text(stringResource(R.string.Yes))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = {askforpermission = false}) {
-                        Text(stringResource(R.string.no))
-                    }
-                }
-            )*/
         }
     }
 }
 
-@SuppressLint("CoroutineCreationDuringComposition") // To get address string in title using coroutine
-@OptIn(ExperimentalMaterial3Api::class)     // må vi forsvare denne?
+@SuppressLint("CoroutineCreationDuringComposition")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Header(
     modifier: Modifier = Modifier,
@@ -317,38 +251,21 @@ fun Header(
     val titleColors = MaterialTheme.colorScheme.onPrimary
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val addressTitle = homeScreenViewModel.uiState.collectAsState().value.address
+    val currentAddress = homeScreenViewModel.uiState.collectAsState().value.address
 
     val navStackBackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navStackBackEntry?.destination?.route
 
-    // Put inside a viewModel?
-    var showPopup by remember { mutableStateOf(false) }
-
-    LaunchedEffect(homeScreenViewModel.uiState.collectAsState().value.markerPosition) {
-        scope.launch {
-            val (_, address) = getNameandAdress( //name is no longer used
-                context,
-                homeScreenViewModel.uiState.value.markerPosition.latitude,
-                homeScreenViewModel.uiState.value.markerPosition.longitude
-            )
-            homeScreenViewModel.updateAddress(address.toString())
-        }
-    }
+    var showInfoPopup by remember { mutableStateOf(false) }
+    val infoPopupState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     TopAppBar(
         {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-//                Icon(
-//                    imageVector = Icons.Default.LocationOn,
-//                    contentDescription = "location symbol",
-//                    tint = MaterialTheme.colorScheme.onPrimary
-//                )
                 Text(
-                    //stringResource(R.string.app_title),
-                    text = addressTitle,
+                    text = currentAddress,
                     color = titleColors,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -379,6 +296,7 @@ fun Header(
 
         ),
         actions = {
+            //favorite symbol
             TopBarIcon(
                 onClick = onFavoriteButtonClick,
                 imageVector = Icons.Default.FavoriteBorder,
@@ -387,26 +305,33 @@ fun Header(
 
             if(currentRoute == "graph"){
                 //Map symbol
-                TopBarIcon({navHostController.navigate(route = "home")}, Icons.Outlined.Map, "Navigate to map")
+                TopBarIcon(
+                    { navHostController.navigate(route = "home") },
+                    Icons.Outlined.Map,
+                    "Navigate to map"
+                )
 
             }else {
                 //Graph symbol
-                TopBarIcon({ navHostController.navigate("graph") }, Icons.Outlined.DataThresholding, "menu")
+                TopBarIcon(
+                    { navHostController.navigate("graph") },
+                    Icons.Outlined.DataThresholding,
+                    "menu"
+                )
             }
             //Information symbol
-            TopBarIcon({showPopup = true}, Icons.Outlined.Info, "Information")
-
-            //favorite symbol
-
-
+            TopBarIcon(
+                {showInfoPopup = true},
+                Icons.Outlined.Info,
+                "Information"
+            )
         }
-
     )
-    val infoPopupState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    if(showPopup) {
+
+    if(showInfoPopup) {
         // Modal bottom sheet for info button
         ModalBottomSheet(
-            onDismissRequest = { showPopup = false},
+            onDismissRequest = { showInfoPopup = false},
             sheetState = infoPopupState,
             containerColor = MaterialTheme.colorScheme.background,
 
@@ -434,12 +359,4 @@ fun TopBarIcon(
             tint = MaterialTheme.colorScheme.onPrimary
         )
     }
-}
-
-
-
-@Preview
-@Composable
-fun HeaderPreview(modifier: Modifier = Modifier.fillMaxSize()){
-    //Header() {}
 }

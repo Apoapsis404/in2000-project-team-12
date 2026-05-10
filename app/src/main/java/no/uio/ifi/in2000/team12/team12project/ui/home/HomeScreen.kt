@@ -381,6 +381,7 @@ fun HomeScreen(
 
     }
 }
+//FLYTTET TIL HOMESCREENVIEWMODEL:
 
 suspend fun getNameandAdress(
     context: android.content.Context,
