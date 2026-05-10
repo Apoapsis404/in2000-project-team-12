@@ -11,7 +11,7 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
  * Provides caching of verified stations and nearest station lookup.
  */
 class ObsStationRepository(
-    private val obsStationDataSource: ObsStationDataSource = ObsStationDataSource()
+    private val obsStationDataSource: ObsStationDataSource = ObsStationDataSource(),
 ) {
     private companion object {
         const val TAG = "ObsStationRepository"
