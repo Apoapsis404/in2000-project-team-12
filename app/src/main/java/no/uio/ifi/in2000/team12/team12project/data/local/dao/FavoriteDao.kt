@@ -17,6 +17,6 @@ interface FavoriteDao {
     @Query("DELETE FROM favorites WHERE name = :name")
     suspend fun deleteByName(name: String)
 
-    @Query("UPDATE favorites SET name = :changenameto WHERE name = :prevname")
-    suspend fun changeFavoriteLocationName(prevname: String, changenameto: String)
+    @Query("UPDATE favorites SET name = :newName WHERE name = :oldName")
+    suspend fun changeFavoriteLocationName(oldName: String, newName: String)
 }

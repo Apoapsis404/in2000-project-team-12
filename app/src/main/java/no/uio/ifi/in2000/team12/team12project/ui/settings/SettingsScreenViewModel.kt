@@ -63,7 +63,7 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
 fun SettingsEntity?.toUiState(): SettingsScreenUiState {
     return SettingsScreenUiState(
         lightmode = this?.lightMode ?: true,
-        language = this?.language?.let { Languages.valueOf(it) } ?: Languages.ENGLISH
+        language = this?.language ?: Languages.ENGLISH
         //Add additional settings here
     )
 }
@@ -72,7 +72,7 @@ fun SettingsScreenUiState.toEntity(): SettingsEntity {
     return SettingsEntity(
         id = 0,
         lightMode = this.lightmode,
-        language = this.language.name
+        language = this.language
         //Add additional settings here
     )
 }

@@ -129,8 +129,8 @@ class MainActivity : ComponentActivity() {
             val graphScreenViewModel : GraphScreenViewModel = viewModel(
                 factory = GraphScreenViewModelFactory(app.climateDataRepository, app.plantsRepository)
             )
-            val settingsViewModel : SettingsScreenViewModel = viewModel(factory = SettingsScreenViewModelFactory(app.database.settingDao()))
-            val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoriteDao()))
+            val settingsViewModel : SettingsScreenViewModel = viewModel(factory = SettingsScreenViewModelFactory(app.database.settingsDao()))
+            val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoritesDao()))
             val notesScreenViewModel : NotesScreenViewModel = viewModel(factory = NotesScreenViewModelFactory(app.database.notesDao()))
             val homeScreenViewModel : HomeScreenViewModel = viewModel()
             //HomeScreen()
