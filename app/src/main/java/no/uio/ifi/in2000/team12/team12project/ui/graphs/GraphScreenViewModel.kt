@@ -39,17 +39,32 @@ data class GraphScreenUiState(
     val errorMessage: String? = null,
     val showMean: Boolean = false,
     val showPopup: Boolean = false,
-    val yearSelected: Float = 2026f,
-    val predictedTemperature: Float = 15f,
-    val predictedHumidity: Float = 100f,
-    val predictedSunshine: Float = 100f,
-    val predictedPrecipitation: Float? = 100f,
+    val yearSelected: Float = GraphScreenViewModel.DEFAULT_YEAR_SELECTED,
+    val predictedTemperature: Float = GraphScreenViewModel.DEFAULT_PREDICTED_TEMP,
+    val predictedHumidity: Float = GraphScreenViewModel.DEFAULT_PREDICTED_HUMIDITY,
+    val predictedSunshine: Float = GraphScreenViewModel.DEFAULT_PREDICTED_SUNSHINE,
+    val predictedPrecipitation: Float? = GraphScreenViewModel.DEFAULT_PREDICTED_PRECIPITATION,
 )
 
 class GraphScreenViewModel(
     private val climateDataRepository: ClimateDataRepository,
     private val plantsRepository: PlantsRepository
 ) : ViewModel() {
+
+    companion object {
+        const val MAX_MONTHS_OF_HISTORY = 360u
+        const val MIN_DATA_POINTS_FOR_REGRESSION = 10
+        
+        const val DEFAULT_YEAR_SELECTED = 2026f
+        const val DEFAULT_PREDICTED_TEMP = 15f
+        const val DEFAULT_PREDICTED_HUMIDITY = 100f
+        const val DEFAULT_PREDICTED_SUNSHINE = 100f
+        const val DEFAULT_PREDICTED_PRECIPITATION = 100f
+
+        const val FALLBACK_HUMIDITY = 50f
+        const val FALLBACK_SUNSHINE = 7f
+        const val FALLBACK_PRECIPITATION = 5f
+    }
 
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
@@ -115,7 +130,7 @@ class GraphScreenViewModel(
                         try {
                             val (timeSeries, source) = climateDataRepository.getClimateTimeSeriesFromPos(position, type)
                             val months = monthsSince(timeSeries)
-                            val refTime = constructTimeSeries(min(months.toUInt(), 360u))
+                            val refTime = constructTimeSeries(min(months.toUInt(), MAX_MONTHS_OF_HISTORY))
                             val obs = climateDataRepository.getClimateData(source, type.elementId, refTime)
                             val climateData = ClimateData(refTime, obs, type)
                             setClimateData(type, climateData)
@@ -174,7 +189,7 @@ class GraphScreenViewModel(
             }
 
             getClimateChartData(ClimateType.PRECIPITATION, currentMonth)?.let { precData ->
-                precRegressionModel = if (precData.years.size < 10) {
+                precRegressionModel = if (precData.years.size < MIN_DATA_POINTS_FOR_REGRESSION) {
                     null
                 } else {
                     LinearRegressionModel(precData.years.toDoubleArray(), precData.values.toDoubleArray())
@@ -213,9 +228,9 @@ class GraphScreenViewModel(
 
     fun getBestPlants(
         targetTemp: Float,
-        targetHumidity: Float = 50f,
-        targetSunshine: Float = 7f,
-        targetPrecipitation: Float? = 5f
+        targetHumidity: Float = FALLBACK_HUMIDITY,
+        targetSunshine: Float = FALLBACK_SUNSHINE,
+        targetPrecipitation: Float? = FALLBACK_PRECIPITATION
     ): PriorityQueue<Plant> {
         return plantsRepository.getBestPlantsPriorityQueue(
             targetTemp, targetHumidity, targetSunshine, targetPrecipitation
