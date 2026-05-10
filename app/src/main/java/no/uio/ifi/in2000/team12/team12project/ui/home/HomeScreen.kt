@@ -122,7 +122,9 @@ fun HomeScreen(
             cameraPositionState = cameraPositionState,
             onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = { latLng ->
-                homeScreenViewModel.onMapClick(latLng)
+                if (!isSearchFocused) {
+                    homeScreenViewModel.onMapClick(latLng)
+                }
                 localFocusManager.clearFocus()
                 keyboardController?.hide()
             },
