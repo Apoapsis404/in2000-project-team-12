@@ -71,6 +71,7 @@ fun GraphScreen(
     val uiState by graphScreenViewModel.uiState.collectAsState()
     val plantPopupState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     // Sync climate data with the chart producer whenever it changes
     LaunchedEffect(uiState.climateChartData) {
@@ -119,7 +120,6 @@ fun GraphScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            val context = LocalContext.current
             // Month selection dropdown
             DropDown<Months>(
                 defaultName = uiState.month.localizedName(context),
