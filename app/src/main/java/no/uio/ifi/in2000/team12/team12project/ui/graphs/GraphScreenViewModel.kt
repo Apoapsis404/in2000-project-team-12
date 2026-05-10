@@ -1,9 +1,7 @@
 package no.uio.ifi.in2000.team12.team12project.ui.graphs
 
-import android.annotation.SuppressLint
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CancellationException
@@ -14,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
 import no.uio.ifi.in2000.team12.team12project.data.frost.constructTimeSeries
 import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
@@ -49,29 +46,22 @@ data class GraphScreenUiState(
     val predictedPrecipitation: Float? = 100f,
 )
 
-
 class GraphScreenViewModel(
-    application: Application
-) : AndroidViewModel(application) {
-
-    @SuppressLint("StaticFieldLeak")
-    private val context = getApplication<Application>().applicationContext
-    private val climateDataRepository = ClimateDataRepository()
-    private val plantsRepository = PlantsRepository(context)
+    private val climateDataRepository: ClimateDataRepository,
+    private val plantsRepository: PlantsRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GraphScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    // Cache maps, previously in GraphScreenData
     private val climateMap = mutableMapOf<ClimateType, ClimateData>()
     private val meansMap = mutableMapOf<Pair<ClimateType, Months>, Double>()
     private val chartDataMap = mutableMapOf<Pair<ClimateType, Months>, ClimateChartData>()
-    private var tempRegressionModel : LinearRegressionModel? = null// = LinearRegressionModel(uiState.value.climateChartData.years.toDoubleArray(), uiState.value.climateChartData.values.toDoubleArray())
-    private var precRegressionModel : LinearRegressionModel? = null
-
+    
+    private var tempRegressionModel: LinearRegressionModel? = null
+    private var precRegressionModel: LinearRegressionModel? = null
 
     private var graphDataFetchJob: Job? = null
-
 
     private fun clearCachedData() {
         climateMap.clear()
@@ -96,18 +86,16 @@ class GraphScreenViewModel(
         }
     }
 
-
     private fun getClimateChartData(climateType: ClimateType, month: Months): ClimateChartData? {
         val key = Pair(climateType, month)
-        if (chartDataMap.containsKey(key)) return chartDataMap[key]
+        chartDataMap[key]?.let { return it }
+        
         val data = climateMap[climateType] ?: return null
         val obsFromMonth = getObsFromMonth(month, data.climateObs)
         val chartData = getYearAndData(obsFromMonth)
         chartDataMap[key] = chartData
         return chartData
     }
-
-    // --- Public API ---
 
     fun setMarkerPositionAndFetch(position: LatLng) {
         clearCachedData()
@@ -127,10 +115,7 @@ class GraphScreenViewModel(
                         try {
                             val (timeSeries, source) = climateDataRepository.getClimateTimeSeriesFromPos(position, type)
                             val months = monthsSince(timeSeries)
-
-
                             val refTime = constructTimeSeries(min(months.toUInt(), 360u))
-
                             val obs = climateDataRepository.getClimateData(source, type.elementId, refTime)
                             val climateData = ClimateData(refTime, obs, type)
                             setClimateData(type, climateData)
@@ -171,49 +156,45 @@ class GraphScreenViewModel(
         updateChartData()
     }
 
-//    fun toggleMean(show: Boolean) {
-//        _uiState.update { it.copy(showMean = show) }
-//    }
-
     fun getMean(climateType: ClimateType, month: Months): Double? {
         return meansMap[Pair(climateType, month)]
     }
 
     fun updateChartData(climateType: ClimateType = _uiState.value.climateType) {
-        val chartData = getClimateChartData(climateType, _uiState.value.month)
+        val currentMonth = _uiState.value.month
+        val chartData = getClimateChartData(climateType, currentMonth)
+        
         _uiState.update {
             it.copy(climateChartData = chartData ?: ClimateChartData(emptyList(), emptyList()))
         }
 
-        // To update regression model when chart is updated
         try {
-            val tempData = getClimateChartData(ClimateType.MEAN_AIR_TEMP, month = uiState.value.month)!!
-            tempRegressionModel = LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
-
-            val precData = getClimateChartData(ClimateType.PRECIPITATION, month = uiState.value.month)!!
-            if (precData.years.size < 10) {
-                precRegressionModel = null
-            } else {
-                precRegressionModel = LinearRegressionModel(
-                    precData.years.toDoubleArray(),
-                    precData.values.toDoubleArray()
-                )
+            getClimateChartData(ClimateType.MEAN_AIR_TEMP, currentMonth)?.let { tempData ->
+                tempRegressionModel = LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
             }
 
-        }catch (
-            e: Exception
-        ){
+            getClimateChartData(ClimateType.PRECIPITATION, currentMonth)?.let { precData ->
+                precRegressionModel = if (precData.years.size < 10) {
+                    null
+                } else {
+                    LinearRegressionModel(precData.years.toDoubleArray(), precData.values.toDoubleArray())
+                }
+            }
+        } catch (e: Exception) {
             Log.e("GraphViewModel", "Failed to update regression model", e)
         }
     }
 
     fun updatePredictedClimate() {
+        val currentMonth = _uiState.value.month
+        val selectedYear = _uiState.value.yearSelected.toInt()
+        
         _uiState.update {
             it.copy(
-                predictedTemperature = tempRegressionModel?.predict(it.yearSelected.toInt())?.toFloat() ?: 0f,
-                predictedHumidity = getMean(ClimateType.RELATIVE_HUMIDITY, uiState.value.month)?.toFloat() ?: 0f,
-                predictedSunshine = getMean(ClimateType.DURATION_OF_SUN, uiState.value.month)?.toFloat() ?: 0f,
-                predictedPrecipitation = precRegressionModel?.predict(it.yearSelected.toInt())?.toFloat(),
+                predictedTemperature = tempRegressionModel?.predict(selectedYear)?.toFloat() ?: 0f,
+                predictedHumidity = getMean(ClimateType.RELATIVE_HUMIDITY, currentMonth)?.toFloat() ?: 0f,
+                predictedSunshine = getMean(ClimateType.DURATION_OF_SUN, currentMonth)?.toFloat() ?: 0f,
+                predictedPrecipitation = precRegressionModel?.predict(selectedYear)?.toFloat(),
             )
         }
     }
