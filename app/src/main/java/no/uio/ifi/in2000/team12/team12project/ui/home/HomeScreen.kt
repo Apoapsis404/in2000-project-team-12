@@ -20,13 +20,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -48,7 +46,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.AdvancedMarkerOptions.CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY
@@ -65,7 +62,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team12.team12project.R
-import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import java.util.Locale
 import kotlin.coroutines.resume
 
@@ -73,8 +69,6 @@ import kotlin.coroutines.resume
 fun HomeScreen(
     modifier: Modifier = Modifier,
     homeScreenViewModel: HomeScreenViewModel = viewModel(),
-    favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(),
-    navHostController: NavHostController,
 ) {
     val uiState by homeScreenViewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -112,9 +106,6 @@ fun HomeScreen(
         )
     }
 
-    var askPermissionForLatLng by remember { mutableStateOf<LatLng?>(null) }
-    var askForPermission by remember { mutableStateOf(false) }
-
     fun searchLocation(query: String) {
         scope.launch {
             val latLng = getLatLngFromLocationName(context, query)
@@ -125,42 +116,6 @@ fun HomeScreen(
         }
     }
 
-    if (askForPermission && askPermissionForLatLng != null) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = { Text(stringResource(R.string.favorites_popup_title)) },
-            text = { Text(stringResource(R.string.favorites_popup_question)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        scope.launch {
-                            val tempName = "temp_${System.currentTimeMillis()}"
-                            val (_, address) = getNameAndAddress(
-                                context,
-                                askPermissionForLatLng!!.latitude,
-                                askPermissionForLatLng!!.longitude
-                            )
-                            navHostController.navigate("favorites")
-                            favoritesScreenViewModel.addFavoriteLocation(
-                                location = askPermissionForLatLng!!,
-                                name = tempName,
-                                address = address.toString()
-                            )
-                        }
-
-                    }
-                ) {
-                    Text(stringResource(R.string.yes))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {  }) {
-                    Text(stringResource(R.string.no))
-                }
-            }
-        )
-    }
-
     Box(modifier = modifier.fillMaxSize()) {
         GoogleMap(
             modifier = modifier.fillMaxSize(),
@@ -168,7 +123,6 @@ fun HomeScreen(
             onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = { latLng ->
                 homeScreenViewModel.onMapClick(latLng)
-                askPermissionForLatLng = latLng
                 localFocusManager.clearFocus()
                 keyboardController?.hide()
             },
@@ -227,9 +181,7 @@ fun HomeScreen(
             Column(modifier = modifier.fillMaxWidth()) {
                 TextField(
                     value = uiState.searchQuery,
-                    onValueChange = { homeScreenViewModel.setSearchQuery(it)
-                                    //homeScreenViewModel.fetchSuggestions(it)  ACTIVATE BEFORE DEADLINE
-                         },
+                    onValueChange = { homeScreenViewModel.setSearchQuery(it) },
                     placeholder = { Text(stringResource(R.string.search_location)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -248,8 +200,7 @@ fun HomeScreen(
                     ),
                     modifier = modifier
                         .fillMaxWidth()
-                        .onFocusChanged{ isSearchFocused = it.isFocused }
-
+                        .onFocusChanged { isSearchFocused = it.isFocused }
                 )
 
                 if (uiState.suggestions.isNotEmpty() && uiState.searchQuery.isNotEmpty() && isSearchFocused) {

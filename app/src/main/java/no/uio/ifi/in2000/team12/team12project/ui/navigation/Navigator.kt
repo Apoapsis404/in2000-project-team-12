@@ -34,9 +34,7 @@ fun Navigator(
     ){
         composable(route = "home") {
             HomeScreen(
-                homeScreenViewModel = homeViewModel,
-                favoritesScreenViewModel = favoritesViewModel,
-                navHostController = navController,
+                homeScreenViewModel = homeViewModel
             )
         }
         composable(route = "graph") {
