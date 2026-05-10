@@ -135,10 +135,10 @@ fun MainComp(
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
     //variables with the changed location on the map and to ask if user wants to add location to favorites
-    var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
+    //var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
     var showFavoritesAlertDialog by remember { mutableStateOf(false)}
 
-    val context = LocalContext.current
+    //val context = LocalContext.current
 
 
 
@@ -159,7 +159,7 @@ fun MainComp(
                     homeScreenViewModel = homeScreenViewModel,
                     navHostController = navController,
                     onFavoriteButtonClick = {
-                        askpermissonforlatlng = homeScreenViewModel.uiState.value.markerPosition
+                        //askpermissonforlatlng = homeScreenViewModel.uiState.value.markerPosition
                         showFavoritesAlertDialog = true
                     }
                 )
@@ -176,7 +176,7 @@ fun MainComp(
             )
 
         }
-        if(showFavoritesAlertDialog && askpermissonforlatlng != null){
+        if(showFavoritesAlertDialog){//&& askpermissonforlatlng != null){
             AlertDialog(
                 onDismissRequest = { showFavoritesAlertDialog = false },
                 title = { Text(stringResource(R.string.favorites_popup_title)) },
@@ -220,9 +220,8 @@ fun MainComp(
                             // NY
                                 // Trenger ikke oversette addresse lenger, da den allerede er lagret i homeScreenViewModel
                                 navController.navigate("favorites")
-
                                 favoriteScreenViewModel.addFavoriteLocation(
-                                    location = askpermissonforlatlng!!,
+                                    location = homeScreenViewModel.uiState.value.markerPosition,//askpermissonforlatlng!!,
                                     name = "temp_${System.currentTimeMillis()}",
                                     address = homeScreenViewModel.uiState.value.address
                                 )
@@ -249,8 +248,6 @@ fun Header(
     onFavoriteButtonClick: () -> Unit
 ){
     val titleColors = MaterialTheme.colorScheme.onPrimary
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val currentAddress = homeScreenViewModel.uiState.collectAsState().value.address
 
     val navStackBackEntry by navHostController.currentBackStackEntryAsState()
