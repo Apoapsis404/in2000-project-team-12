@@ -30,18 +30,9 @@ fun Navigator(
     settingsViewModel: SettingsScreenViewModel,
     favoritesViewModel: FavoritesScreenViewModel = viewModel(),
     notesScreenViewModel: NotesScreenViewModel,
+    graphScreenViewModel: GraphScreenViewModel,
     navController: NavHostController,
 ){
-
-    // Creating a view model for the graph screen with context for plants repository
-    val context = LocalContext.current
-    val graphViewModel: GraphScreenViewModel = viewModel(
-        factory = GraphScreenViewModelFactory(
-            ClimateDataRepository(),
-            PlantsRepository(context)
-        )
-    )
-
 
     homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
     NavHost(
@@ -61,9 +52,9 @@ fun Navigator(
         }
         composable(route = "graph") {
             LaunchedEffect(homeViewModel.getMarkerPosition()) {
-                graphViewModel.setMarkerPositionAndFetch(homeViewModel.getMarkerPosition())
+                graphScreenViewModel.setMarkerPositionAndFetch(homeViewModel.getMarkerPosition())
             }
-            GraphScreen(graphScreenViewModel = graphViewModel)
+            GraphScreen(graphScreenViewModel = graphScreenViewModel)
         }
         composable  (
             route = "settings"
@@ -73,7 +64,7 @@ fun Navigator(
         composable  (
             route = "favorites"
         ){
-            FavoritesScreen(favoritesScreenViewModel = favoritesViewModel, graphViewModel,homeViewModel, navController)
+            FavoritesScreen(favoritesScreenViewModel = favoritesViewModel, graphScreenViewModel,homeViewModel, navController)
         }
         composable (
             route = "notes",

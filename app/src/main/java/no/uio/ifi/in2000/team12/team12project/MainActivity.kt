@@ -85,6 +85,8 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.InfoPopup
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModelFactory
+import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
+import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.home.getNameandAdress
 import no.uio.ifi.in2000.team12.team12project.ui.navigation.Navigator
@@ -124,6 +126,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val app = applicationContext as Team12Application
+            val graphScreenViewModel : GraphScreenViewModel = viewModel(
+                factory = GraphScreenViewModelFactory(app.climateDataRepository, app.plantsRepository)
+            )
             val settingsViewModel : SettingsScreenViewModel = viewModel(factory = SettingsScreenViewModelFactory(app.database.settingDao()))
             val favoritesViewModel : FavoritesScreenViewModel = viewModel(factory = FavoritesScreenViewModelFactory(app.database.favoriteDao()))
             val notesScreenViewModel : NotesScreenViewModel = viewModel(factory = NotesScreenViewModelFactory(app.database.notesDao()))
@@ -134,7 +139,7 @@ class MainActivity : ComponentActivity() {
                 darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
                 dynamicColor = false
             ) {
-                MainComp(settingsViewModel, favoritesViewModel, notesScreenViewModel, homeScreenViewModel)
+                MainComp(settingsViewModel, favoritesViewModel, notesScreenViewModel, homeScreenViewModel, graphScreenViewModel)
             }
         }
     }
@@ -153,6 +158,7 @@ fun MainComp(
     favoriteScreenViewModel: FavoritesScreenViewModel,
     notesScreenViewModel: NotesScreenViewModel,
     homeScreenViewModel: HomeScreenViewModel,
+    graphScreenViewModel: GraphScreenViewModel,
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -292,6 +298,7 @@ fun MainComp(
                 favoritesViewModel = favoriteScreenViewModel,
                 notesScreenViewModel = notesScreenViewModel,
                 homeViewModel = homeScreenViewModel,
+                graphScreenViewModel = graphScreenViewModel,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = innerPadding.calculateTopPadding()), navController = navController

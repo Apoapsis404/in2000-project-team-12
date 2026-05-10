@@ -64,7 +64,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 @Composable
 fun GraphScreen(
     modifier: Modifier = Modifier,
-    graphScreenViewModel: GraphScreenViewModel = viewModel(),
+    graphScreenViewModel: GraphScreenViewModel,
 
 ) {
     val modelProducer = remember { CartesianChartModelProducer() }
