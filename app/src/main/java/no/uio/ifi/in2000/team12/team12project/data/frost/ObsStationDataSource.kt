@@ -76,9 +76,9 @@ class ObsStationDataSource {
     /**
      * Fetches all MET.NO sensor system stations in Norway.
      *
-     * @return A comma-separated string of station IDs.
+     * @return A list of station IDs.
      */
-    suspend fun getMetStations(): String {
+    suspend fun getMetStations(): List<String> {
         val response: HttpResponse = KtorClient.client.get(URL_V0) {
             basicAuth(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_SECRET)
             url {
@@ -89,12 +89,11 @@ class ObsStationDataSource {
             }
         }
 
-        return handleResponse<ObsStationIdResponse>(response).data.joinToString(",") { it.id }
+        return handleResponse<ObsStationIdResponse>(response).data.map { it.id }
     }
 
     /**
      * Helper function to handle the [HttpResponse] and throw appropriate exceptions.
-     * This reduces boilerplate and ensures consistent error handling across different API calls.
      */
     private suspend inline fun <reified T> handleResponse(response: HttpResponse): T {
         return when (response.status.value) {
