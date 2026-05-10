@@ -43,7 +43,9 @@ data class GraphScreenUiState(
     val predictedTemperature: Float = GraphScreenViewModel.DEFAULT_PREDICTED_TEMP,
     val predictedHumidity: Float = GraphScreenViewModel.DEFAULT_PREDICTED_HUMIDITY,
     val predictedSunshine: Float = GraphScreenViewModel.DEFAULT_PREDICTED_SUNSHINE,
-    val predictedPrecipitation: Float? = GraphScreenViewModel.DEFAULT_PREDICTED_PRECIPITATION,
+    val predictedPrecipitationDaily: Float? = GraphScreenViewModel.DEFAULT_PREDICTED_PRECIPITATION,
+    val predictedPrecipitationMonthly: Float? = null,
+    val recommendedPlants: List<Plant> = emptyList(),
 )
 
 class GraphScreenViewModel(
@@ -64,6 +66,12 @@ class GraphScreenViewModel(
         const val FALLBACK_HUMIDITY = 50f
         const val FALLBACK_SUNSHINE = 7f
         const val FALLBACK_PRECIPITATION = 5f
+
+        // New Constants for logic and UI sync
+        const val DAYS_IN_MONTH = 30f
+        const val MIN_YEAR = 2026f
+        const val MAX_YEAR = 2126f
+        const val RECOMMENDED_PLANTS_LIMIT = 3
     }
 
     private val _uiState = MutableStateFlow(GraphScreenUiState())
@@ -195,27 +203,55 @@ class GraphScreenViewModel(
                     LinearRegressionModel(precData.years.toDoubleArray(), precData.values.toDoubleArray())
                 }
             }
+            
+            // Automatically update predictions when data models are updated
+            updatePredictedClimateInternal()
+            
         } catch (e: Exception) {
             Log.e("GraphViewModel", "Failed to update regression model", e)
         }
     }
 
-    fun updatePredictedClimate() {
+    /**
+     * Logic to update all predicted values based on current month and selected year.
+     * This is private as it is triggered internally by state changes (Month/Year/Data).
+     */
+    private fun updatePredictedClimateInternal() {
         val currentMonth = _uiState.value.month
         val selectedYear = _uiState.value.yearSelected.toInt()
         
+        val temp = tempRegressionModel?.predict(selectedYear)?.toFloat() ?: 0f
+        val hum = getMean(ClimateType.RELATIVE_HUMIDITY, currentMonth)?.toFloat() ?: 0f
+        val sun = getMean(ClimateType.DURATION_OF_SUN, currentMonth)?.toFloat() ?: 0f
+        val precDaily = precRegressionModel?.predict(selectedYear)?.toFloat()
+        
+        // Convert daily average to monthly total for display
+        val precMonthly = precDaily?.let { it * DAYS_IN_MONTH }
+
+        // Fetch recommendations based on these predictions
+        val plantsPq = plantsRepository.getBestPlantsPriorityQueue(
+            temp, hum, sun, precDaily
+        )
+        val bestPlants = mutableListOf<Plant>()
+        repeat(RECOMMENDED_PLANTS_LIMIT) {
+            if (plantsPq.isNotEmpty()) bestPlants.add(plantsPq.poll()!!)
+        }
+
         _uiState.update {
             it.copy(
-                predictedTemperature = tempRegressionModel?.predict(selectedYear)?.toFloat() ?: 0f,
-                predictedHumidity = getMean(ClimateType.RELATIVE_HUMIDITY, currentMonth)?.toFloat() ?: 0f,
-                predictedSunshine = getMean(ClimateType.DURATION_OF_SUN, currentMonth)?.toFloat() ?: 0f,
-                predictedPrecipitation = precRegressionModel?.predict(selectedYear)?.toFloat(),
+                predictedTemperature = temp,
+                predictedHumidity = hum,
+                predictedSunshine = sun,
+                predictedPrecipitationDaily = precDaily,
+                predictedPrecipitationMonthly = precMonthly,
+                recommendedPlants = bestPlants
             )
         }
     }
 
     fun openPopup() {
         _uiState.update { it.copy(showPopup = true) }
+        updatePredictedClimateInternal()
     }
 
     fun closePopup() {
@@ -224,8 +260,10 @@ class GraphScreenViewModel(
 
     fun updateSelectedYear(year: Float) {
         _uiState.update { it.copy(yearSelected = year) }
+        updatePredictedClimateInternal()
     }
 
+    // This method is now redundant for the Popup but kept for other potential callers
     fun getBestPlants(
         targetTemp: Float,
         targetHumidity: Float = FALLBACK_HUMIDITY,

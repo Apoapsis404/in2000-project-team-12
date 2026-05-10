@@ -31,12 +31,7 @@ fun PlantPopup(
     graphScreenViewModel: GraphScreenViewModel,
     uiState: GraphScreenUiState,
 ){
-    val plantPq = graphScreenViewModel.getBestPlants(
-        uiState.predictedTemperature,
-        targetHumidity = uiState.predictedHumidity,
-        targetSunshine = uiState.predictedSunshine,
-        targetPrecipitation = uiState.predictedPrecipitation,
-    )
+    // Removed local plantPq calculation as it is now managed by the ViewModel State
     val verticalScrollState = rememberScrollState()
     Column(
        modifier =  Modifier
@@ -55,11 +50,13 @@ fun PlantPopup(
             labelMapper = { it.localizedName(context) },
             onClick = {
                 graphScreenViewModel.setMonth(it)
-                graphScreenViewModel.updatePredictedClimate()},
+                // updatePredictedClimate is now internal and triggered automatically by setMonth
+            },
         )
         Slider(
             value = uiState.yearSelected,
-            valueRange = 2026f..2126f, // Hardcoded range for now
+            // Use constants from ViewModel instead of hardcoded magic numbers
+            valueRange = GraphScreenViewModel.MIN_YEAR..GraphScreenViewModel.MAX_YEAR,
             steps = 100,
             colors = SliderDefaults.colors(
                 inactiveTrackColor = MaterialTheme.colorScheme.background,
@@ -67,7 +64,7 @@ fun PlantPopup(
             ),
             onValueChange = {
                 graphScreenViewModel.updateSelectedYear(it)
-                graphScreenViewModel.updatePredictedClimate()
+                // updatePredictedClimate is now internal and triggered automatically by updateSelectedYear
             } ,
             modifier = Modifier
                 .padding(start = 24.dp, end = 24.dp)
@@ -94,11 +91,11 @@ fun PlantPopup(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Text(
-                if (uiState.predictedPrecipitation != null){
+                // Use the daily prediction flag and the monthly pre-calculated value from the state
+                if (uiState.predictedPrecipitationDaily != null && uiState.predictedPrecipitationMonthly != null){
                     stringResource(
                         R.string.plant_predicted_precipitation,
-                        uiState.predictedPrecipitation * 30
-
+                        uiState.predictedPrecipitationMonthly
                     )
                 }else{
                     stringResource(R.string.too_few_precipitation_data)
@@ -112,11 +109,9 @@ fun PlantPopup(
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.Center,
         ){
-
-            for (i in 1..3) {
-                if (!plantPq.isEmpty()) {
-                    PlantCard(plantPq.poll()!!)
-                }
+            // Use the recommendedPlants list from the state, which is stable for recomposition
+            uiState.recommendedPlants.forEach { plant ->
+                PlantCard(plant)
             }
         }
     }
