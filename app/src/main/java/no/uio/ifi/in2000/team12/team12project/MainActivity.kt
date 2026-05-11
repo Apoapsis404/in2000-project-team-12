@@ -114,8 +114,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val app = application as Team12Application
-        val settingsDao = app.database.settingDao()
-        val language = runBlocking { settingsDao.getSettings().first()?.language ?: "ENGLISH"}
+        val settingsDao = app.database.settingsDao()
+        val language = runBlocking { settingsDao.getSettings().first()?.language?.name ?: "ENGLISH"}
         setLocale(language)
 
         if (!Places.isInitialized()) {

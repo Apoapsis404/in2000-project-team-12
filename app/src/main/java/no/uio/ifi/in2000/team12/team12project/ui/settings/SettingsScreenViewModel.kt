@@ -1,7 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.ui.settings
 
-import android.app.Activity
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,7 +10,6 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
 import no.uio.ifi.in2000.team12.team12project.data.local.dao.SettingsDao
 import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
-import androidx.core.content.edit
 
 data class SettingsScreenUiState(
     val lightMode: Boolean = true,
@@ -56,11 +53,7 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
 
 // Hjelpefunksjon for å konvertere SettingsEntity fra databasen til SettingsScreenUiState.
 fun SettingsEntity?.toUiState(): SettingsScreenUiState {
-    val languageEnum = try{
-        this?.language?.let {Languages.valueOf(it)} ?: Languages.ENGLISH
-    } catch (e: IllegalArgumentException){
-        Languages.ENGLISH
-    }
+    val languageEnum = this?.language ?: Languages.ENGLISH
     return SettingsScreenUiState(
         lightMode = this?.lightMode ?: true,
         language = languageEnum
@@ -72,6 +65,6 @@ fun SettingsScreenUiState.toEntity(): SettingsEntity {
     return SettingsEntity(
         id = 0,
         lightMode = this.lightMode,
-        language = this.language.name
+        language = this.language
     )
 }
