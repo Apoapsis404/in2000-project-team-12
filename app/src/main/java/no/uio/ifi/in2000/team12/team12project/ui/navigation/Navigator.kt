@@ -3,13 +3,18 @@ package no.uio.ifi.in2000.team12.team12project.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.android.gms.maps.model.LatLng
+import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateDataRepository
+import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreen
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreen
 import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
+import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreen
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreen
@@ -22,12 +27,14 @@ import androidx.compose.runtime.collectAsState
 fun Navigator(
     modifier: Modifier = Modifier,
     homeViewModel: HomeScreenViewModel,
-    graphViewModel: GraphScreenViewModel,
     settingsViewModel: SettingsScreenViewModel,
     favoritesViewModel: FavoritesScreenViewModel,
     notesScreenViewModel: NotesScreenViewModel,
+    graphScreenViewModel: GraphScreenViewModel,
     navController: NavHostController,
 ){
+
+    homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
     NavHost(
         navController = navController,
         startDestination = "home",
@@ -38,12 +45,11 @@ fun Navigator(
                 homeScreenViewModel = homeViewModel
             )
         }
-        // To display climate data, the marker position is passed to the graph screen
         composable(route = "graph") {
             LaunchedEffect(homeViewModel.uiState.collectAsState().value.markerPosition) {
-                graphViewModel.setMarkerPositionAndFetch(homeViewModel.uiState.value.markerPosition)
+                graphScreenViewModel.setMarkerPositionAndFetch(homeViewModel.uiState.value.markerPosition)
             }
-            GraphScreen(graphScreenViewModel = graphViewModel)
+            GraphScreen(graphScreenViewModel = graphScreenViewModel)
         }
         composable(route = "settings") {
             SettingsScreen(settingsScreenViewModel = settingsViewModel)

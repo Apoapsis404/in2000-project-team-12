@@ -5,8 +5,6 @@ import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSer
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoDataException
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
-import java.lang.annotation.ElementType
-
 
 class ClimateDataRepository(
     private val climateDataSource: ClimateDataSource = ClimateDataSource(),
@@ -14,16 +12,15 @@ class ClimateDataRepository(
 ) {
 
     companion object {
-        private const val DEFAULT_FIELDS =
-            "sourceId,referenceTime,elementId,unit,value"
-
+        private const val DEFAULT_FIELDS = "sourceId,referenceTime,elementId,unit,value"
         private const val DEFAULT_MAX_DIST_KM = 5.0
         private const val MAX_STATIONS_LIMIT = 25
         private const val MAX_STATION_STEP = 5
+        private const val MIN_MONTHS_REQUIRED = 60
     }
 
     /**
-     * Fetch climate data for the given station
+     * Fetch climate data for the given station.
      */
     suspend fun getClimateData(
         sourceId: String,
@@ -31,67 +28,35 @@ class ClimateDataRepository(
         referenceTime: String,
         fields: String = DEFAULT_FIELDS
     ): List<ClimateObs> {
-        val result = climateDataSource.getClimateData(
+        return climateDataSource.getClimateData(
             sourceId,
             elementId,
             referenceTime,
             fields
         )
-        return result
-    }
-
-    suspend fun getClimateTimeSeries(sourceId: String, elementId: String, fields: String = "validFrom"): String {
-        try {
-            val result = climateDataSource.getClimateTimeSeries(sourceId, elementId, fields)
-            return result
-        } catch (e: Exception) { //TODO handle specific exceptions
-            throw e
-        }
-    }
-
-    suspend fun getClimateTimeSeriesFromPos(position: LatLng, climateType: ClimateType, fields: String = "validFrom", minCount: Int = 0, maxCount: Int = 5): Pair<String, String> {
-        var currentMin = minCount
-        var currentMax = maxCount
-
-        while (currentMax <= MAX_STATIONS_LIMIT) {
-            val sources = stationRepository.getNearestStation(position.latitude, position.longitude, climateType, maxDist = DEFAULT_MAX_DIST_KM, maxCount = currentMax)
-
-            for (source in sources) {
-                val result = try {
-                    climateDataSource.getClimateTimeSeries(source.id, climateType.elementId, fields)
-                } catch (e: NoAvailableTimeSeriesException) {
-                    continue
-                } catch (e: NoDataException) {
-                    continue
-                }
-
-                if (result.isNotEmpty() && monthsSince(result) >= 60) {
-                    stationRepository.addStationToCache(source, position, climateType)
-                    return Pair(result, source.id)
-                }
-            }
-
-            currentMin = currentMax
-            currentMax += MAX_STATION_STEP
-        }
-
-        throw NoAvailableTimeSeriesException(
-            "No available time series (up to $MAX_STATIONS_LIMIT stations tried)"
-        )
     }
 
     /**
-     * Try multiple nearby stations until data is found, optionally widening the search.
+     * Fetch climate time series for the given station.
      */
-    suspend fun getClimateDataFailing(
+    suspend fun getClimateTimeSeries(
+        sourceId: String,
+        elementId: String,
+        fields: String = "validFrom"
+    ): String {
+        return climateDataSource.getClimateTimeSeries(sourceId, elementId, fields)
+    }
+
+    /**
+     * Finds a station near the position that has a long enough time series for the given climate type.
+     * Returns the validFrom date and the sourceId.
+     */
+    suspend fun getClimateTimeSeriesFromPos(
         position: LatLng,
         climateType: ClimateType,
-        referenceTime: String,
-        minCount: Int = 0,
-        maxCount: Int = 5,
-        fields: String = DEFAULT_FIELDS
-    ): List<ClimateObs> {
-        var currentMin = minCount
+        fields: String = "validFrom",
+        maxCount: Int = 5
+    ): Pair<String, String> {
         var currentMax = maxCount
 
         while (currentMax <= MAX_STATIONS_LIMIT) {
@@ -103,32 +68,77 @@ class ClimateDataRepository(
                 maxCount = currentMax
             )
 
-            for (source in sources.drop(currentMin)) {
-                val result = try {
-                    climateDataSource.getClimateData(
+            for (source in sources) {
+                try {
+                    val result = climateDataSource.getClimateTimeSeries(source.id, climateType.elementId, fields)
+                    if (result.isNotEmpty() && monthsSince(result) >= MIN_MONTHS_REQUIRED) {
+                        stationRepository.addStationToCache(source, position, climateType)
+                        return Pair(result, source.id)
+                    }
+                } catch (e: Exception) {
+                    when (e) {
+                        is NoAvailableTimeSeriesException, is NoDataException -> continue
+                        else -> throw e
+                    }
+                }
+            }
+            currentMax += MAX_STATION_STEP
+        }
+
+        throw NoAvailableTimeSeriesException(
+            "No available time series with at least $MIN_MONTHS_REQUIRED months of data found (up to $MAX_STATIONS_LIMIT stations tried)"
+        )
+    }
+
+    /**
+     * Try multiple nearby stations until data is found, optionally widening the search.
+     */
+    suspend fun getClimateDataWithFallback(
+        position: LatLng,
+        climateType: ClimateType,
+        referenceTime: String,
+        maxCount: Int = 5,
+        fields: String = DEFAULT_FIELDS
+    ): List<ClimateObs> {
+        var currentMax = maxCount
+        var lastTriedCount = 0
+
+        while (currentMax <= MAX_STATIONS_LIMIT) {
+            val sources = stationRepository.getNearestStation(
+                position.latitude,
+                position.longitude,
+                climateType,
+                maxDist = DEFAULT_MAX_DIST_KM,
+                maxCount = currentMax
+            )
+
+            // Only try new stations found in this expansion
+            for (source in sources.drop(lastTriedCount)) {
+                try {
+                    val result = climateDataSource.getClimateData(
                         source.id,
                         climateType.elementId,
                         referenceTime,
                         fields
                     )
-                } catch (e: NoAvailableTimeSeriesException) {
-                    // No time series for this station; skip to next
-                    println("No time series for station ${e.message}")
-                    continue
-                }
-
-                if (result.isNotEmpty()) {
-                    stationRepository.addStationToCache(source, position, climateType)
-                    return result
+                    if (result.isNotEmpty()) {
+                        stationRepository.addStationToCache(source, position, climateType)
+                        return result
+                    }
+                } catch (e: Exception) {
+                    when (e) {
+                        is NoAvailableTimeSeriesException, is NoDataException -> continue
+                        else -> throw e
+                    }
                 }
             }
 
-            currentMin = currentMax
+            lastTriedCount = currentMax
             currentMax += MAX_STATION_STEP
         }
 
-        throw NoAvailableTimeSeriesException(
-            "No available time series (up to $MAX_STATIONS_LIMIT stations tried)"
+        throw NoDataException(
+            "No climate data found for ${climateType.elementId} (up to $MAX_STATIONS_LIMIT stations tried)"
         )
     }
 }

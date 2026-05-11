@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Umbrella
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.filled.WbSunny
@@ -43,22 +42,26 @@ import no.uio.ifi.in2000.team12.team12project.ui.theme.humidityBlue
 import no.uio.ifi.in2000.team12.team12project.ui.theme.precipiationBlue
 import no.uio.ifi.in2000.team12.team12project.ui.theme.sunshineYellow
 
+private const val MIN_TEMP = -30f
+private const val MAX_TEMP = 40f
+private const val MAX_PRECIP = 100f
+private const val MAX_SUN = 400f
+
 @Composable
 fun GraphCard(
     modifier: Modifier = Modifier,
     climateType: ClimateType = ClimateType.MEAN_AIR_TEMP,
     meanValue: Double = 0.0,
     onClick: () -> Unit,
-    selected : Boolean = false
+    selected: Boolean = false
 ) {
+    val containerColor = if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+    val contentColor = if (selected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
+
     Card(
-        modifier = modifier
-            .aspectRatio(1f),
+        modifier = modifier.aspectRatio(1f),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) MaterialTheme.colorScheme.secondary
-            else MaterialTheme.colorScheme.primary
-        ),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
         onClick = onClick,
     ) {
         Column(
@@ -68,15 +71,15 @@ fun GraphCard(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Title at the top
+            val title = climateType.label.split(" ").last().replaceFirstChar { it.uppercase() }
+
             Text(
-                text = climateType.label.split(" ").last().replaceFirstChar { it.uppercase() },
-                color = MaterialTheme.colorScheme.onPrimary,
+                text = title,
+                color = contentColor,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
             )
 
-            // Visual representation in the middle
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -84,25 +87,23 @@ fun GraphCard(
                 contentAlignment = Alignment.Center
             ) {
                 when (climateType) {
-                    ClimateType.RELATIVE_HUMIDITY -> HumidityVisual(meanValue)
-                    ClimateType.MEAN_AIR_TEMP -> TemperatureVisual(meanValue)
-                    //ClimateType.MEAN_WIND_SPEED -> WindVisual(meanValue)
-                    ClimateType.PRECIPITATION -> PrecipitationVisual(meanValue)
-                    ClimateType.DURATION_OF_SUN -> SunVisual(meanValue)
+                    ClimateType.RELATIVE_HUMIDITY -> HumidityVisual(meanValue, contentColor)
+                    ClimateType.MEAN_AIR_TEMP -> TemperatureVisual(meanValue, contentColor)
+                    ClimateType.PRECIPITATION -> PrecipitationVisual(meanValue, contentColor)
+                    ClimateType.DURATION_OF_SUN -> SunVisual(meanValue, contentColor)
                 }
             }
 
-            // Value at the bottom
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "${meanValue.toInt()}${climateType.unit}",
-                    color = Color.White,
+                    color = contentColor,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = climateType.description,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                    color = contentColor.copy(alpha = 0.7f),
                     fontSize = 10.sp,
                     textAlign = TextAlign.Center,
                     lineHeight = 12.sp,
@@ -114,10 +115,8 @@ fun GraphCard(
 }
 
 @Composable
-fun HumidityVisual(value: Double) {
+fun HumidityVisual(value: Double, baseColor: Color) {
     val progress = (value.toFloat() / 100f).coerceIn(0f, 1f)
-    val secondaryColor = MaterialTheme.colorScheme.secondary
-    val onPrimary = MaterialTheme.colorScheme.onPrimary
     
     Box(contentAlignment = Alignment.Center) {
         Box(
@@ -130,7 +129,7 @@ fun HumidityVisual(value: Double) {
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(50))
-                    .background(onPrimary.copy(alpha = 0.15f))
+                    .background(baseColor.copy(alpha = 0.15f))
             )
             Box(
                 modifier = Modifier
@@ -142,7 +141,7 @@ fun HumidityVisual(value: Double) {
         }
         Icon(
             Icons.Default.WaterDrop,
-            null,
+            contentDescription = "Humidity indicator",
             tint = Color.White,
             modifier = Modifier.size(16.dp)
         )
@@ -150,12 +149,10 @@ fun HumidityVisual(value: Double) {
 }
 
 @Composable
-fun TemperatureVisual(value: Double) {
-    val minTemp = -30f
-    val maxTemp = 40f
-    val progress = ((value.toFloat() - minTemp) / (maxTemp - minTemp)).coerceIn(0f, 1f)
-    val accentColor = if (value >= 0) Color.Red else Color.Blue  //MaterialTheme.colorScheme.tertiary
-    val onPrimary = MaterialTheme.colorScheme.onPrimary
+fun TemperatureVisual(value: Double, baseColor: Color) {
+    val progress = ((value.toFloat() - MIN_TEMP) / (MAX_TEMP - MIN_TEMP)).coerceIn(0f, 1f)
+    
+    val accentColor = if (value >= 0) Color(0xFFFF5252) else Color(0xFF448AFF)
 
     Box(
         modifier = Modifier
@@ -169,7 +166,7 @@ fun TemperatureVisual(value: Double) {
                 .width(6.dp)
                 .align(Alignment.TopCenter)
                 .clip(RoundedCornerShape(50))
-                .background(onPrimary.copy(0.2f))
+                .background(baseColor.copy(0.2f))
         ) {
             Box(
                 modifier = Modifier
@@ -189,51 +186,15 @@ fun TemperatureVisual(value: Double) {
 }
 
 @Composable
-fun WindVisual(value: Double) {
-    val maxWind = 25f
-    val progress = (value.toFloat() / maxWind).coerceIn(0f, 1f)
-    val secondaryColor = MaterialTheme.colorScheme.secondary
-    val onPrimary = MaterialTheme.colorScheme.onPrimary
-
-    Box(contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.size(55.dp)) {
-            drawArc(
-                color = onPrimary.copy(alpha = 0.15f),
-                startAngle = 135f,
-                sweepAngle = 270f,
-                useCenter = false,
-                style = Stroke(width = 8f, cap = StrokeCap.Round)
-            )
-            drawArc(
-                color = secondaryColor,
-                startAngle = 135f,
-                sweepAngle = 270f * progress,
-                useCenter = false,
-                style = Stroke(width = 8f, cap = StrokeCap.Round)
-            )
-        }
-        Icon(
-            Icons.Default.Air,
-            null,
-            tint = Color.White,
-            modifier = Modifier.size(20.dp)
-        )
-    }
-}
-
-@Composable
-fun PrecipitationVisual(value: Double) {
-    val maxPrecip = 100f
-    val progress = (value.toFloat() / maxPrecip).coerceIn(0f, 1f)
-    val secondaryColor = MaterialTheme.colorScheme.secondary
-    val onPrimary = MaterialTheme.colorScheme.onPrimary
+fun PrecipitationVisual(value: Double, baseColor: Color) {
+    val progress = (value.toFloat() / MAX_PRECIP).coerceIn(0f, 1f)
 
     Box(contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
                 .size(50.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(onPrimary.copy(0.15f))
+                .background(baseColor.copy(0.15f))
         ) {
             Box(
                 modifier = Modifier
@@ -245,7 +206,7 @@ fun PrecipitationVisual(value: Double) {
         }
         Icon(
             Icons.Default.Umbrella,
-            null,
+            contentDescription = "Precipitation indicator",
             tint = Color.White,
             modifier = Modifier.size(22.dp)
         )
@@ -253,16 +214,13 @@ fun PrecipitationVisual(value: Double) {
 }
 
 @Composable
-fun SunVisual(value: Double) {
-    val maxSun = 400f
-    val progress = (value.toFloat() / maxSun).coerceIn(0f, 1f)
-    val secondaryColor = MaterialTheme.colorScheme.secondary
-    val onPrimary = MaterialTheme.colorScheme.onPrimary
+fun SunVisual(value: Double, baseColor: Color) {
+    val progress = (value.toFloat() / MAX_SUN).coerceIn(0f, 1f)
 
     Box(contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.size(55.dp)) {
             drawCircle(
-                color = onPrimary.copy(alpha = 0.15f),
+                color = baseColor.copy(alpha = 0.15f),
                 style = Stroke(width = 4f)
             )
             drawArc(
@@ -275,7 +233,7 @@ fun SunVisual(value: Double) {
         }
         Icon(
             Icons.Default.WbSunny,
-            null,
+            contentDescription = "Sun duration indicator",
             tint = sunshineYellow,
             modifier = Modifier.size(22.dp)
         )
@@ -299,7 +257,7 @@ fun GraphCardPreview() {
             GraphCard(
                 modifier = Modifier.weight(1f),
                 climateType = ClimateType.MEAN_AIR_TEMP,
-                meanValue = -0.0,
+                meanValue = 0.0,
                 onClick = {}
             )
         }

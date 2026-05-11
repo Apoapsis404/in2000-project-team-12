@@ -10,12 +10,11 @@ import no.uio.ifi.in2000.team12.team12project.data.local.dao.NotesDao
 import no.uio.ifi.in2000.team12.team12project.data.local.dao.SettingsDao
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 
-@Database(entities = [SettingsEntity::class, FavoriteLocationEntity::class, Note::class], version = 2, exportSchema = false)
+@Database(entities = [SettingsEntity::class, FavoriteLocationEntity::class, Note::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun settingDao(): SettingsDao
-    abstract fun favoriteDao(): FavoriteDao
-
+    abstract fun settingsDao(): SettingsDao
+    abstract fun favoritesDao(): FavoriteDao
     abstract fun notesDao(): NotesDao
 
     companion object {
@@ -24,15 +23,14 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
+                Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "team12_database"
                 )
-                    .fallbackToDestructiveMigration(false)
+                    .fallbackToDestructiveMigration(true)
                     .build()
-                INSTANCE = instance
-                instance
+                    .also { INSTANCE = it }
             }
         }
     }

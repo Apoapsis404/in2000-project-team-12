@@ -8,5 +8,9 @@ class Converters {
     fun fromLanguage(languages: Languages): String = languages.name
 
     @TypeConverter
-    fun toLanguage(value: String): Languages = Languages.valueOf(value)
+    fun toLanguage(value: String): Languages = try {
+        Languages.valueOf(value)
+    } catch (e: IllegalArgumentException) {
+        Languages.ENGLISH
+    }
 }

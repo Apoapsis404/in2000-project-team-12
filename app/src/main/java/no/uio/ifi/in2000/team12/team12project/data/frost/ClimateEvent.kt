@@ -12,7 +12,7 @@ class ClimateEvent {
 
     suspend fun listOfTorrentialRainStations(): Map<String, ThreatLevel> {
         val stations = mutableMapOf<String, ThreatLevel>()
-        for (station in obsStationRepository.getMetStations().split(",")) {
+        for (station in obsStationRepository.getMetStations()) {
             val stationThreatLevel = torrentialRain.isTorrentialRainThreat(station)
             if (stationThreatLevel != ThreatLevel.NONE) {
                 stations[station] = stationThreatLevel

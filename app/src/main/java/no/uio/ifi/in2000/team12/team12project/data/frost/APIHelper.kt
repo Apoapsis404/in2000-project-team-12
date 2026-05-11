@@ -6,105 +6,81 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.pow
+import kotlin.math.roundToInt
+
+private const val DATE_FORMAT = "yyyy-MM-dd"
+
+/**
+ * Gets current date as string for time series.
+ * Targeting API 24+, using SimpleDateFormat.
+ */
+fun getCurrentDate(): String {
+    val sdf = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
+    return sdf.format(Date())
+}
 
 fun constructTimeSeries(n: UInt, currentDate: String = getCurrentDate()): String {
     val start = getStartOfDate(currentDate)
     return "${lastNMonths(n, start)}/$start"
 }
 
-
-/*
- * Gets current date as string for time series
- * Because of the need to target API 24+
- * Have to use old version of getting date
- */
-fun getCurrentDate(): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    return sdf.format(Date())
-}
-
 fun getStartOfDate(date: String): String {
-    val year = date.split("-")[0]
-    val month = date.split("-")[1]
-    return "$year-$month-01"
+    val year = extractYear(date) ?: 0
+    val month = extractMonth(date) ?: 1
+    return "%04d-%02d-01".format(year, month)
 }
 
-
-
-/*
- * Returns TimeSeries for last N months from beginning of current month
- * N can be more than a year
- * Example: Last 5 months from 2023-03-01 -> 2022-10-01
+/**
+ * Returns TimeSeries for last N months from beginning of current month.
+ * Example: Last 5 months from 2023-03-01 -> 2022-10-01.
  */
 fun lastNMonths(n: UInt, currentDate: String): String {
-    val currentMonth = currentDate.split("-")[1].toInt()
-    var fromMonth: Int = (currentMonth - n.toInt()).mod(12)
-    if (fromMonth == 0) {
-        fromMonth = 12
+    val calendar = Calendar.getInstance().apply {
+        time = SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).parse(currentDate) ?: Date()
+        add(Calendar.MONTH, -(n.toInt()))
     }
-
-    var years: Int = (n / 12u).toInt()
-    if (currentMonth - fromMonth < 0) {
-        years += 1
-    }
-
-    val fromYear = currentDate.split("-")[0].toInt() - years
-    //println("fromYear: $fromYear, fromMonth: $fromMonth")
-    return "$fromYear-${fromMonth.toString().padStart(2, '0')}-01"
+    return SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(calendar.time)
 }
 
 fun monthsSince(date: String, currentDate: String = getCurrentDate()): Int {
-
-//    println("Date: $date, Current Date: $currentDate")
-
-    val currentYear = currentDate.split("-")[0].toInt()
-    val currentMonth = currentDate.split("-")[1].toInt()
-
-    val year = date.split("-")[0].toInt()
-    val month = date.split("-")[1].toInt()
-
-//    println("Year: $year, Month: $month")
+    val currentYear = extractYear(currentDate) ?: 0
+    val currentMonth = extractMonth(currentDate) ?: 0
+    val year = extractYear(date) ?: 0
+    val month = extractMonth(date) ?: 0
 
     return (currentYear - year) * 12 + (currentMonth - month)
 }
 
 fun yearsSince(date: String, currentDate: String = getCurrentDate()): Int {
-    val currentYear = currentDate.split("-")[0].toInt()
-    val year = date.split("-")[0].toInt()
+    val currentYear = extractYear(currentDate) ?: 0
+    val year = extractYear(date) ?: 0
     return currentYear - year
 }
 
-
-fun isFromMonth(referencetime: String, month: Int): Boolean {
-    return referencetime.split("-")[1].toInt() == month
+fun isFromMonth(referenceTime: String, month: Int): Boolean {
+    return extractMonth(referenceTime) == month
 }
 
-fun isFromYear(referencetime: String, year: Int): Boolean {
-    return referencetime.split("-")[0].toInt() == year
+fun isFromYear(referenceTime: String, year: Int): Boolean {
+    return extractYear(referenceTime) == year
 }
 
-/*
- * Rounds LatLng to n decimals
+/**
+ * Rounds LatLng to n decimals.
  */
-fun LatLng.Round(decimals: Int = 2): LatLng {
-    var multiplier = 1.0
-    repeat(decimals) { multiplier *= 10 }
-    val lat = (latitude * multiplier).toInt() / multiplier
-    val lng = (longitude * multiplier).toInt() / multiplier
+fun LatLng.round(decimals: Int = 2): LatLng {
+    val multiplier = 10.0.pow(decimals)
+    val lat = (latitude * multiplier).roundToInt() / multiplier
+    val lng = (longitude * multiplier).roundToInt() / multiplier
     return LatLng(lat, lng)
 }
 
 fun getStationIdsFromList(stationList: List<ObsStation>): String {
-    var stationIds = ""
-    for (station in stationList) {
-        if (stationIds != ""){
-            stationIds += ","
-        }
-        stationIds += station.id
-    }
-    return stationIds
+    return stationList.joinToString(",") { it.id }
 }
 
 fun printClimateObsList(climateObsList: List<ClimateObs>) {
@@ -127,42 +103,24 @@ fun printClimateObsList(climateObsList: List<ClimateObs>) {
 }
 
 fun getYearAndData(climateObsList: List<ClimateObs>): ClimateChartData {
-    val years = mutableListOf<Double>()
-    val values = mutableListOf<Double>()
-
-    climateObsList.forEach { obs ->
-        val year = extractYear(obs.referenceTime)
-        if (year != null) {
-            years += year.toDouble()
-            values += findMeanObs(obs)
+    val (years, values) = climateObsList.mapNotNull { obs ->
+        extractYear(obs.referenceTime)?.let { year ->
+            year.toDouble() to findMeanObs(obs)
         }
-    }
+    }.unzip()
 
-    return ClimateChartData(
-        years = years,
-        values = values,
-    )
+    return ClimateChartData(years = years, values = values)
 }
 
-
 fun getObsFromYear(year: Int, climateObsList: List<ClimateObs>): List<ClimateObs> {
-    if (climateObsList.isEmpty()) return emptyList()
-
-    return climateObsList.filter { obs ->
-        extractYear(obs.referenceTime) == year
-    }
+    return climateObsList.filter { extractYear(it.referenceTime) == year }
 }
 
 /**
  * Returns observations from the internally cached list whose referenceTime is in the given month.
- * Used by the integration tests after getWeatherDataFailing has populated weatherObsList.
  */
 fun getObsFromMonth(month: Months, climateObsList: List<ClimateObs>): List<ClimateObs> {
-    if (climateObsList.isEmpty()) return emptyList()
-
-    return climateObsList.filter { obs ->
-        extractMonth(obs.referenceTime) == month.value
-    }
+    return climateObsList.filter { extractMonth(it.referenceTime) == month.value }
 }
 
 /**
@@ -182,42 +140,24 @@ fun extractMonth(referenceTime: String): Int? =
     referenceTime.takeIf { it.length >= 7 }
         ?.substring(5, 7)
         ?.toIntOrNull()
+
 /**
  * Compute the mean of the per-observation means.
- * Tests assume the list is non-empty, so we keep the non-null Double return type.
  */
 fun findMeanValue(climateObsList: List<ClimateObs>): Double {
-    require(climateObsList.isNotEmpty()) {
-        "Cannot compute mean value of an empty list"
-    }
-
-    // Mean of each WeatherObs
-    val obsMeans = climateObsList.map { obs ->
-        findMeanObs(obs)
-    }
-
-    // Mean of those means
-    return obsMeans.average()
+    require(climateObsList.isNotEmpty()) { "Cannot compute mean value of an empty list" }
+    return climateObsList.map { findMeanObs(it) }.average()
 }
 
 /**
- * Compute the mean value of a single WeatherObs.
- * Tests assume observations is non-empty.
+ * Compute the mean value of a single ClimateObs.
  */
 fun findMeanObs(climateObs: ClimateObs): Double {
-    val observations = climateObs.observations
-    require(observations.isNotEmpty()) {
-        "Cannot compute mean of WeatherObs with no observations"
-    }
-
-    val sum = observations.sumOf { it.value }
-    return sum / observations.size
+    require(climateObs.observations.isNotEmpty()) { "Cannot compute mean of ClimateObs with no observations" }
+    return climateObs.observations.map { it.value }.average()
 }
 
 fun findMaxObs(climateObs: ClimateObs): Double {
-    val observations = climateObs.observations
-    require(observations.isNotEmpty()) {
-        "Cannot compute max of ClimateObs with no observations"
-    }
-    return observations.maxOf { it.value }
+    require(climateObs.observations.isNotEmpty()) { "Cannot compute max of ClimateObs with no observations" }
+    return climateObs.observations.maxOf { it.value }
 }

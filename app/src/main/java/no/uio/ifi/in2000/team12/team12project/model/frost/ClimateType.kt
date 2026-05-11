@@ -21,13 +21,6 @@ enum class ClimateType(
         "Mean air temperature",
         Icons.Default.Thermostat
     ),
-//    MEAN_WIND_SPEED(
-//        "mean(max(wind_speed P1D) P1M)",
-//        "m/s",
-//        "Mean wind speed",
-//        "Mean wind speed",
-//        Icons.Default.Air
-//    ),
     RELATIVE_HUMIDITY(
         "mean(relative_humidity P1M)",
         "%",

@@ -80,7 +80,7 @@ class TestClimateDataRepository {
         val climateType = ClimateType.MEAN_AIR_TEMP
         val referenceTime = "2023-01-01/2023-12-31"
 
-        val result = repository.getClimateDataFailing(oslo, climateType, referenceTime)
+        val result = repository.getClimateDataWithFallback(oslo, climateType, referenceTime)
 
         assertTrue(result.isNotEmpty(), "Should return weather observations")
 
@@ -100,7 +100,7 @@ class TestClimateDataRepository {
         val climateType = ClimateType.MEAN_AIR_TEMP
         val referenceTime = "2022-01-01/2022-12-31"
 
-        val result = repository.getClimateDataFailing(oslo, climateType, referenceTime)
+        val result = repository.getClimateDataWithFallback(oslo, climateType, referenceTime)
         assertTrue(result.isNotEmpty(), "Should return observations using fallback logic")
     }
 }
