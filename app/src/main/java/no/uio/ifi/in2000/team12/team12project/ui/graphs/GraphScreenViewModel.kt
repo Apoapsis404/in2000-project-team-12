@@ -18,6 +18,7 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
 import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData
 import no.uio.ifi.in2000.team12.team12project.data.frost.monthsSince
+import no.uio.ifi.in2000.team12.team12project.data.frost.printClimateObsList
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.data.regression.LinearRegressionModel
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
@@ -103,9 +104,12 @@ class GraphScreenViewModel(
 
     private fun computeAllMeans() {
         for (climateType in ClimateType.entries) {
+            val data = climateMap[climateType] ?: continue
             for (month in Months.entries) {
-                val obs = getObsFromMonth(month, climateMap[climateType]?.climateObs ?: continue)
-                meansMap[Pair(climateType, month)] = findMeanValue(obs)
+                val obs = getObsFromMonth(month, data.climateObs)
+                if (obs.isNotEmpty()) {
+                    meansMap[Pair(climateType, month)] = findMeanValue(obs)
+                }
             }
         }
     }
@@ -149,6 +153,9 @@ class GraphScreenViewModel(
                             val months = monthsSince(timeSeries)
                             val refTime = constructTimeSeries(min(months.toUInt(), MAX_MONTHS_OF_HISTORY))
                             val obs = climateDataRepository.getClimateData(source, type.elementId, refTime)
+                            if (type == ClimateType.DURATION_OF_SUN) {
+                                printClimateObsList(obs)
+                            }
                             val climateData = ClimateData(refTime, obs, type)
                             setClimateData(type, climateData)
                             successfulTypes.add(type)
@@ -213,7 +220,11 @@ class GraphScreenViewModel(
 
         try {
             getClimateChartData(ClimateType.MEAN_AIR_TEMP, currentMonth)?.let { tempData ->
-                tempRegressionModel = LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
+                tempRegressionModel = if (tempData.years.isNotEmpty()) {
+                    LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
+                } else {
+                    null
+                }
             }
 
             getClimateChartData(ClimateType.PRECIPITATION, currentMonth)?.let { precData ->

@@ -9,5 +9,6 @@ data class TimeSeriesResponse(
 
 @Serializable
 data class TimeSeriesData(
-    val validFrom: String? = null
+    val validFrom: String? = null,
+    val validTo: String? = null
 )
