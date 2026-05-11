@@ -321,6 +321,7 @@ fun HomeScreen(
         }
     }
 }
+//FLYTTET TIL HOMESCREENVIEWMODEL:
 
 suspend fun getLatLngFromLocationName(
     context: android.content.Context,

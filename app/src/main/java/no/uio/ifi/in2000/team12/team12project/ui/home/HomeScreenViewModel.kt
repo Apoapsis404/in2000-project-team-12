@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team12.team12project.ui.home
 import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.location.Geocoder
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
@@ -18,13 +19,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team12.team12project.data.frost.TorrentialRain
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
+import java.util.Locale
+import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 
 data class HomeScreenUiState(
     val markerPosition: LatLng = LatLng(59.91, 10.74),
@@ -78,7 +83,7 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
                 _uiState.update { it.copy(suggestions = emptyList()) }
             }
     }
-    // Clears suggestions from the textfield, used when a suggestion is selected
+    // Clears suggestions from the text field, used when a suggestion is selected
     fun clearSuggestions() {
         _uiState.update { it.copy(suggestions = emptyList()) }
         sessionToken = AutocompleteSessionToken.newInstance()
@@ -130,11 +135,34 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     // Updates the marker position in the uiState
     fun setMarkerPosition(position: LatLng) {
         _uiState.update { it.copy(markerPosition = position) }
+        updateAddress(position)
+    }
+
+
+    // Translates the position into an address using Geocoder
+    private suspend fun getAddressFromLatLng(lat: Double, long: Double): String{
+        try {
+            val geocoder = Geocoder(getApplication(), Locale.getDefault())
+            val locationDetails = geocoder.getFromLocation(lat,long,1)
+            if(!locationDetails.isNullOrEmpty()){
+                val locationObject = locationDetails[0]
+                val address = locationObject.getAddressLine(0)
+                return withContext(Dispatchers.IO) {address}
+            }else{
+                return withContext(Dispatchers.IO) {"Almanakken"}
+            }
+        }catch (e : Exception){
+            e.printStackTrace()
+            return withContext(Dispatchers.IO) {"Almanakken"}
+        }
     }
 
     // Updates the address in the uiState
-    fun updateAddress(address: String) {
-        _uiState.update { it.copy(address = address) }
+    fun updateAddress(position: LatLng){
+        viewModelScope.launch {
+            val address = getAddressFromLatLng(position.latitude, position.longitude)
+            _uiState.update { it.copy(address = address) }
+        }
     }
 
     // Updates the search query in the uiState
@@ -142,7 +170,7 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
         _uiState.update { it.copy(searchQuery = query) }
     }
 
-    // Updates the serch query and marker title in the uiState
+    // Updates the search query and marker title in the uiState
     fun onSearchedLocation(query: String, position: LatLng) {
         _uiState.update {
             it.copy(
@@ -162,6 +190,7 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
                 markerTitle = ""
             )
         }
+        updateAddress(latLng)
     }
     // Updates the isMapReady in the uiState, used to end displaying of the loading screen
     fun onMapReady() {
