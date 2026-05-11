@@ -220,7 +220,21 @@ fun MainComp(
 
                             // NY
                                 // Trenger ikke oversette addresse lenger, da den allerede er lagret i homeScreenViewModel
-                                navController.navigate("favorites")
+
+                                val currentRoute = navController.currentBackStackEntry?.destination?.route
+
+                                if (currentRoute != "favorites") {
+                                    navController.navigate("favorites")
+                                }
+                                /*
+                                if (navController.currentDestination?.route != "favorites") {
+                                    navController.navigate("favorites") {
+                                        // Avoid multiple copies of the same destination when re-selecting the same item
+                                        launchSingleTop = true
+                                        // Optional: Restore state if you want to keep the scroll position, etc.
+                                        restoreState = true
+                                    }
+                                }*/
                                 favoriteScreenViewModel.addFavoriteLocation(
                                     location = homeScreenViewModel.uiState.value.markerPosition,//askpermissonforlatlng!!,
                                     name = "temp_${System.currentTimeMillis()}",

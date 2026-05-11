@@ -22,12 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
-import no.uio.ifi.in2000.team12.team12project.ui.customComposables.FavoriteCard
-import no.uio.ifi.in2000.team12.team12project.ui.graphs.GraphScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 
 @Composable

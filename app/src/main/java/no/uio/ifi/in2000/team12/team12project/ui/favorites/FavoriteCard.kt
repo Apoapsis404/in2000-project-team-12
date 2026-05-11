@@ -1,7 +1,8 @@
-package no.uio.ifi.in2000.team12.team12project.ui.customComposables
+package no.uio.ifi.in2000.team12.team12project.ui.favorites
 
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.DataThresholding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -132,13 +134,25 @@ fun FavoriteCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(
+                Button(modifier = Modifier
+                    .padding(6.dp),
+                    shape = ButtonDefaults.shape,
+                    border = BorderStroke(
+                        2.dp,
+                        MaterialTheme.colorScheme.onPrimary
+                    ),
                     onClick= onEditClick
                 ) {
                     Text(stringResource(R.string.favorite_edit_name))
                 }
 
-                Button(
+                Button(modifier = Modifier
+                    .padding(6.dp),
+                    shape = ButtonDefaults.shape,
+                    border = BorderStroke(
+                        2.dp,
+                        MaterialTheme.colorScheme.onPrimary
+                    ),
                     onClick = onDeleteClick
                 ){
                     Text(stringResource(R.string.favorite_delete))

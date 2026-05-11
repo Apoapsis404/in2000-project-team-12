@@ -48,8 +48,8 @@
 
 
     <!-- NOTES -->
-    <string name="delete_pop_up_header">Slett notat?"</string>
-    <string name="delete_pop_up_body">Vil du slette dette notatet?"</string>
+    <string name="delete_note_pop_up_header">Slett notat?"</string>
+    <string name="delete_note_pop_up_body">Vil du slette dette notatet?"</string>
     <string name="delete_pop_up_cancel">Avbryt</string>
     <string name="delete_pop_up_delete">Slett"</string>
     <string name="add_note">Legg til notat</string>

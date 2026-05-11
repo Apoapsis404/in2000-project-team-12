@@ -40,7 +40,7 @@ import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 
 
 @Composable
-fun NoteItem(
+fun Notecard(
     note: Note,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
@@ -66,7 +66,7 @@ fun NoteItem(
                 .heightIn(min = 52.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
+            //note icon
             Box(
                 modifier = Modifier
                     .size(52.dp)
@@ -164,7 +164,7 @@ fun NoteItemPreview() {
 
     MaterialTheme {
         Box(modifier = Modifier.padding(16.dp)) {
-            NoteItem(note = sampleNote)
+            Notecard(note = sampleNote)
         }
     }
 }

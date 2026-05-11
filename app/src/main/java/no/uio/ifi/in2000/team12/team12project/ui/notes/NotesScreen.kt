@@ -27,9 +27,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
+/*
 @Composable
 fun NotesScreen(notesScreenViewModel: NotesScreenViewModel, navHostController: NavHostController) {
     val uiState by notesScreenViewModel.uiState.collectAsState()
@@ -129,16 +131,17 @@ fun DeleteNoteDialog(
             }
         }
     )
-}
-/*
+}*/
+
 @Composable
 fun NotesScreen(notesScreenViewModel: NotesScreenViewModel, navHostController: NavHostController) {
     val uiState by notesScreenViewModel.uiState.collectAsState()
 
     NotesScreenContent(
-        notes = uiState,
+        notes = uiState.notes,
         onAddNote = { notesScreenViewModel.addNote(it) },
         onRemoveNote = { notesScreenViewModel.deleteNote(it) },
+        notesScreenViewModel = notesScreenViewModel
     )
 
 
@@ -148,19 +151,27 @@ fun NotesScreen(notesScreenViewModel: NotesScreenViewModel, navHostController: N
 fun NotesScreenContent(
     notes: List<Note>,
     onAddNote: (Note) -> Unit,
-    onRemoveNote: (Note) -> Unit
+    onRemoveNote: (Note) -> Unit,
+    notesScreenViewModel: NotesScreenViewModel = viewModel()
 ) {
+    val uiState by notesScreenViewModel.uiState.collectAsState()
+    //val uiState by notesScreenViewModel.uiState.collectAsState()
+    /*
+    val viewModel: NotesScreenViewModel = viewModel()
+    val uiState by viewModel.uiState.collectAsState()
+    */
+    /*
     var editing by remember { mutableStateOf(false) }
     var selectedNote by remember { mutableStateOf<Note?>(null) }
     var showDialog by remember { mutableStateOf(false) }
-
+    */
 
     Column(modifier = Modifier
         .fillMaxSize()
     ) {
-        if (editing) {
+        if (uiState.isEditing) {
             NoteEntryField(
-                note = selectedNote,
+                note = uiState.selectedNote,
                 /*
                 onSave = { updatedText ->
                     val noteToSave = selectedNote?.copy(content = updatedText) ?: Note(content = updatedText)
@@ -169,21 +180,29 @@ fun NotesScreenContent(
                 }*/
                 onSave = { updatedText ->
 
-                    val noteToSave =
-                        if (selectedNote != null) {
+                    val noteToSave = uiState.selectedNote?.copy(content = updatedText)
+                        ?: Note(content = updatedText)
+                    /*
+                        if (uiState.selectedNote != null) {
                             selectedNote!!.copy(content = updatedText)
                         } else {
                             Note(content = updatedText)
-                        }
+                        }*/
 
                     onAddNote(noteToSave)
 
+                /*
                     selectedNote = null
                     editing = false
+                */
                 },
                 onCancel = {
+                    /*
                     selectedNote = null
                     editing = false
+                    */
+                    notesScreenViewModel.setEditing(false)
+                    notesScreenViewModel.onNoteSelected(null)
                 }
             )
         } else {
@@ -192,30 +211,40 @@ fun NotesScreenContent(
                     notes,
                     key = { it.id ?: it.hashCode() }
                 ) { note ->
-                    val isSelected = selectedNote?.id == note.id
+                    val isSelected = uiState.selectedNote?.id == note.id
 
                     Box(
                         modifier = Modifier
                             .padding(6.dp)
 
                     ){
-                        NoteItem(
+                        Notecard(
                             note = note,
 
                             selected = isSelected,
 
                             onClick = {
-                                selectedNote = note
+                                //selectedNote = note
+                                notesScreenViewModel.onNoteSelected(note)
+                                //notesScreenViewModel.setShowDeleteDialog(true)
                             },
 
                             onDeleteButtonClick = {
+                                /*
                                 selectedNote = note
                                 showDialog = true
+                                */
+                                notesScreenViewModel.onNoteSelected(note)
+                                notesScreenViewModel.setShowDeleteDialog(true)
                             },
 
                             onEditButtonClick = {
+                                /*
                                 selectedNote = note
                                 editing = true
+                                */
+                                notesScreenViewModel.onNoteSelected(note)
+                                notesScreenViewModel.setEditing(true)
                             }
                         )
                     }
@@ -223,29 +252,37 @@ fun NotesScreenContent(
 
 
             }
+
             Button(
                 modifier = Modifier.padding(16.dp),
                 onClick = {
+                    /*
                     editing = true
                     selectedNote = null//(content = "")
+                    */
+                    notesScreenViewModel.onNoteSelected(null)
+                    notesScreenViewModel.setEditing(true)
                 }
             ) {
                 Text(stringResource(R.string.add_note))
             }
         }
     }
-    if(showDialog && selectedNote != null) {
+    //delete dialog popup
+    if(uiState.showDeleteDialog && uiState.selectedNote != null) {
         AlertDialog(
             onDismissRequest = {
-                showDialog = false
+                //showDialog = false
+                notesScreenViewModel.setShowDeleteDialog(false)
+
             },
 
             title = {
-                Text("Delete note")
+                Text(stringResource(R.string.delete_note_pop_up_header))
             },
 
             text = {
-                Text("Do wish to delete this note?")
+                Text(stringResource(R.string.delete_note_pop_up_body))
             },
 
             confirmButton = {
@@ -258,7 +295,8 @@ fun NotesScreenContent(
                     // NO -> left
                     TextButton(
                         onClick = {
-                            showDialog = false
+                            //showDialog = false
+                            notesScreenViewModel.setShowDeleteDialog(false)
                         }
                     ) {
                         Text(stringResource(R.string.no))
@@ -267,12 +305,14 @@ fun NotesScreenContent(
                     // YES -> right
                     TextButton(
                         onClick = {
-                            selectedNote?.let {
+                            uiState.selectedNote?.let {
                                 onRemoveNote(it)
                             }
-
+                                /*
                             selectedNote = null
                             showDialog = false
+                            */
+
                         }
                     ) {
                         Text(stringResource(R.string.yes))
@@ -326,4 +366,4 @@ fun NotesScreenPreview() {
         onAddNote = {},
         onRemoveNote = {}
     )
-}*/
+}
