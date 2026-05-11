@@ -46,6 +46,7 @@ data class GraphScreenUiState(
     val predictedPrecipitationDaily: Float? = GraphScreenViewModel.DEFAULT_PREDICTED_PRECIPITATION,
     val predictedPrecipitationMonthly: Float? = null,
     val recommendedPlants: List<Plant> = emptyList(),
+    val availableClimateTypes: Set<ClimateType> = ClimateType.entries.toSet(),
 )
 
 class GraphScreenViewModel(
@@ -131,7 +132,15 @@ class GraphScreenViewModel(
         graphDataFetchJob?.cancel()
 
         graphDataFetchJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null,
+                    availableClimateTypes = emptySet(),
+                    climateChartData = ClimateChartData(emptyList(), emptyList())
+                )
+            }
+            val successfulTypes = mutableSetOf<ClimateType>()
             try {
                 val deferreds = ClimateType.entries.map { type ->
                     async {
@@ -142,6 +151,7 @@ class GraphScreenViewModel(
                             val obs = climateDataRepository.getClimateData(source, type.elementId, refTime)
                             val climateData = ClimateData(refTime, obs, type)
                             setClimateData(type, climateData)
+                            successfulTypes.add(type)
                         } catch (e: CancellationException) {
                             throw e
                         } catch (e: Exception) {
@@ -150,9 +160,19 @@ class GraphScreenViewModel(
                     }
                 }
                 deferreds.awaitAll()
-                computeAllMeans()
-                updateChartData()
-                _uiState.update { it.copy(isLoading = false) }
+
+                if (successfulTypes.isEmpty()) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "No climate data available for this location."
+                        )
+                    }
+                } else {
+                    computeAllMeans()
+                    updateChartData()
+                    _uiState.update { it.copy(isLoading = false, availableClimateTypes = successfulTypes) }
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

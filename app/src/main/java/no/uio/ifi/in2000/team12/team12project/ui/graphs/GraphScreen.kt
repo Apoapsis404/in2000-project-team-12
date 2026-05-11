@@ -76,8 +76,8 @@ fun GraphScreen(
     // Sync climate data with the chart producer whenever it changes
     LaunchedEffect(uiState.climateChartData) {
         val data = uiState.climateChartData
-        modelProducer.runTransaction {
-            if (data.years.isNotEmpty() && data.values.isNotEmpty()) {
+        if (data.years.isNotEmpty() && data.values.isNotEmpty()) {
+            modelProducer.runTransaction {
                 lineSeries {
                     // Original data points
                     series(data.years, data.values)
@@ -225,12 +225,14 @@ private fun ClimateCardGrid(
         maxItemsInEachRow = if (isLandscape) 4 else 2
     ) {
         climateTypes.forEach { type ->
+            val isAvailable = uiState.availableClimateTypes.contains(type)
             GraphCard(
                 modifier = Modifier.weight(1f),
                 climateType = type,
                 meanValue = getMean(type, uiState.month) ?: 0.0,
                 selected = uiState.climateType == type,
-                onClick = { onCardClick(type) }
+                onClick = { onCardClick(type) },
+                enabled = isAvailable
             )
         }
     }
