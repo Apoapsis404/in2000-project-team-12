@@ -32,9 +32,8 @@ import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 
 @Composable
 fun FavoritesScreen(
-    favoritesScreenViewModel: FavoritesScreenViewModel = viewModel(),
-    graphScreenViewModel: GraphScreenViewModel = viewModel(),
-    homeScreenViewModel: HomeScreenViewModel = viewModel(),
+    favoritesScreenViewModel: FavoritesScreenViewModel,
+    homeScreenViewModel: HomeScreenViewModel,
     navHostController: NavHostController) {
 
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
