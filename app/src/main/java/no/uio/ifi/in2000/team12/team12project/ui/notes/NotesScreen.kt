@@ -30,8 +30,107 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
+@Composable
+fun NotesScreen(notesScreenViewModel: NotesScreenViewModel, navHostController: NavHostController) {
+    val uiState by notesScreenViewModel.uiState.collectAsState()
 
+    NotesScreenContent(
+        uiState = uiState,
+        onSelectNote = notesScreenViewModel::onSelectNote,
+        onEditNote = { notesScreenViewModel.setEditing(true, it) },
+        onAddNote = { notesScreenViewModel.setEditing(true, null) },
+        onCancelEdit = { notesScreenViewModel.setEditing(false) },
+        onSaveNote = notesScreenViewModel::saveNote,
+        onDeleteClick = { notesScreenViewModel.setShowDeleteDialog(true, it) },
+        onConfirmDelete = notesScreenViewModel::confirmDelete,
+        onDismissDelete = { notesScreenViewModel.setShowDeleteDialog(false) }
+    )
+}
+@Composable
+fun NotesScreenContent(
+    uiState: NotesUiState,
+    onSelectNote: (Note) -> Unit,
+    onEditNote: (Note) -> Unit,
+    onAddNote: () -> Unit,
+    onCancelEdit: () -> Unit,
+    onSaveNote: (String) -> Unit,
+    onDeleteClick: (Note) -> Unit,
+    onConfirmDelete: () -> Unit,
+    onDismissDelete: () -> Unit
 
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (uiState.isEditing) {
+            NoteEntryField(
+                note = uiState.selectedNote,
+                onSave = onSaveNote,
+                onCancel = onCancelEdit
+            )
+
+        } else {
+            Column {
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(uiState.notes, key = { it.id ?: it.hashCode() }) { note ->
+                        NoteItem(
+                            note = note,
+                            selected = uiState.selectedNote?.id == note.id,
+                            onClick = { onSelectNote(note) },
+                            onDeleteButtonClick = { onDeleteClick(note) },
+                            onEditButtonClick = { onEditNote(note) }
+                        )
+                    }
+
+                }
+
+                Button(
+                    modifier = Modifier.padding(16.dp),
+                    onClick = onAddNote //{ onAddNote
+                    /*
+                    selectedNote = null
+                    isEditing = true
+                    */
+                    //}
+                ) {
+                    Text(stringResource(R.string.add_note))
+                }
+            }
+        }
+
+        if (uiState.showDeleteDialog) {
+            DeleteNoteDialog(
+                onConfirm = onConfirmDelete,
+                onDismiss = onDismissDelete //{ showDeleteDialog = false }
+            )
+        }
+    }
+}
+
+@Composable
+fun DeleteNoteDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.delete_pop_up_header)) },
+        text = { Text(stringResource(R.string.delete_pop_up_body)) },
+        confirmButton = {
+            // Keeping your custom Row layout exactly as requested
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.no))
+                }
+                TextButton(onClick = onConfirm) {
+                    Text(stringResource(R.string.yes))
+                }
+            }
+        }
+    )
+}
+/*
 @Composable
 fun NotesScreen(notesScreenViewModel: NotesScreenViewModel, navHostController: NavHostController) {
     val uiState by notesScreenViewModel.uiState.collectAsState()
@@ -227,4 +326,4 @@ fun NotesScreenPreview() {
         onAddNote = {},
         onRemoveNote = {}
     )
-}
+}*/
