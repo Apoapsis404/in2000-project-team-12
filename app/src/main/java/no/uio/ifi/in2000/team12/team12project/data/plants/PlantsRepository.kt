@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team12.team12project.data.plants
 
 import android.content.Context
+import androidx.core.os.LocaleListCompat
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
@@ -8,8 +9,8 @@ import java.util.PriorityQueue
 
 class PlantsRepository(private val context: Context){
 
-    private val plantList = getPlantData()
-
+    private val plantListEn: List<Plant> by lazy { getPlantData(R.raw.plants_datav2) }
+    private val plantListNb: List<Plant> by lazy { getPlantData(R.raw.plants_datav2_norwegian) }
     private fun getTextFromResources(resourceId: Int): String{
         return context.resources.openRawResource(resourceId)
             .bufferedReader()
@@ -18,49 +19,39 @@ class PlantsRepository(private val context: Context){
             }
     }
 
-    private fun getPlantData(): List<Plant>{
-        val jsonString = getTextFromResources(R.raw.plants_datav2)
+    // Checks which language the user is using, and returns the correct data
+    private fun getPlantData(resourceId: Int): List<Plant>{
+        val jsonString = getTextFromResources(resourceId = resourceId)
         return Json.decodeFromString(jsonString)
     }
 
-// Returns a list of <quantity> plants with optimal_temp average closest to <targetTemp>
-    fun getBestPlants(targetTemp: Int, quantity: Int = 3, allowNonOptimal: Boolean = true): List<Plant>{
-        val list = if (!allowNonOptimal){
-            plantList.filter {targetTemp >= it.optimal_temp_min && targetTemp <= it.optimal_temp_max}
-        } else plantList
-        list.filter { targetTemp >= it.temp_min && targetTemp <= it.temp_max }
+    // Returns a priority queue of plants with optimal_temp average closest to <targetTemp>,
+    // then humidity average closest to <targetHumidity>, then sunshine average closest to <targetSunshine>,
+    // then precipitation average closest to <targetPrecipitation> (if it is not null)
+     fun getBestPlantsPriorityQueue(
+        targetTemp: Float,
+        targetHumidity: Float,
+        targetSunshine: Float,
+        targetPrecipitation: Float?
+    ): PriorityQueue<Plant> {
+         //choose the right language data
+        val currentLanguage = LocaleListCompat.getAdjustedDefault()[0]?.language ?: "en"
+        val plantList = if (currentLanguage == "en") plantListEn else plantListNb
 
-        val heap = PriorityQueue<Plant>(compareBy { kotlin.math.abs(((it.optimal_temp_min+it.optimal_temp_max)/2)-targetTemp) })
-        list.forEach { heap.add(it) }
-
-        val bestList = mutableListOf<Plant>()
-        for(i in 0 until quantity){
-            if(heap.isNotEmpty()) bestList.add(heap.poll()!!)
-        }
-        return bestList
-    }
-
-
-    fun getBestPlantsPriorityQueue(targetTemp: Float, targetHumidity: Float, targetSunshine: Float, targetPrecipitation: Float?): PriorityQueue<Plant>{
-        var comparator = compareBy<Plant> { kotlin.math.abs(((it.optimal_temp_min + it.optimal_temp_max) / 2.0) - targetTemp) }
-            .thenBy { kotlin.math.abs(((it.humidity_min + it.humidity_max) / 2.0) - targetHumidity) }
-            .thenBy { kotlin.math.abs(((it.sunshine_min + it.sunshine_max) / 2.0) - targetSunshine) }
+        // sort by optimal_temp, then humidity, then sunshine, then precipitation
+        var comparator = compareBy<Plant> { kotlin.math.abs(((it.optimalTempMin + it.optimalTempMax) / 2.0) - targetTemp) }
+            .thenBy { kotlin.math.abs(((it.humidityMin + it.humidityMax) / 2.0) - targetHumidity) }
+            .thenBy { kotlin.math.abs(((it.sunshineMin + it.sunshineMax) / 2.0) - targetSunshine) }
 
         if (targetPrecipitation != null) {
-            comparator = comparator.thenBy { kotlin.math.abs(((it.precipitation_min + it.precipitation_max) / 2.0) - targetPrecipitation) }
+            comparator = comparator.thenBy { kotlin.math.abs(((it.precipitationMin + it.precipitationMax) / 2.0) - targetPrecipitation) }
         }
-
-        val pq = PriorityQueue<Plant>(comparator)
+        val pq = PriorityQueue(comparator)
+        //filter out plants that cannot survive
         plantList
-            .filter { targetTemp >= it.temp_min && targetTemp <= it.temp_max }
+            .filter { targetTemp >= it.tempMin && targetTemp <= it.tempMax }
             .forEach { pq.add(it) }
         return pq
     }
 
-
-    fun printPlant(plant: Plant){
-        println("${plant.id} (${plant.name}) : " +
-                "optimal_temp: (${plant.optimal_temp_min}-${plant.optimal_temp_max})C, " +
-                "livable_temp: (${plant.temp_min}-${plant.temp_max})C")
-    }
 }
