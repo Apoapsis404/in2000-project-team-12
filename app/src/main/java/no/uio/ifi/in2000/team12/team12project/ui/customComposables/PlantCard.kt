@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Nature
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,7 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +28,6 @@ import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
 @Composable
 fun PlantCard(
     plant: Plant,
-    //modifier: Modifier = Modifier
 ){
     Column(
         modifier = Modifier
@@ -133,24 +129,25 @@ fun PlantInfoRow(
 
 @Composable
 fun categoryIcon(category: String): Painter {
-    return when(category) {
-        "Grain" -> painterResource(id = R.drawable.icon_grain)
-        "Fodder" -> painterResource(id = R.drawable.icon_fodder)
-        "Legume" -> painterResource(id = R.drawable.icon_legume)
-        "Root" -> painterResource(id = R.drawable.icon_root)
-        "Vegetable" -> painterResource(id = R.drawable.icons_vegetable)
-        "Fruit" -> painterResource(id = R.drawable.icon_fruit)
-        "Nut" -> painterResource(id = R.drawable.icon_nut)
-        "Oilseed" -> painterResource(id = R.drawable.icon_oilseed)
-        "Industrial" -> painterResource(id = R.drawable.icon_cannabis)
-        "Herb" -> painterResource(id = R.drawable.icon_herb)
-        "Berry" -> painterResource(id = R.drawable.icons_berry)
-        else -> rememberVectorPainter(Icons.Default.Nature)
+    val resId = when (category) {
+        "Grain" -> R.drawable.icon_grain
+        "Fodder" -> R.drawable.icon_fodder
+        "Legume" -> R.drawable.icon_legume
+        "Root" -> R.drawable.icon_root
+        "Vegetable" -> R.drawable.icons_vegetable
+        "Fruit" -> R.drawable.icon_fruit
+        "Nut" -> R.drawable.icon_nut
+        "Oilseed" -> R.drawable.icon_oilseed
+        "Industrial" -> R.drawable.icon_cannabis
+        "Herb" -> R.drawable.icon_herb
+        "Berry" -> R.drawable.icons_berry
+        else -> null
     }
+    return if (resId != null) painterResource(resId) else painterResource(R.drawable.icon_grain)
 }
 
 @Preview
 @Composable
 fun PreviewPlantCard(){
-    PlantCard(plant = Plant(0, "Epletre", "Tre", 10f, 20f, 0f, 30f, 0f, 100f, 0f, 30f, 0f, 10f))
+    PlantCard(plant = Plant(0, "Apple tree", "Tree", 10f, 20f, 0f, 30f, 0f, 100f, 0f, 30f, 0f, 10f))
 }

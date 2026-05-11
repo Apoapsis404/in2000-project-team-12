@@ -37,12 +37,14 @@ fun PlantPopup(
        modifier =  Modifier
            .fillMaxWidth()
            .verticalScroll(verticalScrollState)
-           .padding(16.dp),
+           .padding(bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
             stringResource(R.string.plant_popup_header),
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         val context = LocalContext.current
         DropDown<Months>(
