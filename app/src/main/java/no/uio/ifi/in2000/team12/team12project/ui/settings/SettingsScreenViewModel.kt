@@ -18,6 +18,9 @@ data class SettingsScreenUiState(
     val lightMode: Boolean = true,
     val language: Languages = Languages.ENGLISH
 )
+
+
+// Viewmodel for SettingsScreen. Håndterer logikken for å bytte tema og språk.
 class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
 
     val uiState : StateFlow<SettingsScreenUiState> = dao.getSettings()
@@ -28,18 +31,21 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
             initialValue = SettingsScreenUiState()
         )
 
+    //Endrer mellom mørk og lys tema i appen.
     fun toggleTheme(){
         updateConfig { currentState ->
             currentState.copy(lightMode = !currentState.lightMode)
         }
     }
 
+    //Endrer på språket til appen.
     fun switchLanguage(newLanguage: Languages){
         updateConfig { currentState ->
             currentState.copy(language = newLanguage)
         }
     }
 
+    // Metoden oppdaterer config i databasen.
     private fun updateConfig(transform: (SettingsScreenUiState) -> SettingsScreenUiState) {
         viewModelScope.launch {
             val current = uiState.value
@@ -48,6 +54,7 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
     }
 }
 
+// Hjelpefunksjon for å konvertere SettingsEntity fra databasen til SettingsScreenUiState.
 fun SettingsEntity?.toUiState(): SettingsScreenUiState {
     val languageEnum = try{
         this?.language?.let {Languages.valueOf(it)} ?: Languages.ENGLISH
@@ -60,6 +67,7 @@ fun SettingsEntity?.toUiState(): SettingsScreenUiState {
     )
 }
 
+// Hjelpefunksjon for å konvertere SettingScreenUiState til SettingsEntity i databasen.
 fun SettingsScreenUiState.toEntity(): SettingsEntity {
     return SettingsEntity(
         id = 0,

@@ -39,8 +39,7 @@ fun SettingsScreen(
         Text(
             stringResource(R.string.settingsTitle),
             fontSize = 36.sp,
-            modifier = Modifier
-                .padding(top = 16.dp, bottom = 16.dp)
+            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
         )
 
         // Switching themes
@@ -78,6 +77,7 @@ fun SettingsScreen(
     }
 }
 
+// Gjenbrukbar metode som gir oss en rad med text label og switch.
 @Composable
 fun ToggleSetting(
     text: String,
