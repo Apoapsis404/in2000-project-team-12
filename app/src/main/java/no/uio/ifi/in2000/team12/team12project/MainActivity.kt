@@ -74,7 +74,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.InfoPopup
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModelFactory
@@ -106,18 +108,21 @@ class MainActivity : ComponentActivity() {
     }
 
 
-
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        val app = application as Team12Application
+        val settingsDao = app.database.settingDao()
+        val language = runBlocking { settingsDao.getSettings().first()?.language ?: "ENGLISH"}
+        setLocale(language)
 
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         }
         enableEdgeToEdge()
         setContent {
-            val app = applicationContext as Team12Application
             val graphScreenViewModel : GraphScreenViewModel = viewModel(
                 factory = GraphScreenViewModelFactory(app.climateDataRepository, app.plantsRepository)
             )
@@ -128,7 +133,7 @@ class MainActivity : ComponentActivity() {
             //HomeScreen()
             //GraphScreen()
             Team12ProjectTheme(
-                darkTheme = !settingsViewModel.uiState.collectAsState().value.lightmode,
+                darkTheme = !settingsViewModel.uiState.collectAsState().value.lightMode,
                 dynamicColor = false
             ) {
                 MainComp(settingsViewModel, favoritesViewModel, notesScreenViewModel, homeScreenViewModel, graphScreenViewModel)
@@ -141,6 +146,23 @@ class MainActivity : ComponentActivity() {
 //        val app = applicationContext as Team12Application
 //        app.database.close()
 //    }
+
+
+    private fun setLocale(language: String) {
+        val languageCode = when (language) {
+            "ENGLISH" -> "en"
+            "NORSK" -> "nb"
+            else -> language.lowercase()
+        }
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        createConfigurationContext(config)
+        resources.updateConfiguration(config, resources.displayMetrics)
+        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+        prefs.edit().putString("language", languageCode).apply()
+    }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

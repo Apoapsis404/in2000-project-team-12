@@ -15,9 +15,12 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 import androidx.core.content.edit
 
 data class SettingsScreenUiState(
-    val lightmode: Boolean = true,
+    val lightMode: Boolean = true,
     val language: Languages = Languages.ENGLISH
 )
+
+
+// Viewmodel for SettingsScreen. Håndterer logikken for å bytte tema og språk.
 class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
 
     val uiState : StateFlow<SettingsScreenUiState> = dao.getSettings()
@@ -28,51 +31,47 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
             initialValue = SettingsScreenUiState()
         )
 
+    //Endrer mellom mørk og lys tema i appen.
+    fun toggleTheme(){
+        updateConfig { currentState ->
+            currentState.copy(lightMode = !currentState.lightMode)
+        }
+    }
+
+    //Endrer på språket til appen.
+    fun switchLanguage(newLanguage: Languages){
+        updateConfig { currentState ->
+            currentState.copy(language = newLanguage)
+        }
+    }
+
+    // Metoden oppdaterer config i databasen.
     private fun updateConfig(transform: (SettingsScreenUiState) -> SettingsScreenUiState) {
         viewModelScope.launch {
             val current = uiState.value
             dao.saveSettings(transform(current).toEntity())
         }
     }
-
-    fun toggleTheme(){
-        updateConfig {
-            it.copy(lightmode = !it.lightmode)
-        }
-    }
-
-    fun switchLanguage(newLanguage: Languages, activity: Activity){
-        val localeCode = when (newLanguage) {
-            Languages.ENGLISH -> "en"
-            Languages.NORSK -> "nb"
-
-        }
-
-        val prefs = activity.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        prefs.edit { putString("language", localeCode) }
-        updateConfig {
-            it.copy(language = newLanguage)
-        }
-
-        // To see changes in the app instant
-        activity.recreate()
-    }
-
 }
 
+// Hjelpefunksjon for å konvertere SettingsEntity fra databasen til SettingsScreenUiState.
 fun SettingsEntity?.toUiState(): SettingsScreenUiState {
+    val languageEnum = try{
+        this?.language?.let {Languages.valueOf(it)} ?: Languages.ENGLISH
+    } catch (e: IllegalArgumentException){
+        Languages.ENGLISH
+    }
     return SettingsScreenUiState(
-        lightmode = this?.lightMode ?: true,
-        language = this?.language ?: Languages.ENGLISH
-        //Add additional settings here
+        lightMode = this?.lightMode ?: true,
+        language = languageEnum
     )
 }
 
+// Hjelpefunksjon for å konvertere SettingScreenUiState til SettingsEntity i databasen.
 fun SettingsScreenUiState.toEntity(): SettingsEntity {
     return SettingsEntity(
         id = 0,
-        lightMode = this.lightmode,
-        language = this.language
-        //Add additional settings here
+        lightMode = this.lightMode,
+        language = this.language.name
     )
 }

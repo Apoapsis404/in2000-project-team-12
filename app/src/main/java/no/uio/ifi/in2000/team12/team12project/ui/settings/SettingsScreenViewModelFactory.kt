@@ -10,6 +10,6 @@ class SettingsScreenViewModelFactory(private val dao: SettingsDao): ViewModelPro
             @Suppress("UNCHECKED_CAST")
             return SettingsScreenViewModel(dao) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }
