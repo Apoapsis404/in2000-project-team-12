@@ -107,18 +107,20 @@ fun HomeScreen(
         )
     }
 
+    val onMapOrMarkerClick: (LatLng) -> Unit = { latLng ->
+        if (!isSearchFocused) {
+            homeScreenViewModel.onMapClick(latLng)
+        }
+        localFocusManager.clearFocus()
+        keyboardController?.hide()
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             onMapLoaded = { homeScreenViewModel.onMapReady() },
-            onMapClick = { latLng ->
-                if (!isSearchFocused) {
-                    homeScreenViewModel.onMapClick(latLng)
-                }
-                localFocusManager.clearFocus()
-                keyboardController?.hide()
-            },
+            onMapClick = onMapOrMarkerClick,
             googleMapOptionsFactory = {
                 GoogleMapOptions().mapId("48427ab8c098a917274af32e")
             },
@@ -138,21 +140,24 @@ fun HomeScreen(
                 list = uiState.downpourList,
                 iconRes = R.drawable.outline_rainy_24,
                 contentDescription = stringResource(R.string.cont_desc_downpour_marker),
-                homeScreenViewModel = homeScreenViewModel
+                homeScreenViewModel = homeScreenViewModel,
+                onMarkerClick = onMapOrMarkerClick
             )
             HazardMarkers(
                 show = uiState.showExtremeWind,
                 list = uiState.extremeWindList,
                 iconRes = R.drawable.baseline_air_24,
                 contentDescription = stringResource(R.string.cont_desc_wind_marker),
-                homeScreenViewModel = homeScreenViewModel
+                homeScreenViewModel = homeScreenViewModel,
+                onMarkerClick = onMapOrMarkerClick
             )
             HazardMarkers(
                 show = uiState.showFlood,
                 list = uiState.floodList,
                 iconRes = R.drawable.baseline_water_24,
                 contentDescription = stringResource(R.string.cont_desc_flood_marker),
-                homeScreenViewModel = homeScreenViewModel
+                homeScreenViewModel = homeScreenViewModel,
+                onMarkerClick = onMapOrMarkerClick
             )
         }
 
@@ -231,7 +236,8 @@ fun HazardMarkers(
     list: List<LatLng>,
     iconRes: Int,
     contentDescription: String,
-    homeScreenViewModel: HomeScreenViewModel
+    homeScreenViewModel: HomeScreenViewModel,
+    onMarkerClick: (LatLng) -> Unit = {}
 ) {
     if (show) {
         val context = LocalContext.current
@@ -240,7 +246,11 @@ fun HazardMarkers(
                 state = remember { MarkerState(latLng) },
                 contentDescription = contentDescription,
                 collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                icon = homeScreenViewModel.vectorToBitMap(context, iconRes)
+                icon = homeScreenViewModel.vectorToBitMap(context, iconRes),
+                onClick = {
+                    onMarkerClick(latLng)
+                    true // Consume click to prevent camera focus on hazard markers
+                }
             )
         }
     }
