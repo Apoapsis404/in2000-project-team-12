@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
@@ -34,6 +35,16 @@ fun FavoritesScreen(
     navHostController: NavHostController) {
 
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
+    FavoritesScreenContent(
+        uiState = uiState,
+        onNavigateToGraph = { coords ->
+            homeScreenViewModel.setMarkerPosition(coords)
+            navHostController.navigate("graph") { popUpTo("graph") }
+        },
+        viewModel = favoritesScreenViewModel
+    )
+}
+    /*
     //string that will be added to removefavoritefunction
     var deletePlaceByName by remember { mutableStateOf<String?>(null) }
     var deleteRequest by remember { mutableStateOf(false) }
@@ -56,8 +67,9 @@ fun FavoritesScreen(
             //}
             favoritesScreenViewModel.lastfavoriteadded = null
         }
-    }
+    }*/
 
+    /*
     Box(modifier = Modifier){
 
         //val favoriteList = uiState.favoritesLocationMap.toList()
@@ -266,7 +278,77 @@ fun FavoritesScreen(
                 }
             }
         )*/
+    }*/
+
+    @Composable
+    fun FavoritesScreenContent(
+        uiState: FavoritesScreenUiState,
+        onNavigateToGraph: (LatLng) -> Unit,
+        viewModel: FavoritesScreenViewModel
+    ) {
+        Box(modifier = Modifier) {
+            LazyColumn {
+                items(uiState.favoritesLocationMap.toList()) { (key, favoriteLocation) ->
+                    val isSelected = uiState.selectedLocation?.name == favoriteLocation.name
+
+                    Box(modifier = Modifier
+                        .clickable { viewModel.onLocationSelected(favoriteLocation) }
+                        .padding(6.dp)
+                    ) {
+                        FavoriteCard(
+                            title = favoriteLocation.name,
+                            subtitle = favoriteLocation.address,
+                            selected = isSelected,
+                            onIconClick = { onNavigateToGraph(favoriteLocation.coordinates) },
+                            onDeleteClick = {
+                                viewModel.onLocationSelected(favoriteLocation)
+                                viewModel.setShowDeleteDialog(true)
+                            },
+                            onEditClick = {
+                                viewModel.onLocationSelected(favoriteLocation)
+                                viewModel.setShowRenameDialog(true, "")
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        // Delete Dialog
+        if (uiState.showDeleteDialog && uiState.selectedLocation != null) {
+            AlertDialog(
+                onDismissRequest = { viewModel.setShowDeleteDialog(false) },
+                title = { Text("Delete?") },
+                text = { Text("Do you wish to delete address ${uiState.selectedLocation.name}") },
+                confirmButton = {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        TextButton(onClick = { viewModel.setShowDeleteDialog(false) }) { Text(stringResource(R.string.no)) }
+                        TextButton(onClick = { viewModel.confirmDelete() }) { Text(stringResource(R.string.yes)) }
+                    }
+                }
+            )
+        }
+
+        // Rename Dialog (Handles newly added favorites automatically via State)
+        if (uiState.showRenameDialog && uiState.selectedLocation != null) {
+            AlertDialog(
+                onDismissRequest = { viewModel.setShowRenameDialog(false) },
+                title = { Text("Enter new name") },
+                text = {
+                    TextField(
+                        value = uiState.renameTextFieldValue,
+                        onValueChange = { viewModel.onRenameTextChanged(it) },
+                        placeholder = { Text("New name") }
+                    )
+                },
+                confirmButton = {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        TextButton(onClick = { viewModel.setShowRenameDialog(false) }) { Text("Cancel") }
+                        TextButton(onClick = { viewModel.confirmRename() }) { Text("Save") }
+                    }
+                }
+            )
+        }
     }
 
 
-}
