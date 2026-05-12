@@ -7,8 +7,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,13 +19,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -45,6 +52,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
@@ -140,41 +148,47 @@ fun HomeScreen(
                 onClick = { true },
                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
             )
-            // Hazard markers for extreme downpour
-            uiState.downpourList.forEach {
-                AdvancedMarker(
-                    state = remember { MarkerState(it) },
-                    contentDescription = stringResource(R.string.cont_desc_downpour_marker),
-                    collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                    icon = homeScreenViewModel.vectorToBitMap(
-                        LocalContext.current,
-                        R.drawable.outline_rainy_24
-                    )
-                )
-            }
             // Hazard markers for extreme wind speed
-            uiState.extremeWindList.forEach {
-                AdvancedMarker(
-                    state = remember { MarkerState(it) },
-                    contentDescription = stringResource(R.string.cont_desc_wind_marker),
-                    collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                    icon = homeScreenViewModel.vectorToBitMap(
-                        LocalContext.current,
-                        R.drawable.baseline_air_24
+            if (uiState.showExtremeWind) {
+                uiState.extremeWindList.forEach {
+                    AdvancedMarker(
+                        state = remember { MarkerState(it) },
+                        contentDescription = stringResource(R.string.cont_desc_wind_marker),
+                        collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                        icon = homeScreenViewModel.vectorToBitMap(
+                            LocalContext.current,
+                            R.drawable.baseline_air_24
+                        )
                     )
-                )
+                }
             }
             // Hazard markers for flood warnings
-            uiState.floodList.forEach {
-                AdvancedMarker(
-                    state = remember { MarkerState(it) },
-                    contentDescription = stringResource(R.string.cont_desc_flood_marker),
-                    collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                    icon = homeScreenViewModel.vectorToBitMap(
-                        LocalContext.current,
-                        R.drawable.baseline_water_24
+            if (uiState.showFlood) {
+                uiState.floodList.forEach {
+                    AdvancedMarker(
+                        state = remember { MarkerState(it) },
+                        contentDescription = stringResource(R.string.cont_desc_flood_marker),
+                        collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                        icon = homeScreenViewModel.vectorToBitMap(
+                            LocalContext.current,
+                            R.drawable.baseline_water_24
+                        )
                     )
-                )
+                }
+            }
+            // Hazard markers for extreme downpour
+            if (uiState.showDownpour) {
+                uiState.downpourList.forEach {
+                    AdvancedMarker(
+                        state = remember { MarkerState(it) },
+                        contentDescription = stringResource(R.string.cont_desc_downpour_marker),
+                        collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                        icon = homeScreenViewModel.vectorToBitMap(
+                            LocalContext.current,
+                            R.drawable.outline_rainy_24
+                        )
+                    )
+                }
             }
         }
 
@@ -256,11 +270,24 @@ fun HomeScreen(
             Spacer(modifier = modifier.weight(1f))
 
             Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomEnd
+                modifier = modifier.fillMaxWidth(),
+                contentAlignment = Alignment.BottomCenter
             ) {
+                // Filter button in bottom left
+                FilledIconButton(
+                    onClick = { homeScreenViewModel.toggleFilterPopup() },
+                    modifier = Modifier.align(Alignment.BottomStart)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = "Filter hazards"
+                    )
+                }
+
                 // Buttons in bottom right corner
-                Column {
+                Column(
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                ) {
                     FilledIconButton(
                         onClick = {
                             val fineLocationGranted =
@@ -319,6 +346,85 @@ fun HomeScreen(
         if (!uiState.isMapReady) {
             LoadingScreen()
         }
+
+        if (uiState.isFilterPopupVisible) {
+            FilterDialog(
+                uiState = uiState,
+                onToggleDownpour = { homeScreenViewModel.toggleDownpourFilter() },
+                onToggleWind = { homeScreenViewModel.toggleExtremeWindFilter() },
+                onToggleFlood = { homeScreenViewModel.toggleFloodFilter() },
+                onDismiss = { homeScreenViewModel.toggleFilterPopup() }
+            )
+        }
+    }
+}
+
+@Composable
+fun FilterDialog(
+    uiState: HomeScreenUiState,
+    onToggleDownpour: () -> Unit,
+    onToggleWind: () -> Unit,
+    onToggleFlood: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Filter Hazards",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.Close, contentDescription = "Close")
+                    }
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                FilterItem(
+                    label = "Downpour",
+                    checked = uiState.showDownpour,
+                    onCheckedChange = { onToggleDownpour() }
+                )
+                FilterItem(
+                    label = "Extreme Wind",
+                    checked = uiState.showExtremeWind,
+                    onCheckedChange = { onToggleWind() }
+                )
+                FilterItem(
+                    label = "Flood",
+                    checked = uiState.showFlood,
+                    onCheckedChange = { onToggleFlood() }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun FilterItem(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) }
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        Text(text = label, modifier = Modifier.padding(start = 8.dp))
     }
 }
 //FLYTTET TIL HOMESCREENVIEWMODEL:

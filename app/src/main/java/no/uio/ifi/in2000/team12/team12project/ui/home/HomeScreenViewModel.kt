@@ -41,7 +41,11 @@ data class HomeScreenUiState(
     val suggestions: List<String> = emptyList(),
     val downpourList: List<LatLng> = emptyList(),
     val extremeWindList: List<LatLng> = emptyList(),
-    val floodList: List<LatLng> = emptyList()
+    val floodList: List<LatLng> = emptyList(),
+    val showDownpour: Boolean = true,
+    val showExtremeWind: Boolean = true,
+    val showFlood: Boolean = true,
+    val isFilterPopupVisible: Boolean = false
 )
 
 class HomeScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -231,5 +235,25 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     // Updates the uiState if the user has given location permission
     fun setInitialLocationFlag() {
         _uiState.update { it.copy(hasInitialLocationBeenSet = true) }
+    }
+
+    // Toggle filter for downpour markers
+    fun toggleDownpourFilter() {
+        _uiState.update { it.copy(showDownpour = !it.showDownpour) }
+    }
+
+    // Toggle filter for extreme wind markers
+    fun toggleExtremeWindFilter() {
+        _uiState.update { it.copy(showExtremeWind = !it.showExtremeWind) }
+    }
+
+    // Toggle filter for flood markers
+    fun toggleFloodFilter() {
+        _uiState.update { it.copy(showFlood = !it.showFlood) }
+    }
+
+    // Toggles the visibility of the filter popup
+    fun toggleFilterPopup() {
+        _uiState.update { it.copy(isFilterPopupVisible = !it.isFilterPopupVisible) }
     }
 }
