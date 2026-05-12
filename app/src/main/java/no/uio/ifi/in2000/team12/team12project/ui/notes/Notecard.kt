@@ -138,12 +138,6 @@ fun Notecard(
                         2.dp,
                         MaterialTheme.colorScheme.onPrimary
                     ),
-                    /*
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        shape = RoundedCornerShape(16.dp)
-                    ),*/
                     onClick = onDeleteButtonClick
                 ) {
                     Text(stringResource(R.string.delete_pop_up_delete))

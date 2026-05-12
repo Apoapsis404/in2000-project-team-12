@@ -1,8 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.ui.favorites
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -10,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,15 +23,12 @@ data class FavoritesScreenUiState(
 )
 
 class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
-    //var lastfavoriteadded by mutableStateOf<String?>(null) //so it know the newly added favorite to delete
-    //private val _lastfavoriteadded = MutableSharedFlow<String?>()
-    //val lastfavoriteadded = _lastfavoriteadded.asSharedFlow()
-    private val _interactionState = MutableStateFlow(FavoritesScreenUiState())
+    private val _uiState = MutableStateFlow(FavoritesScreenUiState())
 
 
 
     val uiState: StateFlow<FavoritesScreenUiState> = dao.getAllFavorites()
-        .combine(_interactionState) { list, interaction ->
+        .combine(_uiState) { list, interaction ->
             // Map the DB list to our FavoriteLocation objects
             val locationMap = list.associate { entity ->
                 entity.name to FavoriteLocation(
@@ -48,38 +41,29 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
             interaction.copy(favoritesLocationMap = locationMap)
 
         }
-        /*.map { list ->
-            FavoritesScreenUiState(
-                favoritesLocationMap = list.associate { entity ->
-                    entity.name to FavoriteLocation(
-                        coordinates = LatLng(entity.latitude, entity.longitude),
-                        name = entity.name,
-                        address = entity.address
-                    )
-                }
-            )
-        }*/.stateIn(
+        .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = FavoritesScreenUiState()
         )
+
     // Events flow UP from UI
     fun onLocationSelected(location: FavoriteLocation?) {
-        _interactionState.update { it.copy(selectedLocation = location) }
+        _uiState.update { it.copy(selectedLocation = location) }
     }
 
     fun setShowDeleteDialog(show: Boolean) {
-        _interactionState.update { it.copy(showDeleteDialog = show) }
+        _uiState.update { it.copy(showDeleteDialog = show) }
     }
 
     fun setShowRenameDialog(show: Boolean, initialText: String = "") {
-        _interactionState.update {
+        _uiState.update {
             it.copy(showRenameDialog = show, renameTextFieldValue = initialText)
         }
     }
 
     fun onRenameTextChanged(newText: String) {
-        _interactionState.update { it.copy(renameTextFieldValue = newText) }
+        _uiState.update { it.copy(renameTextFieldValue = newText) }
     }
     fun addFavoriteLocation(location: LatLng, name: String, address : String){
         viewModelScope.launch {
@@ -95,7 +79,7 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
             //_lastfavoriteadded.emit(name)
             // Replaces the LaunchedEffect: Immediately prepare the UI for renaming
             val addedLoc = FavoriteLocation(location, name, address)
-            _interactionState.update {
+            _uiState.update {
                 it.copy(
                     selectedLocation = addedLoc,
                     showRenameDialog = true,
@@ -105,21 +89,21 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
         }
     }
     fun confirmDelete() {
-        val name = _interactionState.value.selectedLocation?.name ?: return
+        val name = _uiState.value.selectedLocation?.name ?: return
         viewModelScope.launch {
             dao.deleteByName(name)
-            _interactionState.update { it.copy(showDeleteDialog = false, selectedLocation = null) }
+            _uiState.update { it.copy(showDeleteDialog = false, selectedLocation = null) }
         }
     }
 
     fun confirmRename() {
-        val oldName = _interactionState.value.selectedLocation?.name ?: return
-        val newName = _interactionState.value.renameTextFieldValue
+        val oldName = _uiState.value.selectedLocation?.name ?: return
+        val newName = _uiState.value.renameTextFieldValue
         if (newName.isBlank()) return
 
         viewModelScope.launch {
             dao.changeFavoriteLocationName(oldName, newName)
-            _interactionState.update { it.copy(showRenameDialog = false, selectedLocation = null) }
+            _uiState.update { it.copy(showRenameDialog = false, selectedLocation = null) }
         }
     }
     /*

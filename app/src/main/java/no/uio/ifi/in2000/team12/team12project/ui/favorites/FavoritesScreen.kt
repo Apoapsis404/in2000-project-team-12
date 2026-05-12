@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.favorites
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -20,6 +23,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -44,244 +50,8 @@ fun FavoritesScreen(
         viewModel = favoritesScreenViewModel
     )
 }
-    /*
-    //string that will be added to removefavoritefunction
-    var deletePlaceByName by remember { mutableStateOf<String?>(null) }
-    var deleteRequest by remember { mutableStateOf(false) }
-    //check if the name wants to be changed
-    var changeName by remember { mutableStateOf(false) }
-    var changeNameTo by remember { mutableStateOf("") }
-    var chosenLocation by remember { mutableStateOf<FavoriteLocation?>(null) }
-    var selectedName by remember { mutableStateOf<String?>(null) }
-
-    //check for newly added to favorites
-    LaunchedEffect(favoritesScreenViewModel.lastfavoriteadded,uiState.favoritesLocationMap) {
-        val newname = favoritesScreenViewModel.lastfavoriteadded
-        if(newname != null){
-            val item = uiState.favoritesLocationMap.values.find{it.name == newname}//uiState.favoritesLocationMap[newname]//[deleteplacebyname]//[newname]
-            if(item == null) return@LaunchedEffect
-            //if(item != null){
-                chosenLocation = item
-                deletePlaceByName = item.name
-                changeName = true
-            //}
-            favoritesScreenViewModel.lastfavoriteadded = null
-        }
-    }*/
-
-    /*
-    Box(modifier = Modifier){
-
-        //val favoriteList = uiState.favoritesLocationMap.toList()
-
-
-    LazyColumn(
-        modifier = Modifier
-    )
-        {
-
-        items(uiState.favoritesLocationMap.toList()) { (key, favoriteLocation) ->
-            //items(favoriteList) { (key, favoriteLocation) ->
-
-            //var selectedbox = chosenlocation?.name == favoriteLocation.name
-            val selectedbox = selectedName == favoriteLocation.name
-            Box(
-                modifier = Modifier.clickable{
-                    deletePlaceByName =favoriteLocation.name
-                    chosenLocation =favoriteLocation
-                    selectedName = favoriteLocation.name
-                }
-                    .padding(6.dp)
-
-            ){
-            FavoriteCard(
-                title = favoriteLocation.name,
-                subtitle = favoriteLocation.address,
-                selected = selectedbox, //
-                onIconClick = {
-                    homeScreenViewModel.setMarkerPosition(favoriteLocation.coordinates)
-                    navHostController.navigate("graph")
-                    { popUpTo("graph")
-                    }
-                } ,
-                onDeleteClick = {
-                    deleteRequest = true
-                },
-                onEditClick = {
-                    changeName = true
-                }
-            )
-        }
-        }
-
-    }
-    }
-
-    if(deleteRequest && chosenLocation !=null){
-        AlertDialog(
-            onDismissRequest = { deleteRequest = false },
-
-            title = {
-                Text("Delete?")
-            },
-
-            text = {
-                Text("Do you wish to delete address $deletePlaceByName")
-            },
-
-            confirmButton = {
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-
-                    TextButton(
-                        onClick = {
-                            deleteRequest = false
-                        }
-                    ) {
-                        Text(stringResource(R.string.no))
-                    }
-
-                    TextButton(
-                        onClick = {
-                            deletePlaceByName?.let { name ->
-                                favoritesScreenViewModel.removeFavoriteLocation(name)
-                            }
-
-                            deleteRequest = false
-                            chosenLocation = null
-                        }
-                    ) {
-                        Text(stringResource(R.string.yes))
-                    }
-                }
-            }
-        )
-        /*
-        AlertDialog(
-            onDismissRequest = {deleteRequest= false},
-            title = {Text("Delete location")},
-            text = {Text("Do you wish to delete your location ${deletePlaceByName}?" )},
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                       deletePlaceByName?.let { name ->
-                           favoritesScreenViewModel.removeFavoriteLocation(name)
-                       }
-                        deleteRequest = false
-                        chosenLocation =null
-                    }) {
-                    Text("Delete")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {deleteRequest = false}) {
-                    Text("Cancel")
-                }
-            }
-        )*/
-    }
-
-    if (changeName && chosenLocation != null) {
-        AlertDialog(
-            onDismissRequest = {
-                changeName = false
-                changeNameTo = ""
-            },
-
-            title = {
-                Text("Enter new name")
-            },
-
-            text = {
-                TextField(
-                    value = changeNameTo,
-                    onValueChange = { changeNameTo = it },
-                    placeholder = {
-                        Text("New name")
-                    }
-                )
-            },
-
-            confirmButton = {
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-
-                    // Cancel -> left
-                    TextButton(
-                        onClick = {
-                            changeName = false
-                            changeNameTo = ""
-                        }
-                    ) {
-                        Text("Cancel")
-                    }
-
-                    // Save -> right
-                    TextButton(
-                        onClick = {
-                            favoritesScreenViewModel.changeFavoriteLocationName(
-                                prevname = chosenLocation!!.name,
-                                changenameto = changeNameTo
-                            )
-
-                            changeNameTo = ""
-                            changeName = false
-                        }
-                    ) {
-                        Text("Save")
-                    }
-                }
-            }
-        )
-        /*
-            AlertDialog(
-            onDismissRequest = {
-                changeName = false
-                changeNameTo = ""
-
-            },
-            title = { Text("Enter new name") },
-            text = {
-                TextField(
-                    value = changeNameTo,
-                    onValueChange = { changeNameTo = it },
-                    placeholder = { Text("New name") }
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    //changenameof?.let {
-                        favoritesScreenViewModel.changeFavoriteLocationName(
-                            prevname = chosenLocation!!.name,//it.name,
-                            changenameto = changeNameTo
-                        )
-                    //}
-                    changeNameTo = ""
-                    changeName = false
-
-                }) {
-                    Text("Save")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    changeName = false
-
-                }) {
-                    Text("Cancel")
-                }
-            }
-        )*/
-    }*/
-
-    @Composable
-    fun FavoritesScreenContent(
+@Composable
+fun FavoritesScreenContent(
         uiState: FavoritesScreenUiState,
         onNavigateToGraph: (LatLng) -> Unit,
         viewModel: FavoritesScreenViewModel
@@ -293,7 +63,17 @@ fun FavoritesScreen(
 
                     Box(modifier = Modifier
                         .clickable { viewModel.onLocationSelected(favoriteLocation) }
-                        .padding(6.dp)
+                        //.padding(6.dp)
+                        .padding(top = 4.dp, start = 4.dp, end = 4.dp)
+
+                        //.padding(horizontal = 20.dp, vertical = 18.dp)
+                        .border(
+                            width = if(isSelected) 4.dp else 0.dp,
+                            color = if(isSelected) MaterialTheme.colorScheme.secondary else Color.Transparent,
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .shadow(6.dp,RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(20.dp))
                     ) {
                         FavoriteCard(
                             title = favoriteLocation.name,

@@ -19,64 +19,10 @@ data class NotesUiState(
     val selectedNote: Note? = null,
     val showDeleteDialog: Boolean = false
 )
-/*
-class NotesScreenViewModel(private val dao: NotesDao) : ViewModel() {
-    private val _uiState = MutableStateFlow(NotesUiState())
-    val uiState: StateFlow<NotesUiState> = combine(
-        dao.getAllNotes(),
-        _uiState
-    ) { notes, currentState ->
-        currentState.copy(notes = notes)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = NotesUiState()
-    )
-
-    fun onSelectNote(note: Note) {
-        _uiState.update {
-            it.copy(selectedNote = if (it.selectedNote?.id == note.id) null else note)
-        }
-    }
-
-    fun setEditing(isEditing: Boolean, note: Note? = null) {
-        _uiState.update { it.copy(isEditing = isEditing, selectedNote = note) }
-    }
-
-    fun setShowDeleteDialog(show: Boolean, note: Note? = null) {
-        _uiState.update {
-            it.copy(showDeleteDialog = show, selectedNote = note ?: it.selectedNote)
-        }
-    }
-
-    fun saveNote(content: String) {
-        viewModelScope.launch {
-            val noteToSave = _uiState.value.selectedNote?.copy(content = content)
-                ?: Note(content = content)
-            dao.insertNote(noteToSave)
-            _uiState.update { it.copy(isEditing = false, selectedNote = null) }
-        }
-    }
-
-    fun confirmDelete() {
-        viewModelScope.launch {
-            _uiState.value.selectedNote?.let { dao.deleteNote(it) }
-            _uiState.update { it.copy(showDeleteDialog = false, selectedNote = null) }
-        }
-    }
-}*/
 
 class NotesScreenViewModel(private val dao: NotesDao) : ViewModel() {
     private val _interactionState = MutableStateFlow(NotesUiState())
 
-    /*
-    val uiState: StateFlow<List<Note>> = dao.getAllNotes()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-    */
     val uiState: StateFlow<NotesUiState> = dao.getAllNotes()
         .combine(_interactionState) { notes, interaction ->
             interaction.copy(notes = notes)
@@ -87,6 +33,7 @@ class NotesScreenViewModel(private val dao: NotesDao) : ViewModel() {
             initialValue = NotesUiState()
         )
 
+    // Events flow UP from UI
     fun onNoteSelected(note: Note?) {
         _interactionState.update { it.copy(selectedNote = note) }
     }
