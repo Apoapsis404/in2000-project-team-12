@@ -39,7 +39,7 @@ fun PlantCard(
             )
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.primary)
-            .padding(horizontal = 18.dp, vertical = 18.dp),
+            .padding(horizontal = 10.dp, vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -113,13 +113,13 @@ fun PlantInfoRow(
     ) {
         Text(
             text = text,
-            fontSize = 10.sp,
+            fontSize = 11.sp,
             lineHeight = 6.sp,
             color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
             text = value,
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             lineHeight = 8.sp,
             color = MaterialTheme.colorScheme.onPrimary
 
