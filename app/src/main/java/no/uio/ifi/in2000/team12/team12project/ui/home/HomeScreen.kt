@@ -1,8 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.home
 
 import android.Manifest
-import android.location.Geocoder
-import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -65,13 +63,8 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team12.team12project.R
-import java.util.Locale
-import kotlin.coroutines.resume
 
 @Composable
 fun HomeScreen(
@@ -79,9 +72,9 @@ fun HomeScreen(
     homeScreenViewModel: HomeScreenViewModel = viewModel(),
 ) {
     val uiState by homeScreenViewModel.uiState.collectAsState()
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val scope = rememberCoroutineScope()
     val localFocusManager = LocalFocusManager.current
     var isSearchFocused by remember { mutableStateOf(false) }
 
@@ -113,20 +106,10 @@ fun HomeScreen(
             )
         )
     }
-    // Fetches location based on query and updates the map and marker position
-    fun searchLocation(query: String) {
-        scope.launch {
-            val latLng = getLatLngFromLocationName(context, query)
-            latLng?.let {
-                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
-                homeScreenViewModel.onSearchedLocation(query, it)
-            }
-        }
-    }
 
     Box(modifier = modifier.fillMaxSize()) {
         GoogleMap(
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = { latLng ->
@@ -148,199 +131,82 @@ fun HomeScreen(
                 onClick = { true },
                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
             )
-            // Hazard markers for extreme wind speed
-            if (uiState.showExtremeWind) {
-                uiState.extremeWindList.forEach {
-                    AdvancedMarker(
-                        state = remember { MarkerState(it) },
-                        contentDescription = stringResource(R.string.cont_desc_wind_marker),
-                        collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                        icon = homeScreenViewModel.vectorToBitMap(
-                            LocalContext.current,
-                            R.drawable.baseline_air_24
-                        )
-                    )
-                }
-            }
-            // Hazard markers for flood warnings
-            if (uiState.showFlood) {
-                uiState.floodList.forEach {
-                    AdvancedMarker(
-                        state = remember { MarkerState(it) },
-                        contentDescription = stringResource(R.string.cont_desc_flood_marker),
-                        collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                        icon = homeScreenViewModel.vectorToBitMap(
-                            LocalContext.current,
-                            R.drawable.baseline_water_24
-                        )
-                    )
-                }
-            }
-            // Hazard markers for extreme downpour
-            if (uiState.showDownpour) {
-                uiState.downpourList.forEach {
-                    AdvancedMarker(
-                        state = remember { MarkerState(it) },
-                        contentDescription = stringResource(R.string.cont_desc_downpour_marker),
-                        collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
-                        icon = homeScreenViewModel.vectorToBitMap(
-                            LocalContext.current,
-                            R.drawable.outline_rainy_24
-                        )
-                    )
-                }
-            }
+
+            // Render hazard markers based on filters
+            HazardMarkers(
+                show = uiState.showDownpour,
+                list = uiState.downpourList,
+                iconRes = R.drawable.outline_rainy_24,
+                contentDescription = stringResource(R.string.cont_desc_downpour_marker),
+                homeScreenViewModel = homeScreenViewModel
+            )
+            HazardMarkers(
+                show = uiState.showExtremeWind,
+                list = uiState.extremeWindList,
+                iconRes = R.drawable.baseline_air_24,
+                contentDescription = stringResource(R.string.cont_desc_wind_marker),
+                homeScreenViewModel = homeScreenViewModel
+            )
+            HazardMarkers(
+                show = uiState.showFlood,
+                list = uiState.floodList,
+                iconRes = R.drawable.baseline_water_24,
+                contentDescription = stringResource(R.string.cont_desc_flood_marker),
+                homeScreenViewModel = homeScreenViewModel
+            )
         }
 
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp)
                 .navigationBarsPadding()
         ) {
-            Column(modifier = modifier.fillMaxWidth()) {
-                // Search field for locations
-                TextField(
-                    value = uiState.searchQuery,
-                    onValueChange = { homeScreenViewModel.setSearchQuery(it)
-                                   // homeScreenViewModel.fetchSuggestions(it) // HAS TO BE REACTIVATED BEFORE DELIVERY
-                                    },
-                    placeholder = { Text(stringResource(R.string.search_location)) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            searchLocation(uiState.searchQuery)
-                            keyboardController?.hide()
-                            localFocusManager.clearFocus()
-                        }
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White,
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedTextColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { isSearchFocused = it.isFocused }
-                )
-                // Suggestions for locations, only shows if search field is focused and query and suggestions are not empty
-                if (uiState.suggestions.isNotEmpty() && uiState.searchQuery.isNotEmpty() && isSearchFocused) {
-                    Column(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                    ) {
-                        uiState.suggestions.forEach { suggestion ->
-                            Text(
-                                text = suggestion,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        searchLocation(suggestion)
-                                        homeScreenViewModel.clearSuggestions()
-                                        keyboardController?.hide()
-                                        localFocusManager.clearFocus()
-                                    }
-                                    .padding(12.dp)
+            SearchBox(
+                uiState = uiState,
+                isSearchFocused = isSearchFocused,
+                onFocusChanged = { isSearchFocused = it },
+                onQueryChange = { homeScreenViewModel.setSearchQuery(it) },
+                onSearch = { query ->
+                    homeScreenViewModel.searchLocation(query) {
+                        scope.launch { cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f)) }
+                    }
+                    keyboardController?.hide()
+                    localFocusManager.clearFocus()
+                },
+                onSuggestionClick = { suggestion ->
+                    homeScreenViewModel.searchLocation(suggestion) {
+                        scope.launch { cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f)) }
+                    }
+                    homeScreenViewModel.clearSuggestions()
+                    keyboardController?.hide()
+                    localFocusManager.clearFocus()
+                }
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            MapControls(
+                onToggleFilter = { homeScreenViewModel.toggleFilterPopup() },
+                onReturnToLocation = {
+                    val fineLocationGranted = android.content.pm.PackageManager.PERMISSION_GRANTED ==
+                            androidx.core.content.ContextCompat.checkSelfPermission(
+                                context, Manifest.permission.ACCESS_FINE_LOCATION
                             )
-                            HorizontalDivider()
+                    if (fineLocationGranted) {
+                        @Suppress("MissingPermission")
+                        homeScreenViewModel.fetchCurrentLocation { position ->
+                            scope.launch { cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(position, 15f)) }
                         }
-                    }
-                }
-                // Shows no available results if search field is focused, query is not empty and suggestions are empty
-                if (uiState.searchQuery.isNotEmpty() && uiState.suggestions.isEmpty() && isSearchFocused) {
-                    Column(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.no_result),
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .padding(12.dp)
+                    } else {
+                        locationPermissionRequest.launch(
+                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
                         )
                     }
-                }
-            }
-
-            Spacer(modifier = modifier.weight(1f))
-
-            Box(
-                modifier = modifier.fillMaxWidth(),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                // Filter button in bottom left
-                FilledIconButton(
-                    onClick = { homeScreenViewModel.toggleFilterPopup() },
-                    modifier = Modifier.align(Alignment.BottomStart)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filter hazards"
-                    )
-                }
-
-                // Buttons in bottom right corner
-                Column(
-                    modifier = Modifier.align(Alignment.BottomEnd)
-                ) {
-                    FilledIconButton(
-                        onClick = {
-                            val fineLocationGranted =
-                                android.content.pm.PackageManager.PERMISSION_GRANTED ==
-                                        androidx.core.content.ContextCompat.checkSelfPermission(
-                                            context, Manifest.permission.ACCESS_FINE_LOCATION
-                                        )
-                            if (fineLocationGranted) {
-                                @Suppress("MissingPermission")
-                                homeScreenViewModel.fetchCurrentLocation { position ->
-                                    scope.launch {
-                                        cameraPositionState.animate(
-                                            CameraUpdateFactory.newLatLngZoom(position, 15f)
-                                        )
-                                    }
-                                }
-                            } else {
-                                locationPermissionRequest.launch(
-                                    arrayOf(
-                                        Manifest.permission.ACCESS_FINE_LOCATION,
-                                        Manifest.permission.ACCESS_COARSE_LOCATION
-                                    )
-                                )
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MyLocation,
-                            contentDescription = stringResource(R.string.cont_desc_return_to_current_position)
-                        )
-                    }
-                    FilledIconButton(
-                        onClick = {
-                            scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomIn()) }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.AddCircleOutline,
-                            contentDescription = stringResource(R.string.cont_desc_zoom_in)
-                        )
-                    }
-                    FilledIconButton(
-                        onClick = {
-                            scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomOut()) }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.RemoveCircleOutline,
-                            contentDescription = stringResource(R.string.cont_desc_zoom_out)
-                        )
-                    }
-                }
-            }
+                },
+                onZoomIn = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomIn()) } },
+                onZoomOut = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomOut()) } }
+            )
         }
 
         if (!uiState.isMapReady) {
@@ -355,6 +221,118 @@ fun HomeScreen(
                 onToggleFlood = { homeScreenViewModel.toggleFloodFilter() },
                 onDismiss = { homeScreenViewModel.toggleFilterPopup() }
             )
+        }
+    }
+}
+
+@Composable
+fun HazardMarkers(
+    show: Boolean,
+    list: List<LatLng>,
+    iconRes: Int,
+    contentDescription: String,
+    homeScreenViewModel: HomeScreenViewModel
+) {
+    if (show) {
+        val context = LocalContext.current
+        list.forEach { latLng ->
+            AdvancedMarker(
+                state = remember { MarkerState(latLng) },
+                contentDescription = contentDescription,
+                collisionBehavior = OPTIONAL_AND_HIDES_LOWER_PRIORITY,
+                icon = homeScreenViewModel.vectorToBitMap(context, iconRes)
+            )
+        }
+    }
+}
+
+@Composable
+fun SearchBox(
+    uiState: HomeScreenUiState,
+    isSearchFocused: Boolean,
+    onFocusChanged: (Boolean) -> Unit,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    onSuggestionClick: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        TextField(
+            value = uiState.searchQuery,
+            onValueChange = onQueryChange,
+            placeholder = { Text(stringResource(R.string.search_location)) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = { onSearch(uiState.searchQuery) }),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.primary,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { onFocusChanged(it.isFocused) }
+        )
+        if (isSearchFocused && uiState.searchQuery.isNotEmpty()) {
+            if (uiState.suggestions.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                ) {
+                    uiState.suggestions.forEach { suggestion ->
+                        Text(
+                            text = suggestion,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onSuggestionClick(suggestion) }
+                                .padding(12.dp)
+                        )
+                        HorizontalDivider()
+                    }
+                }
+            } else {
+                Text(
+                    text = stringResource(R.string.no_result),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(12.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MapControls(
+    onToggleFilter: () -> Unit,
+    onReturnToLocation: () -> Unit,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        FilledIconButton(
+            onClick = onToggleFilter,
+            modifier = Modifier.align(Alignment.BottomStart)
+        ) {
+            Icon(Icons.Default.FilterList, contentDescription = stringResource(R.string.cont_desc_filter_hazards))
+        }
+
+        Column(modifier = Modifier.align(Alignment.BottomEnd)) {
+            FilledIconButton(onClick = onReturnToLocation) {
+                Icon(Icons.Default.MyLocation, contentDescription = stringResource(R.string.cont_desc_return_to_current_position))
+            }
+            FilledIconButton(onClick = onZoomIn) {
+                Icon(Icons.Outlined.AddCircleOutline, contentDescription = stringResource(R.string.cont_desc_zoom_in))
+            }
+            FilledIconButton(onClick = onZoomOut) {
+                Icon(Icons.Outlined.RemoveCircleOutline, contentDescription = stringResource(R.string.cont_desc_zoom_out))
+            }
         }
     }
 }
@@ -384,28 +362,28 @@ fun FilterDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Filter Hazards",
+                        text = stringResource(R.string.filter_hazards),
                         style = MaterialTheme.typography.titleLarge
                     )
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close))
                     }
                 }
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 FilterItem(
-                    label = "Downpour",
+                    label = stringResource(R.string.downpour),
                     checked = uiState.showDownpour,
                     onCheckedChange = { onToggleDownpour() }
                 )
                 FilterItem(
-                    label = "Extreme Wind",
+                    label = stringResource(R.string.extreme_wind),
                     checked = uiState.showExtremeWind,
                     onCheckedChange = { onToggleWind() }
                 )
                 FilterItem(
-                    label = "Flood",
+                    label = stringResource(R.string.flood),
                     checked = uiState.showFlood,
                     onCheckedChange = { onToggleFlood() }
                 )
@@ -425,53 +403,5 @@ fun FilterItem(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Un
     ) {
         Checkbox(checked = checked, onCheckedChange = onCheckedChange)
         Text(text = label, modifier = Modifier.padding(start = 8.dp))
-    }
-}
-//FLYTTET TIL HOMESCREENVIEWMODEL:
-
-suspend fun getLatLngFromLocationName(
-    context: android.content.Context,
-    query: String
-): LatLng? = withContext(Dispatchers.IO) {
-    val geocoder = Geocoder(context, Locale.getDefault())
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        suspendCancellableCoroutine { continuation ->
-            geocoder.getFromLocationName(query, 1) { addresses ->
-                continuation.resume(
-                    addresses.firstOrNull()?.let { LatLng(it.latitude, it.longitude) }
-                )
-            }
-        }
-    } else {
-        @Suppress("DEPRECATION")
-        geocoder.getFromLocationName(query, 1)?.firstOrNull()?.let {
-            LatLng(it.latitude, it.longitude)
-        }
-    }
-}
-
-suspend fun getNameAndAddress(
-    context: android.content.Context,
-    lat: Double,
-    lon: Double
-): Pair<String?, String?> = withContext(Dispatchers.IO) {
-    val geocoder = Geocoder(context, Locale.getDefault())
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        suspendCancellableCoroutine { continuation ->
-            geocoder.getFromLocation(lat, lon, 1) { addresses ->
-                val address = addresses.firstOrNull()
-                continuation.resume(address?.featureName to address?.getAddressLine(0))
-            }
-        }
-    } else {
-        try {
-            @Suppress("DEPRECATION")
-            val results = geocoder.getFromLocation(lat, lon, 1)
-            val address = results?.firstOrNull()
-            address?.featureName to address?.getAddressLine(0)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null to null
-        }
     }
 }

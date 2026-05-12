@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.Context
 import android.location.Geocoder
+import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
@@ -24,11 +25,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team12.team12project.data.frost.TorrentialRain
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
 import java.util.Locale
+import kotlin.coroutines.resume
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 
 data class HomeScreenUiState(
@@ -184,6 +187,38 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
             )
         }
         sessionToken = AutocompleteSessionToken.newInstance()
+    }
+
+    // Searches for a location using Geocoder and updates the map and marker position
+    fun searchLocation(query: String, onLocationFound: (LatLng) -> Unit) {
+        viewModelScope.launch {
+            val latLng = getLatLngFromLocationName(getApplication(), query)
+            latLng?.let {
+                onSearchedLocation(query, it)
+                onLocationFound(it)
+            }
+        }
+    }
+
+    private suspend fun getLatLngFromLocationName(
+        context: Context,
+        query: String
+    ): LatLng? = withContext(Dispatchers.IO) {
+        val geocoder = Geocoder(context, Locale.getDefault())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            suspendCancellableCoroutine { continuation ->
+                geocoder.getFromLocationName(query, 1) { addresses ->
+                    continuation.resume(
+                        addresses.firstOrNull()?.let { LatLng(it.latitude, it.longitude) }
+                    )
+                }
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            geocoder.getFromLocationName(query, 1)?.firstOrNull()?.let {
+                LatLng(it.latitude, it.longitude)
+            }
+        }
     }
 
     // Updates the marker position and title in the uiState based on mapClicks
