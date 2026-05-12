@@ -275,6 +275,7 @@ fun HomeScreen(
                                         cameraPositionState.animate(
                                             CameraUpdateFactory.newLatLngZoom(position, 15f)
                                         )
+                                        homeScreenViewModel.onMapClick(position)
                                     }
                                 }
                             } else {
