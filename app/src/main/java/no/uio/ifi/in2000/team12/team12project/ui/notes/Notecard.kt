@@ -51,7 +51,6 @@ fun Notecard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 4.dp, start = 4.dp, end = 4.dp)
             .shadow(6.dp, RoundedCornerShape(20.dp), spotColor = Color(0x1A000000))
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.primary)

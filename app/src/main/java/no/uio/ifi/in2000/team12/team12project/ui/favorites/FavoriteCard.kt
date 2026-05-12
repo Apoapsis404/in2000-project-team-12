@@ -4,6 +4,7 @@ package no.uio.ifi.in2000.team12.team12project.ui.favorites
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,8 +55,18 @@ fun FavoriteCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp, start = 4.dp, end = 4.dp)
             .shadow(6.dp, RoundedCornerShape(20.dp), spotColor = Color(0x1A000000))
+            .then(
+                if (selected) {
+                    Modifier.border(
+                        width = 4.dp,
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                } else {
+                    Modifier
+                }
+            )
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.primary)
             .animateContentSize()
@@ -162,4 +173,3 @@ fun FavoriteCard(
 
 }
 }
-
