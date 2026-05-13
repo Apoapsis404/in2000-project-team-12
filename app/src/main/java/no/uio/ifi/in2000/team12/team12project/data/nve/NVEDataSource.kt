@@ -13,6 +13,7 @@ import java.io.InputStreamReader
 import android.content.Context
 
 class NVEDataSource(val context: Context){
+    // Varsler fra Flomvarslingen i Norge og www.varsom.no
     private val url: String = "https://api01.nve.no/hydrology/forecast/flood/v1.0.10/api/Warning/1/2016-01-01/2026-01-01"
     private val json = Json { ignoreUnknownKeys = true }
 
