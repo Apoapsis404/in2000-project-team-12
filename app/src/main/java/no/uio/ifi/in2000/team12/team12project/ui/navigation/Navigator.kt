@@ -22,6 +22,8 @@ import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreen
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 
 @Composable
 fun Navigator(
@@ -32,7 +34,9 @@ fun Navigator(
     notesScreenViewModel: NotesScreenViewModel,
     graphScreenViewModel: GraphScreenViewModel,
     navController: NavHostController,
+    onNoInternet: () -> Unit
 ){
+    val context = LocalContext.current
 
     homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
     NavHost(
@@ -46,6 +50,11 @@ fun Navigator(
             )
         }
         composable(route = "graph") {
+            LaunchedEffect(Unit) {
+                if (!NetworkUtils.isNetworkAvailable(context)) {
+                    onNoInternet()
+                }
+            }
             LaunchedEffect(homeViewModel.uiState.collectAsState().value.markerPosition) {
                 graphScreenViewModel.setMarkerPositionAndFetch(homeViewModel.uiState.value.markerPosition)
             }

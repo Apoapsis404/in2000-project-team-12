@@ -65,4 +65,12 @@
     <string name="favorites">Favoritter</string>
     <string name="settings">Innstillinger</string>
     <string name="notes">Notater</string>
+    <!-- NETWORK -->
+    <string name="no_internet_title">Ingen internettforbindelse</string>
+    <string name="no_internet_startup_message">Denne appen krever en internettforbindelse for å fungere. Vennligst sjekk tilkoblingen din og prøv igjen.</string>
+    <string name="no_internet_navigation_message">Du trenger en internettforbindelse for å se grafer. Vennligst sjekk tilkoblingen din og prøv igjen.</string>
+    <string name="exit_app">Lukk appen</string>
+    <string name="go_back">Gå tilbake</string>
+
+
 </resources>

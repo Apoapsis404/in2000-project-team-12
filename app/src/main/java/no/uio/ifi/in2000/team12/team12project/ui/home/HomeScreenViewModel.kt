@@ -33,6 +33,7 @@ import no.uio.ifi.in2000.team12.team12project.data.local.AppDatabase
 import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 import java.util.Locale
 import kotlin.coroutines.resume
@@ -52,7 +53,8 @@ data class HomeScreenUiState(
     val showDownpour: Boolean = true,
     val showExtremeWind: Boolean = true,
     val showFlood: Boolean = true,
-    val isFilterPopupVisible: Boolean = false
+    val isFilterPopupVisible: Boolean = false,
+    val showNoInternetDialog: Boolean = false
 )
 
 class HomeScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -116,6 +118,10 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     fun fetchSuggestions(query: String) {
         if (query.isBlank()) {
             _uiState.update { it.copy(suggestions = emptyList()) }
+            return
+        }
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            _uiState.update { it.copy(showNoInternetDialog = true) }
             return
         }
         val request = FindAutocompletePredictionsRequest.builder()
@@ -234,6 +240,10 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
 
     // Searches for a location using Geocoder and updates the map and marker position
     fun searchLocation(query: String, onLocationFound: (LatLng) -> Unit) {
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            _uiState.update { it.copy(showNoInternetDialog = true) }
+            return
+        }
         viewModelScope.launch {
             val latLng = getLatLngFromLocationName(getApplication(), query)
             latLng?.let {
@@ -333,5 +343,10 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     // Toggles the visibility of the filter popup
     fun toggleFilterPopup() {
         _uiState.update { it.copy(isFilterPopupVisible = !it.isFilterPopupVisible) }
+    }
+
+    // Dismisses the no internet dialog
+    fun dismissNoInternetDialog() {
+        _uiState.update { it.copy(showNoInternetDialog = false) }
     }
 }

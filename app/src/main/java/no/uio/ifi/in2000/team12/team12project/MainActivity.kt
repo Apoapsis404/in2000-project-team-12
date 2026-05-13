@@ -28,6 +28,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -141,6 +143,50 @@ fun MainComp(
 
 
 
+    val context = LocalContext.current
+    var showStartupNoInternetDialog by remember { mutableStateOf(!NetworkUtils.isNetworkAvailable(context)) }
+    var showNavigationNoInternetDialog by remember { mutableStateOf(false) }
+
+    // Dialog for no internet at startup
+    if (showStartupNoInternetDialog) {
+        AlertDialog(
+            onDismissRequest = { /* Don't allow dismissal */ },
+            title = { Text(stringResource(R.string.no_internet_title)) },
+            text = { Text(stringResource(R.string.no_internet_startup_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        (context as? MainActivity)?.finish()
+                    }
+                ) {
+                    Text(stringResource(R.string.exit_app))
+                }
+            }
+        )
+    }
+
+    // Dialog for no internet when navigating
+    if (showNavigationNoInternetDialog) {
+        AlertDialog(
+            onDismissRequest = { 
+                showNavigationNoInternetDialog = false
+                navController.popBackStack()
+            },
+            title = { Text(stringResource(R.string.no_internet_title)) },
+            text = { Text(stringResource(R.string.no_internet_navigation_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showNavigationNoInternetDialog = false
+                        navController.popBackStack()
+                    }
+                ) {
+                    Text(stringResource(R.string.go_back))
+                }
+            }
+        )
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = false,
@@ -174,6 +220,7 @@ fun MainComp(
                     .fillMaxSize()
                     .padding(top = innerPadding.calculateTopPadding()),
                 navController = navController,
+                onNoInternet = { showNavigationNoInternetDialog = true }
             )
 
         }

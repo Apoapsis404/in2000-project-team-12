@@ -30,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -225,6 +226,19 @@ fun HomeScreen(
                 onToggleWind = { homeScreenViewModel.toggleExtremeWindFilter() },
                 onToggleFlood = { homeScreenViewModel.toggleFloodFilter() },
                 onDismiss = { homeScreenViewModel.toggleFilterPopup() }
+            )
+        }
+
+        if (uiState.showNoInternetDialog) {
+            AlertDialog(
+                onDismissRequest = { homeScreenViewModel.dismissNoInternetDialog() },
+                title = { Text(stringResource(R.string.no_internet_title)) },
+                text = { Text(stringResource(R.string.no_internet_navigation_message)) },
+                confirmButton = {
+                    TextButton(onClick = { homeScreenViewModel.dismissNoInternetDialog() }) {
+                        Text(stringResource(R.string.close))
+                    }
+                }
             )
         }
     }
