@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.favorites
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,10 +42,19 @@ fun FavoritesScreen(
     favoritesScreenViewModel: FavoritesScreenViewModel,
     homeScreenViewModel: HomeScreenViewModel,
     navHostController: NavHostController,
-    onNoInternet: () -> Unit
+    onNoInternet: (Int?) -> Unit
 ) {
     val context = LocalContext.current
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
+
+    BackHandler {
+        if (NetworkUtils.isNetworkAvailable(context)) {
+            navHostController.popBackStack()
+        } else {
+            onNoInternet(R.string.no_internet_map_message)
+        }
+    }
+
     FavoritesScreenContent(
         uiState = uiState,
         onNavigateToGraph = { coords ->
@@ -52,7 +62,7 @@ fun FavoritesScreen(
                 homeScreenViewModel.setMarkerPosition(coords)
                 navHostController.navigate("graph") { popUpTo("graph") }
             } else {
-                onNoInternet()
+                onNoInternet(R.string.no_internet_navigation_message)
             }
         },
         viewModel = favoritesScreenViewModel

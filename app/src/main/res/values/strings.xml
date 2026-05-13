@@ -123,6 +123,7 @@
     <string name="no_internet_title">No internet connection</string>
     <string name="no_internet_startup_message">This app requires an internet connection to function. Please check your connection and try again.</string>
     <string name="no_internet_navigation_message">You need an internet connection to view graphs. Please check your connection and try again.</string>
+    <string name="no_internet_map_message">You need an internet connection to view the map. Please check your connection and try again.</string>
     <string name="exit_app">Exit app</string>
     <string name="go_back">Go back</string>
 

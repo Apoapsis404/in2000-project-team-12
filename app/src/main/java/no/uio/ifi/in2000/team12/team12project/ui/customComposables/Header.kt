@@ -49,7 +49,7 @@ fun Header(
     homeScreenViewModel: HomeScreenViewModel,
     navHostController: NavHostController,
     onFavoriteButtonClick: () -> Unit,
-    onNoInternet: () -> Unit
+    onNoInternet: (Int?) -> Unit
 ){
     val context = LocalContext.current
     val titleColors = MaterialTheme.colorScheme.onPrimary
@@ -108,7 +108,13 @@ fun Header(
             if(currentRoute == "graph"){
                 //Map symbol
                 TopBarIcon(
-                    { navHostController.navigate(route = "home") },
+                    { 
+                        if (NetworkUtils.isNetworkAvailable(context)) {
+                            navHostController.navigate(route = "home") 
+                        } else {
+                            onNoInternet(R.string.no_internet_map_message)
+                        }
+                    },
                     Icons.Outlined.Map,
                     "Navigate to map"
                 )
@@ -120,7 +126,7 @@ fun Header(
                         if (NetworkUtils.isNetworkAvailable(context)) {
                             navHostController.navigate("graph") 
                         } else {
-                            onNoInternet()
+                            onNoInternet(R.string.no_internet_navigation_message)
                         }
                     },
                     Icons.Outlined.DataThresholding,

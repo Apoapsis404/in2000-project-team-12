@@ -146,6 +146,7 @@ fun MainComp(
     val context = LocalContext.current
     var showStartupNoInternetDialog by remember { mutableStateOf(!NetworkUtils.isNetworkAvailable(context)) }
     var showNavigationNoInternetDialog by remember { mutableStateOf(false) }
+    var noInternetMessageResId by remember { mutableStateOf(R.string.no_internet_navigation_message) }
 
     // Dialog for no internet at startup
     if (showStartupNoInternetDialog) {
@@ -172,7 +173,7 @@ fun MainComp(
                 showNavigationNoInternetDialog = false
             },
             title = { Text(stringResource(R.string.no_internet_title)) },
-            text = { Text(stringResource(R.string.no_internet_navigation_message)) },
+            text = { Text(stringResource(noInternetMessageResId)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -191,7 +192,11 @@ fun MainComp(
         drawerContent = {
             NavigationDrawer(
                 onNavigate = {route -> navController.navigate(route = route)},
-                onClose = {scope.launch { drawerState.close() }}
+                onClose = {scope.launch { drawerState.close() }},
+                onNoInternet = { messageResId ->
+                    noInternetMessageResId = messageResId ?: R.string.no_internet_navigation_message
+                    showNavigationNoInternetDialog = true 
+                }
             )
         }
     ) {
@@ -205,7 +210,10 @@ fun MainComp(
                         //askpermissonforlatlng = homeScreenViewModel.uiState.value.markerPosition
                         showFavoritesAlertDialog = true
                     },
-                    onNoInternet = { showNavigationNoInternetDialog = true }
+                    onNoInternet = { messageResId ->
+                        noInternetMessageResId = messageResId ?: R.string.no_internet_navigation_message
+                        showNavigationNoInternetDialog = true 
+                    }
                 )
             },
         ) { innerPadding ->
@@ -219,7 +227,10 @@ fun MainComp(
                     .fillMaxSize()
                     .padding(top = innerPadding.calculateTopPadding()),
                 navController = navController,
-                onNoInternet = { showNavigationNoInternetDialog = true }
+                onNoInternet = { messageResId ->
+                    noInternetMessageResId = messageResId ?: R.string.no_internet_navigation_message
+                    showNavigationNoInternetDialog = true 
+                }
             )
 
         }

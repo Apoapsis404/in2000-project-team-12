@@ -1,6 +1,9 @@
 package no.uio.ifi.in2000.team12.team12project.ui.graphs
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
+import androidx.navigation.NavHostController
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
@@ -66,12 +69,22 @@ import no.uio.ifi.in2000.team12.team12project.ui.customComposables.PlantPopup
 fun GraphScreen(
     modifier: Modifier = Modifier,
     graphScreenViewModel: GraphScreenViewModel,
+    navHostController: NavHostController,
+    onNoInternet: (Int?) -> Unit
 ) {
     val modelProducer = remember { CartesianChartModelProducer() }
     val uiState by graphScreenViewModel.uiState.collectAsState()
     val plantPopupState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
     val context = LocalContext.current
+
+    BackHandler {
+        if (NetworkUtils.isNetworkAvailable(context)) {
+            navHostController.popBackStack()
+        } else {
+            onNoInternet(R.string.no_internet_map_message)
+        }
+    }
 
     // Sync climate data with the chart producer whenever it changes
     LaunchedEffect(uiState.climateChartData) {
