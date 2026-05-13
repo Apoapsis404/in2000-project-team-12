@@ -23,13 +23,17 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team12.team12project.data.frost.TorrentialRain
+import no.uio.ifi.in2000.team12.team12project.data.local.AppDatabase
+import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
+import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 import java.util.Locale
 import kotlin.coroutines.resume
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
@@ -58,6 +62,9 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
     private val placesClient = Places.createClient(application)
 
+    private val settingsDao = AppDatabase.getDatabase(application).settingsDao()
+    private var currentSettings: SettingsEntity = SettingsEntity()
+
     private var sessionToken = AutocompleteSessionToken.newInstance()
     private val bitmapCache = mutableMapOf<Int, BitmapDescriptor>()
 
@@ -67,6 +74,42 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     init {
         loadHazardMarkers()
         fetchFloodWarnings()
+        observeSettings()
+    }
+
+    // Observes settings from the database and updates the uiState
+    private fun observeSettings() {
+        viewModelScope.launch {
+            settingsDao.getSettings().collect { settings ->
+                settings?.let { s ->
+                    currentSettings = s
+                    _uiState.update {
+                        it.copy(
+                            showDownpour = s.showDownpour,
+                            showExtremeWind = s.showExtremeWind,
+                            showFlood = s.showFlood
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    // Updates the filter settings in the database
+    private fun updateFilterSetting(
+        showDownpour: Boolean = currentSettings.showDownpour,
+        showExtremeWind: Boolean = currentSettings.showExtremeWind,
+        showFlood: Boolean = currentSettings.showFlood
+    ) {
+        viewModelScope.launch {
+            settingsDao.saveSettings(
+                currentSettings.copy(
+                    showDownpour = showDownpour,
+                    showExtremeWind = showExtremeWind,
+                    showFlood = showFlood
+                )
+            )
+        }
     }
 
     // Fetches suggestions from google places based on the query in the TextField
@@ -274,17 +317,17 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
 
     // Toggle filter for downpour markers
     fun toggleDownpourFilter() {
-        _uiState.update { it.copy(showDownpour = !it.showDownpour) }
+        updateFilterSetting(showDownpour = !uiState.value.showDownpour)
     }
 
     // Toggle filter for extreme wind markers
     fun toggleExtremeWindFilter() {
-        _uiState.update { it.copy(showExtremeWind = !it.showExtremeWind) }
+        updateFilterSetting(showExtremeWind = !uiState.value.showExtremeWind)
     }
 
     // Toggle filter for flood markers
     fun toggleFloodFilter() {
-        _uiState.update { it.copy(showFlood = !it.showFlood) }
+        updateFilterSetting(showFlood = !uiState.value.showFlood)
     }
 
     // Toggles the visibility of the filter popup

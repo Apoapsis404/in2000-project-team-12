@@ -13,7 +13,10 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 
 data class SettingsScreenUiState(
     val lightMode: Boolean = true,
-    val language: Languages = Languages.ENGLISH
+    val language: Languages = Languages.ENGLISH,
+    val showDownpour: Boolean = true,
+    val showExtremeWind: Boolean = true,
+    val showFlood: Boolean = true
 )
 
 
@@ -56,7 +59,10 @@ fun SettingsEntity?.toUiState(): SettingsScreenUiState {
     val languageEnum = this?.language ?: Languages.ENGLISH
     return SettingsScreenUiState(
         lightMode = this?.lightMode ?: true,
-        language = languageEnum
+        language = languageEnum,
+        showDownpour = this?.showDownpour ?: true,
+        showExtremeWind = this?.showExtremeWind ?: true,
+        showFlood = this?.showFlood ?: true
     )
 }
 
@@ -65,6 +71,9 @@ fun SettingsScreenUiState.toEntity(): SettingsEntity {
     return SettingsEntity(
         id = 0,
         lightMode = this.lightMode,
-        language = this.language
+        language = this.language,
+        showDownpour = this.showDownpour,
+        showExtremeWind = this.showExtremeWind,
+        showFlood = this.showFlood
     )
 }

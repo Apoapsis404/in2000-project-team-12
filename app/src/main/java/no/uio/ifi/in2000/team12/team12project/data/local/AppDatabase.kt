@@ -10,7 +10,7 @@ import no.uio.ifi.in2000.team12.team12project.data.local.dao.NotesDao
 import no.uio.ifi.in2000.team12.team12project.data.local.dao.SettingsDao
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 
-@Database(entities = [SettingsEntity::class, FavoriteLocationEntity::class, Note::class], version = 3, exportSchema = false)
+@Database(entities = [SettingsEntity::class, FavoriteLocationEntity::class, Note::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun settingsDao(): SettingsDao
