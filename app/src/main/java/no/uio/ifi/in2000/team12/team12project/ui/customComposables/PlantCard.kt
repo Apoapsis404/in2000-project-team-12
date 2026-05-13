@@ -113,7 +113,7 @@ fun PlantInfoRow(
     ) {
         Text(
             text = text,
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             lineHeight = 6.sp,
             color = MaterialTheme.colorScheme.onPrimary
         )
