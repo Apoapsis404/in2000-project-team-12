@@ -50,6 +50,8 @@ import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModelFacto
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
+import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
+import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 import java.util.Locale
 
 
@@ -59,7 +61,12 @@ class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context) {
         // Read saved language from SharedPreferences (Room is async, can't use it here)
         val prefs = newBase.getSharedPreferences("settings", MODE_PRIVATE)
-        val langCode = prefs.getString("language", "en") ?: "en"
+
+        // Try to get saved language, fallback to system language if not set (first run)
+        val systemLocale = Locale.getDefault().language
+        val defaultLang = if (systemLocale.startsWith("nb") || systemLocale.startsWith("nn") || systemLocale.startsWith("no")) "nb" else "en"
+        val langCode = prefs.getString("language", defaultLang) ?: defaultLang
+
         val locale = Locale(langCode)
         Locale.setDefault(locale)
         val config = Configuration(newBase.resources.configuration)
@@ -75,8 +82,35 @@ class MainActivity : ComponentActivity() {
 
         val app = application as Team12Application
         val settingsDao = app.database.settingsDao()
-        val language = runBlocking { settingsDao.getSettings().first()?.language?.name ?: "ENGLISH"}
-        setLocale(language)
+
+        // Load settings or initialize if null (first run)
+        val settings = runBlocking { settingsDao.getSettings().first() }
+
+        if (settings == null) {
+            // Detect system language
+            val systemLocale = Locale.getDefault().language
+            val defaultLanguage = if (systemLocale.startsWith("nb") || systemLocale.startsWith("nn") || systemLocale.startsWith("no")) {
+                Languages.NORSK
+            } else {
+                Languages.ENGLISH
+            }
+
+            // Detect system theme (Dark Mode)
+            val isSystemDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+            val initialSettings = SettingsEntity(
+                lightMode = !isSystemDark,
+                language = defaultLanguage
+            )
+
+            // Save initial settings to database
+            runBlocking {
+                settingsDao.saveSettings(initialSettings)
+            }
+            setLocale(defaultLanguage.name)
+        } else {
+            setLocale(settings.language.name)
+        }
 
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)

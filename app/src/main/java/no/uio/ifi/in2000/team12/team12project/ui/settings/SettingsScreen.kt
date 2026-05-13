@@ -58,14 +58,13 @@ fun SettingsScreen(
             modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
         )
 
-        // Switching themes
         val theme = if(uiState.lightMode) {
-            stringResource(R.string.light_mode)
-        } else {
             stringResource(R.string.dark_mode)
+        } else {
+            stringResource(R.string.light_mode)
         }
-        ToggleSetting(
-            stringResource(R.string.darkModeSwitch, theme),
+            ToggleSetting(
+                stringResource(R.string.darkModeSwitch, theme),
             checked = uiState.lightMode,
             onChecked = {
                 settingsScreenViewModel.toggleTheme()
