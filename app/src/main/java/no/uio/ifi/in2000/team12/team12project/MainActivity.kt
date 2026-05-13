@@ -170,7 +170,6 @@ fun MainComp(
         AlertDialog(
             onDismissRequest = { 
                 showNavigationNoInternetDialog = false
-                navController.popBackStack()
             },
             title = { Text(stringResource(R.string.no_internet_title)) },
             text = { Text(stringResource(R.string.no_internet_navigation_message)) },
@@ -178,10 +177,9 @@ fun MainComp(
                 TextButton(
                     onClick = {
                         showNavigationNoInternetDialog = false
-                        navController.popBackStack()
                     }
                 ) {
-                    Text(stringResource(R.string.go_back))
+                    Text(stringResource(R.string.close))
                 }
             }
         )
@@ -206,7 +204,8 @@ fun MainComp(
                     onFavoriteButtonClick = {
                         //askpermissonforlatlng = homeScreenViewModel.uiState.value.markerPosition
                         showFavoritesAlertDialog = true
-                    }
+                    },
+                    onNoInternet = { showNavigationNoInternetDialog = true }
                 )
             },
         ) { innerPadding ->

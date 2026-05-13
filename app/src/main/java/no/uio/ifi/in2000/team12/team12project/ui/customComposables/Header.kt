@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
@@ -46,8 +48,10 @@ fun Header(
     onClick: () -> Unit,
     homeScreenViewModel: HomeScreenViewModel,
     navHostController: NavHostController,
-    onFavoriteButtonClick: () -> Unit
+    onFavoriteButtonClick: () -> Unit,
+    onNoInternet: () -> Unit
 ){
+    val context = LocalContext.current
     val titleColors = MaterialTheme.colorScheme.onPrimary
     val currentAddress = homeScreenViewModel.uiState.collectAsState().value.address
 
@@ -112,7 +116,13 @@ fun Header(
             }else {
                 //Graph symbol
                 TopBarIcon(
-                    { navHostController.navigate("graph") },
+                    { 
+                        if (NetworkUtils.isNetworkAvailable(context)) {
+                            navHostController.navigate("graph") 
+                        } else {
+                            onNoInternet()
+                        }
+                    },
                     Icons.Outlined.DataThresholding,
                     "menu"
                 )

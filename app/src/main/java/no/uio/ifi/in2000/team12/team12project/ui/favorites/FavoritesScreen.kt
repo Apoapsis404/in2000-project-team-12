@@ -28,6 +28,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.R
@@ -38,14 +40,20 @@ import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 fun FavoritesScreen(
     favoritesScreenViewModel: FavoritesScreenViewModel,
     homeScreenViewModel: HomeScreenViewModel,
-    navHostController: NavHostController) {
-
+    navHostController: NavHostController,
+    onNoInternet: () -> Unit
+) {
+    val context = LocalContext.current
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
     FavoritesScreenContent(
         uiState = uiState,
         onNavigateToGraph = { coords ->
-            homeScreenViewModel.setMarkerPosition(coords)
-            navHostController.navigate("graph") { popUpTo("graph") }
+            if (NetworkUtils.isNetworkAvailable(context)) {
+                homeScreenViewModel.setMarkerPosition(coords)
+                navHostController.navigate("graph") { popUpTo("graph") }
+            } else {
+                onNoInternet()
+            }
         },
         viewModel = favoritesScreenViewModel
     )

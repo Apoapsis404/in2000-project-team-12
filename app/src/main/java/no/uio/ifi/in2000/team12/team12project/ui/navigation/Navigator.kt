@@ -36,8 +36,6 @@ fun Navigator(
     navController: NavHostController,
     onNoInternet: () -> Unit
 ){
-    val context = LocalContext.current
-
     homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
     NavHost(
         navController = navController,
@@ -50,11 +48,6 @@ fun Navigator(
             )
         }
         composable(route = "graph") {
-            LaunchedEffect(Unit) {
-                if (!NetworkUtils.isNetworkAvailable(context)) {
-                    onNoInternet()
-                }
-            }
             LaunchedEffect(homeViewModel.uiState.collectAsState().value.markerPosition) {
                 graphScreenViewModel.setMarkerPositionAndFetch(homeViewModel.uiState.value.markerPosition)
             }
@@ -66,7 +59,8 @@ fun Navigator(
         composable(route = "favorites") {
             FavoritesScreen(favoritesScreenViewModel = favoritesViewModel,
                 homeScreenViewModel = homeViewModel,
-                navHostController = navController)
+                navHostController = navController,
+                onNoInternet = onNoInternet)
         }
         composable(route = "notes") {
             NotesScreen(notesScreenViewModel = notesScreenViewModel,
