@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FloodWarning(
     @SerialName("EventId")
-    val eventId: Int,           //id for hendelsen
+    val eventId: Int,           // ID for the event
     @SerialName("ActivityLevel")
-    val activityLevel: Int,     //faregrad
+    val activityLevel: Int,     // danger level
     @SerialName("DangerTypeName")
     val dangerTypeName: String,
     @SerialName("ValidFrom")
@@ -15,6 +15,6 @@ data class FloodWarning(
     @SerialName("ValidTo")
     val validTo: String,
     @SerialName("MunicipalityList")
-    val municipalityList: List<Municipality>        //Liste over komuner som påvirkes av varselet
+    val municipalityList: List<Municipality>        // List of municipalities affected by the warning
 )
 
