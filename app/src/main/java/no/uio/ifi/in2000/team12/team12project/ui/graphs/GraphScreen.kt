@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,8 +77,8 @@ fun GraphScreen(
     // Sync climate data with the chart producer whenever it changes
     LaunchedEffect(uiState.climateChartData) {
         val data = uiState.climateChartData
-        modelProducer.runTransaction {
-            if (data.years.isNotEmpty() && data.values.isNotEmpty()) {
+        if (data.years.isNotEmpty() && data.values.isNotEmpty()) {
+            modelProducer.runTransaction {
                 lineSeries {
                     // Original data points
                     series(data.years, data.values)
@@ -225,12 +226,14 @@ private fun ClimateCardGrid(
         maxItemsInEachRow = if (isLandscape) 4 else 2
     ) {
         climateTypes.forEach { type ->
+            val isAvailable = uiState.availableClimateTypes.contains(type)
             GraphCard(
                 modifier = Modifier.weight(1f),
                 climateType = type,
                 meanValue = getMean(type, uiState.month) ?: 0.0,
                 selected = uiState.climateType == type,
-                onClick = { onCardClick(type) }
+                onClick = { onCardClick(type) },
+                enabled = isAvailable
             )
         }
     }
@@ -248,25 +251,30 @@ private fun ComposeClimateGraph(
     unit: String,
     modifier: Modifier = Modifier,
 ) {
-    val startAxisValueFormatter = remember(unit) { CartesianValueFormatter.decimal(suffix = " $unit") }
-    val axisLabelStyle = rememberTextComponent(
-        TextStyle(color = MaterialTheme.colorScheme.onBackground)
-    )
+    // Keying by unit (and theme color) ensures the chart and its formatters are recreated
+    // when the climate type changes, fixing the issue where units wouldn't update.
+    val onBackground = MaterialTheme.colorScheme.onBackground
+    key(unit, onBackground) {
+        val startAxisValueFormatter = remember { CartesianValueFormatter.decimal(suffix = " $unit") }
+        val axisLabelStyle = rememberTextComponent(
+            TextStyle(color = onBackground)
+        )
 
-    CartesianChartHost(
-        chart = rememberCartesianChart(
-            rememberLineCartesianLayer(rangeProvider = RangeProvider),
-            startAxis = VerticalAxis.rememberStart(
-                valueFormatter = startAxisValueFormatter,
-                label = axisLabelStyle
+        CartesianChartHost(
+            chart = rememberCartesianChart(
+                rememberLineCartesianLayer(rangeProvider = RangeProvider),
+                startAxis = VerticalAxis.rememberStart(
+                    valueFormatter = startAxisValueFormatter,
+                    label = axisLabelStyle
+                ),
+                bottomAxis = HorizontalAxis.rememberBottom(
+                    labelRotationDegrees = 45f,
+                    label = axisLabelStyle
+                ),
             ),
-            bottomAxis = HorizontalAxis.rememberBottom(
-                labelRotationDegrees = 45f,
-                label = axisLabelStyle
-            ),
-        ),
-        modelProducer = modelProducer,
-        modifier = modifier.height(240.dp),
-        scrollState = rememberVicoScrollState(initialScroll = Scroll.Absolute.End),
-    )
+            modelProducer = modelProducer,
+            modifier = modifier.height(240.dp),
+            scrollState = rememberVicoScrollState(initialScroll = Scroll.Absolute.End),
+        )
+    }
 }

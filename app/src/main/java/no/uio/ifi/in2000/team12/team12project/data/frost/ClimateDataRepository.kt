@@ -16,7 +16,7 @@ class ClimateDataRepository(
         private const val DEFAULT_MAX_DIST_KM = 5.0
         private const val MAX_STATIONS_LIMIT = 25
         private const val MAX_STATION_STEP = 5
-        private const val MIN_MONTHS_REQUIRED = 60
+        private const val MIN_MONTHS_REQUIRED = 36
     }
 
     /**
@@ -42,7 +42,7 @@ class ClimateDataRepository(
     suspend fun getClimateTimeSeries(
         sourceId: String,
         elementId: String,
-        fields: String = "validFrom"
+        fields: String = "validFrom,validTo"
     ): String {
         return climateDataSource.getClimateTimeSeries(sourceId, elementId, fields)
     }
@@ -54,7 +54,7 @@ class ClimateDataRepository(
     suspend fun getClimateTimeSeriesFromPos(
         position: LatLng,
         climateType: ClimateType,
-        fields: String = "validFrom",
+        fields: String = "validFrom,validTo",
         maxCount: Int = 5
     ): Pair<String, String> {
         var currentMax = maxCount

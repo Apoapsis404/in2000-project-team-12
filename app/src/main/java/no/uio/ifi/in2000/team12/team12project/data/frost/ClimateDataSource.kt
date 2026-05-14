@@ -38,7 +38,7 @@ class ClimateDataSource {
      *
      * @param sourceId The ID of the observation station.
      * @param elementId The ID of the climate element (e.g., mean air temperature).
-     * @param fields Fields to return (default is "validFrom").
+     * @param fields Fields to return (default is "validFrom,validTo").
      * @return The validFrom date as a string, or an empty string if not found.
      * @throws BadRequestException if the request is malformed (400).
      * @throws UnauthorizedException if authentication fails (401).
@@ -48,7 +48,7 @@ class ClimateDataSource {
     suspend fun getClimateTimeSeries(
         sourceId: String,
         elementId: String,
-        fields: String = "validFrom"
+        fields: String = "validFrom,validTo"
     ): String {
         val response: HttpResponse = KtorClient.client.get(URL_TIME_SERIES) {
             basicAuth(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_SECRET)
@@ -59,7 +59,13 @@ class ClimateDataSource {
             }
         }
 
-        return handleResponse<TimeSeriesResponse>(response).data.firstOrNull()?.validFrom ?: ""
+        val data = handleResponse<TimeSeriesResponse>(response).data.firstOrNull() ?: return ""
+        val from = data.validFrom ?: return ""
+        return if (data.validTo != null) {
+            "$from,${data.validTo}"
+        } else {
+            from
+        }
     }
 
     /**

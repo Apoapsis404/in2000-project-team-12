@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -53,16 +54,29 @@ fun GraphCard(
     climateType: ClimateType = ClimateType.MEAN_AIR_TEMP,
     meanValue: Double = 0.0,
     onClick: () -> Unit,
-    selected: Boolean = false
+    selected: Boolean = false,
+    enabled: Boolean = true
 ) {
-    val containerColor = if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
-    val contentColor = if (selected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
+    val containerColor = when {
+        !enabled -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+        selected -> MaterialTheme.colorScheme.secondary
+        else -> MaterialTheme.colorScheme.primary
+    }
+    val contentColor = when {
+        !enabled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+        selected -> MaterialTheme.colorScheme.onSecondary
+        else -> MaterialTheme.colorScheme.onPrimary
+    }
 
     Card(
         modifier = modifier.aspectRatio(1f),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor,
+            disabledContainerColor = containerColor
+        ),
+        onClick = { if (enabled) onClick() },
+        enabled = enabled
     ) {
         Column(
             modifier = Modifier
@@ -86,24 +100,28 @@ fun GraphCard(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                when (climateType) {
-                    ClimateType.RELATIVE_HUMIDITY -> HumidityVisual(meanValue, contentColor)
-                    ClimateType.MEAN_AIR_TEMP -> TemperatureVisual(meanValue, contentColor)
-                    ClimateType.PRECIPITATION -> PrecipitationVisual(meanValue, contentColor)
-                    ClimateType.DURATION_OF_SUN -> SunVisual(meanValue, contentColor)
+                // Dim the visuals if not enabled
+                val visualAlpha = if (enabled) 1f else 0.3f
+                Box(modifier = Modifier.graphicsLayer { alpha = visualAlpha }) {
+                    when (climateType) {
+                        ClimateType.RELATIVE_HUMIDITY -> HumidityVisual(meanValue, contentColor)
+                        ClimateType.MEAN_AIR_TEMP -> TemperatureVisual(meanValue, contentColor)
+                        ClimateType.PRECIPITATION -> PrecipitationVisual(meanValue, contentColor)
+                        ClimateType.DURATION_OF_SUN -> SunVisual(meanValue, contentColor)
+                    }
                 }
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "${meanValue.toInt()}${climateType.unit}",
+                    text = if (enabled) "${meanValue.toInt()}${climateType.unit}" else "--",
                     color = contentColor,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = climateType.description,
-                    color = contentColor.copy(alpha = 0.7f),
+                    text = if (enabled) climateType.description else "Data unavailable",
+                    color = contentColor.copy(alpha = if (enabled) 0.7f else 0.4f),
                     fontSize = 10.sp,
                     textAlign = TextAlign.Center,
                     lineHeight = 12.sp,

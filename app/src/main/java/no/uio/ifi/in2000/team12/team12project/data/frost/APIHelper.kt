@@ -47,12 +47,18 @@ fun lastNMonths(n: UInt, currentDate: String): String {
 }
 
 fun monthsSince(date: String, currentDate: String = getCurrentDate()): Int {
-    val currentYear = extractYear(currentDate) ?: 0
-    val currentMonth = extractMonth(currentDate) ?: 0
-    val year = extractYear(date) ?: 0
-    val month = extractMonth(date) ?: 0
+    val dates = date.split(",")
+    val startDate = dates[0]
+    if (startDate.isEmpty()) return 0
+    
+    val endDate = if (dates.size > 1 && dates[1].isNotEmpty()) dates[1] else currentDate
 
-    return (currentYear - year) * 12 + (currentMonth - month)
+    val endYear = extractYear(endDate) ?: return 0
+    val endMonth = extractMonth(endDate) ?: 0
+    val startYear = extractYear(startDate) ?: return 0
+    val startMonth = extractMonth(startDate) ?: 0
+
+    return (endYear - startYear) * 12 + (endMonth - startMonth)
 }
 
 fun yearsSince(date: String, currentDate: String = getCurrentDate()): Int {
@@ -89,7 +95,9 @@ fun printClimateObsList(climateObsList: List<ClimateObs>) {
         return
     }
 
-    climateObsList.forEach { obs ->
+    val maxElement: Int = 5
+
+    climateObsList.subList(0, maxElement).forEach { obs ->
         println("-------------------------------------------")
         println("Source ID: ${obs.sourceId}")
         println("Time: ${obs.referenceTime}")
@@ -104,6 +112,7 @@ fun printClimateObsList(climateObsList: List<ClimateObs>) {
 
 fun getYearAndData(climateObsList: List<ClimateObs>): ClimateChartData {
     val (years, values) = climateObsList.mapNotNull { obs ->
+        if (obs.observations.isEmpty()) return@mapNotNull null
         extractYear(obs.referenceTime)?.let { year ->
             year.toDouble() to findMeanObs(obs)
         }

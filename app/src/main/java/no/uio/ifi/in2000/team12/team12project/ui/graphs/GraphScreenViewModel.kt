@@ -18,6 +18,7 @@ import no.uio.ifi.in2000.team12.team12project.data.frost.findMeanValue
 import no.uio.ifi.in2000.team12.team12project.data.frost.getObsFromMonth
 import no.uio.ifi.in2000.team12.team12project.data.frost.getYearAndData
 import no.uio.ifi.in2000.team12.team12project.data.frost.monthsSince
+import no.uio.ifi.in2000.team12.team12project.data.frost.printClimateObsList
 import no.uio.ifi.in2000.team12.team12project.data.plants.PlantsRepository
 import no.uio.ifi.in2000.team12.team12project.data.regression.LinearRegressionModel
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
@@ -46,6 +47,7 @@ data class GraphScreenUiState(
     val predictedPrecipitationDaily: Float? = GraphScreenViewModel.DEFAULT_PREDICTED_PRECIPITATION,
     val predictedPrecipitationMonthly: Float? = null,
     val recommendedPlants: List<Plant> = emptyList(),
+    val availableClimateTypes: Set<ClimateType> = ClimateType.entries.toSet(),
 )
 
 class GraphScreenViewModel(
@@ -102,9 +104,12 @@ class GraphScreenViewModel(
 
     private fun computeAllMeans() {
         for (climateType in ClimateType.entries) {
+            val data = climateMap[climateType] ?: continue
             for (month in Months.entries) {
-                val obs = getObsFromMonth(month, climateMap[climateType]?.climateObs ?: continue)
-                meansMap[Pair(climateType, month)] = findMeanValue(obs)
+                val obs = getObsFromMonth(month, data.climateObs)
+                if (obs.isNotEmpty()) {
+                    meansMap[Pair(climateType, month)] = findMeanValue(obs)
+                }
             }
         }
     }
@@ -131,7 +136,15 @@ class GraphScreenViewModel(
         graphDataFetchJob?.cancel()
 
         graphDataFetchJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null,
+                    availableClimateTypes = emptySet(),
+                    climateChartData = ClimateChartData(emptyList(), emptyList())
+                )
+            }
+            val successfulTypes = mutableSetOf<ClimateType>()
             try {
                 val deferreds = ClimateType.entries.map { type ->
                     async {
@@ -140,8 +153,12 @@ class GraphScreenViewModel(
                             val months = monthsSince(timeSeries)
                             val refTime = constructTimeSeries(min(months.toUInt(), MAX_MONTHS_OF_HISTORY))
                             val obs = climateDataRepository.getClimateData(source, type.elementId, refTime)
+                            if (type == ClimateType.DURATION_OF_SUN) {
+                                printClimateObsList(obs)
+                            }
                             val climateData = ClimateData(refTime, obs, type)
                             setClimateData(type, climateData)
+                            successfulTypes.add(type)
                         } catch (e: CancellationException) {
                             throw e
                         } catch (e: Exception) {
@@ -150,9 +167,19 @@ class GraphScreenViewModel(
                     }
                 }
                 deferreds.awaitAll()
-                computeAllMeans()
-                updateChartData()
-                _uiState.update { it.copy(isLoading = false) }
+
+                if (successfulTypes.isEmpty()) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "No climate data available for this location."
+                        )
+                    }
+                } else {
+                    computeAllMeans()
+                    updateChartData()
+                    _uiState.update { it.copy(isLoading = false, availableClimateTypes = successfulTypes) }
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -193,7 +220,11 @@ class GraphScreenViewModel(
 
         try {
             getClimateChartData(ClimateType.MEAN_AIR_TEMP, currentMonth)?.let { tempData ->
-                tempRegressionModel = LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
+                tempRegressionModel = if (tempData.years.isNotEmpty()) {
+                    LinearRegressionModel(tempData.years.toDoubleArray(), tempData.values.toDoubleArray())
+                } else {
+                    null
+                }
             }
 
             getClimateChartData(ClimateType.PRECIPITATION, currentMonth)?.let { precData ->
