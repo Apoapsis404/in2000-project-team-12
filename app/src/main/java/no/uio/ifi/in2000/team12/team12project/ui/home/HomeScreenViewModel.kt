@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.Context
 import android.location.Geocoder
+import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
@@ -22,13 +23,20 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team12.team12project.data.frost.TorrentialRain
+import no.uio.ifi.in2000.team12.team12project.data.local.AppDatabase
+import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
+import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 import java.util.Locale
+import kotlin.coroutines.resume
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 
 data class HomeScreenUiState(
@@ -41,7 +49,12 @@ data class HomeScreenUiState(
     val suggestions: List<String> = emptyList(),
     val downpourList: List<LatLng> = emptyList(),
     val extremeWindList: List<LatLng> = emptyList(),
-    val floodList: List<LatLng> = emptyList()
+    val floodList: List<LatLng> = emptyList(),
+    val showDownpour: Boolean = true,
+    val showExtremeWind: Boolean = true,
+    val showFlood: Boolean = true,
+    val isFilterPopupVisible: Boolean = false,
+    val showNoInternetDialog: Boolean = false
 )
 
 class HomeScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -50,6 +63,9 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     private val nveRepository = NVERepository(NVEDataSource(application))
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
     private val placesClient = Places.createClient(application)
+
+    private val settingsDao = AppDatabase.getDatabase(application).settingsDao()
+    private var currentSettings: SettingsEntity = SettingsEntity()
 
     private var sessionToken = AutocompleteSessionToken.newInstance()
     private val bitmapCache = mutableMapOf<Int, BitmapDescriptor>()
@@ -60,12 +76,52 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     init {
         loadHazardMarkers()
         fetchFloodWarnings()
+        observeSettings()
+    }
+
+    // Observes settings from the database and updates the uiState
+    private fun observeSettings() {
+        viewModelScope.launch {
+            settingsDao.getSettings().collect { settings ->
+                settings?.let { s ->
+                    currentSettings = s
+                    _uiState.update {
+                        it.copy(
+                            showDownpour = s.showDownpour,
+                            showExtremeWind = s.showExtremeWind,
+                            showFlood = s.showFlood
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    // Updates the filter settings in the database
+    private fun updateFilterSetting(
+        showDownpour: Boolean = currentSettings.showDownpour,
+        showExtremeWind: Boolean = currentSettings.showExtremeWind,
+        showFlood: Boolean = currentSettings.showFlood
+    ) {
+        viewModelScope.launch {
+            settingsDao.saveSettings(
+                currentSettings.copy(
+                    showDownpour = showDownpour,
+                    showExtremeWind = showExtremeWind,
+                    showFlood = showFlood
+                )
+            )
+        }
     }
 
     // Fetches suggestions from google places based on the query in the TextField
     fun fetchSuggestions(query: String) {
         if (query.isBlank()) {
             _uiState.update { it.copy(suggestions = emptyList()) }
+            return
+        }
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            _uiState.update { it.copy(showNoInternetDialog = true) }
             return
         }
         val request = FindAutocompletePredictionsRequest.builder()
@@ -182,6 +238,42 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
         sessionToken = AutocompleteSessionToken.newInstance()
     }
 
+    // Searches for a location using Geocoder and updates the map and marker position
+    fun searchLocation(query: String, onLocationFound: (LatLng) -> Unit) {
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            _uiState.update { it.copy(showNoInternetDialog = true) }
+            return
+        }
+        viewModelScope.launch {
+            val latLng = getLatLngFromLocationName(getApplication(), query)
+            latLng?.let {
+                onSearchedLocation(query, it)
+                onLocationFound(it)
+            }
+        }
+    }
+
+    private suspend fun getLatLngFromLocationName(
+        context: Context,
+        query: String
+    ): LatLng? = withContext(Dispatchers.IO) {
+        val geocoder = Geocoder(context, Locale.getDefault())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            suspendCancellableCoroutine { continuation ->
+                geocoder.getFromLocationName(query, 1) { addresses ->
+                    continuation.resume(
+                        addresses.firstOrNull()?.let { LatLng(it.latitude, it.longitude) }
+                    )
+                }
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            geocoder.getFromLocationName(query, 1)?.firstOrNull()?.let {
+                LatLng(it.latitude, it.longitude)
+            }
+        }
+    }
+
     // Updates the marker position and title in the uiState based on mapClicks
     fun onMapClick(latLng: LatLng) {
         _uiState.update {
@@ -231,5 +323,30 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     // Updates the uiState if the user has given location permission
     fun setInitialLocationFlag() {
         _uiState.update { it.copy(hasInitialLocationBeenSet = true) }
+    }
+
+    // Toggle filter for downpour markers
+    fun toggleDownpourFilter() {
+        updateFilterSetting(showDownpour = !uiState.value.showDownpour)
+    }
+
+    // Toggle filter for extreme wind markers
+    fun toggleExtremeWindFilter() {
+        updateFilterSetting(showExtremeWind = !uiState.value.showExtremeWind)
+    }
+
+    // Toggle filter for flood markers
+    fun toggleFloodFilter() {
+        updateFilterSetting(showFlood = !uiState.value.showFlood)
+    }
+
+    // Toggles the visibility of the filter popup
+    fun toggleFilterPopup() {
+        _uiState.update { it.copy(isFilterPopupVisible = !it.isFilterPopupVisible) }
+    }
+
+    // Dismisses the no internet dialog
+    fun dismissNoInternetDialog() {
+        _uiState.update { it.copy(showNoInternetDialog = false) }
     }
 }

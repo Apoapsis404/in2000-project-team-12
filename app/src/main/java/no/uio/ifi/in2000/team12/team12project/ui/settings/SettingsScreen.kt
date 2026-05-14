@@ -22,15 +22,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team12.team12project.R
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
+import androidx.navigation.NavHostController
 import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 import no.uio.ifi.in2000.team12.team12project.ui.customComposables.DropDown
 
 @Composable
 fun SettingsScreen(
-    settingsScreenViewModel: SettingsScreenViewModel = viewModel()
+    settingsScreenViewModel: SettingsScreenViewModel = viewModel(),
+    navHostController: NavHostController,
+    onNoInternet: (Int?) -> Unit
 ) {
     val uiState by settingsScreenViewModel.uiState.collectAsState()
     val activity = LocalActivity.current as? Activity
+    val context = LocalContext.current
+
+    BackHandler {
+        if (NetworkUtils.isNetworkAvailable(context)) {
+            navHostController.popBackStack()
+        } else {
+            onNoInternet(R.string.no_internet_map_message)
+        }
+    }
+
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -42,14 +58,13 @@ fun SettingsScreen(
             modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
         )
 
-        // Switching themes
         val theme = if(uiState.lightMode) {
-            stringResource(R.string.light_mode)
-        } else {
             stringResource(R.string.dark_mode)
+        } else {
+            stringResource(R.string.light_mode)
         }
-        ToggleSetting(
-            stringResource(R.string.darkModeSwitch, theme),
+            ToggleSetting(
+                stringResource(R.string.darkModeSwitch, theme),
             checked = uiState.lightMode,
             onChecked = {
                 settingsScreenViewModel.toggleTheme()

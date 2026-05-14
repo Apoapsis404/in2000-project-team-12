@@ -28,6 +28,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -48,6 +50,8 @@ import no.uio.ifi.in2000.team12.team12project.ui.notes.NotesScreenViewModelFacto
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModel
 import no.uio.ifi.in2000.team12.team12project.ui.settings.SettingsScreenViewModelFactory
 import no.uio.ifi.in2000.team12.team12project.ui.theme.Team12ProjectTheme
+import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
+import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 import java.util.Locale
 
 
@@ -57,7 +61,12 @@ class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context) {
         // Read saved language from SharedPreferences (Room is async, can't use it here)
         val prefs = newBase.getSharedPreferences("settings", MODE_PRIVATE)
-        val langCode = prefs.getString("language", "en") ?: "en"
+
+        // Try to get saved language, fallback to system language if not set (first run)
+        val systemLocale = Locale.getDefault().language
+        val defaultLang = if (systemLocale.startsWith("nb") || systemLocale.startsWith("nn") || systemLocale.startsWith("no")) "nb" else "en"
+        val langCode = prefs.getString("language", defaultLang) ?: defaultLang
+
         val locale = Locale(langCode)
         Locale.setDefault(locale)
         val config = Configuration(newBase.resources.configuration)
@@ -73,8 +82,35 @@ class MainActivity : ComponentActivity() {
 
         val app = application as Team12Application
         val settingsDao = app.database.settingsDao()
-        val language = runBlocking { settingsDao.getSettings().first()?.language?.name ?: "ENGLISH"}
-        setLocale(language)
+
+        // Load settings or initialize if null (first run)
+        val settings = runBlocking { settingsDao.getSettings().first() }
+
+        if (settings == null) {
+            // Detect system language
+            val systemLocale = Locale.getDefault().language
+            val defaultLanguage = if (systemLocale.startsWith("nb") || systemLocale.startsWith("nn") || systemLocale.startsWith("no")) {
+                Languages.NORSK
+            } else {
+                Languages.ENGLISH
+            }
+
+            // Detect system theme (Dark Mode)
+            val isSystemDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+            val initialSettings = SettingsEntity(
+                lightMode = !isSystemDark,
+                language = defaultLanguage
+            )
+
+            // Save initial settings to database
+            runBlocking {
+                settingsDao.saveSettings(initialSettings)
+            }
+            setLocale(defaultLanguage.name)
+        } else {
+            setLocale(settings.language.name)
+        }
 
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
@@ -141,13 +177,60 @@ fun MainComp(
 
 
 
+    val context = LocalContext.current
+    var showStartupNoInternetDialog by remember { mutableStateOf(!NetworkUtils.isNetworkAvailable(context)) }
+    var showNavigationNoInternetDialog by remember { mutableStateOf(false) }
+    var noInternetMessageResId by remember { mutableStateOf(R.string.no_internet_navigation_message) }
+
+    // Dialog for no internet at startup
+    if (showStartupNoInternetDialog) {
+        AlertDialog(
+            onDismissRequest = { /* Don't allow dismissal */ },
+            title = { Text(stringResource(R.string.no_internet_title)) },
+            text = { Text(stringResource(R.string.no_internet_startup_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        (context as? MainActivity)?.finish()
+                    }
+                ) {
+                    Text(stringResource(R.string.exit_app))
+                }
+            }
+        )
+    }
+
+    // Dialog for no internet when navigating
+    if (showNavigationNoInternetDialog) {
+        AlertDialog(
+            onDismissRequest = { 
+                showNavigationNoInternetDialog = false
+            },
+            title = { Text(stringResource(R.string.no_internet_title)) },
+            text = { Text(stringResource(noInternetMessageResId)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showNavigationNoInternetDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.close))
+                }
+            }
+        )
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = false,
         drawerContent = {
             NavigationDrawer(
                 onNavigate = {route -> navController.navigate(route = route)},
-                onClose = {scope.launch { drawerState.close() }}
+                onClose = {scope.launch { drawerState.close() }},
+                onNoInternet = { messageResId ->
+                    noInternetMessageResId = messageResId ?: R.string.no_internet_navigation_message
+                    showNavigationNoInternetDialog = true 
+                }
             )
         }
     ) {
@@ -160,6 +243,10 @@ fun MainComp(
                     onFavoriteButtonClick = {
                         //askpermissonforlatlng = homeScreenViewModel.uiState.value.markerPosition
                         showFavoritesAlertDialog = true
+                    },
+                    onNoInternet = { messageResId ->
+                        noInternetMessageResId = messageResId ?: R.string.no_internet_navigation_message
+                        showNavigationNoInternetDialog = true 
                     }
                 )
             },
@@ -174,6 +261,10 @@ fun MainComp(
                     .fillMaxSize()
                     .padding(top = innerPadding.calculateTopPadding()),
                 navController = navController,
+                onNoInternet = { messageResId ->
+                    noInternetMessageResId = messageResId ?: R.string.no_internet_navigation_message
+                    showNavigationNoInternetDialog = true 
+                }
             )
 
         }

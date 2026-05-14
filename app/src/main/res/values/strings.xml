@@ -59,6 +59,12 @@
     <string name="cont_desc_wind_marker">Wind</string>
     <string name="cont_desc_flood_marker">Flood</string>
     <string name="your_position">Your position</string>
+    <string name="filter_hazards">Filter Hazards</string>
+    <string name="downpour">Downpour</string>
+    <string name="extreme_wind">Extreme Wind</string>
+    <string name="flood">Flood</string>
+    <string name="close">Close</string>
+    <string name="cont_desc_filter_hazards">Filter hazards</string>
 
 
 
@@ -111,6 +117,15 @@
     <string name="info_notes_title">The Notes Screen:</string>
     <string name="info_notes_edit_delete">Click on card to edit or delete note</string>
     <string name="info_notes_add_note">Click on \'add note\' to add new note</string>
+
+
+    <!-- NETWORK -->
+    <string name="no_internet_title">No internet connection</string>
+    <string name="no_internet_startup_message">This app requires an internet connection to function. Please check your connection and try again.</string>
+    <string name="no_internet_navigation_message">You need an internet connection to view graphs. Please check your connection and try again.</string>
+    <string name="no_internet_map_message">You need an internet connection to view the map. Please check your connection and try again.</string>
+    <string name="exit_app">Exit app</string>
+    <string name="go_back">Go back</string>
 
 
 </resources>

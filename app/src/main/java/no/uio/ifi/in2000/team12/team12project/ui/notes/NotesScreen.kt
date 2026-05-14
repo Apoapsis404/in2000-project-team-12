@@ -34,11 +34,27 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import no.uio.ifi.in2000.team12.team12project.R
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import no.uio.ifi.in2000.team12.team12project.model.notes.Note
 
 @Composable
-fun NotesScreen(notesScreenViewModel: NotesScreenViewModel, navHostController: NavHostController) {
+fun NotesScreen(
+    notesScreenViewModel: NotesScreenViewModel,
+    navHostController: NavHostController,
+    onNoInternet: (Int?) -> Unit
+) {
     val uiState by notesScreenViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    BackHandler {
+        if (NetworkUtils.isNetworkAvailable(context)) {
+            navHostController.popBackStack()
+        } else {
+            onNoInternet(R.string.no_internet_map_message)
+        }
+    }
 
     NotesScreenContent(
         notes = uiState.notes,

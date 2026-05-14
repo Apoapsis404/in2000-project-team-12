@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.favorites
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.R
@@ -38,14 +41,29 @@ import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 fun FavoritesScreen(
     favoritesScreenViewModel: FavoritesScreenViewModel,
     homeScreenViewModel: HomeScreenViewModel,
-    navHostController: NavHostController) {
-
+    navHostController: NavHostController,
+    onNoInternet: (Int?) -> Unit
+) {
+    val context = LocalContext.current
     val uiState by favoritesScreenViewModel.uiState.collectAsState()
+
+    BackHandler {
+        if (NetworkUtils.isNetworkAvailable(context)) {
+            navHostController.popBackStack()
+        } else {
+            onNoInternet(R.string.no_internet_map_message)
+        }
+    }
+
     FavoritesScreenContent(
         uiState = uiState,
         onNavigateToGraph = { coords ->
-            homeScreenViewModel.setMarkerPosition(coords)
-            navHostController.navigate("graph") { popUpTo("graph") }
+            if (NetworkUtils.isNetworkAvailable(context)) {
+                homeScreenViewModel.setMarkerPosition(coords)
+                navHostController.navigate("graph") { popUpTo("graph") }
+            } else {
+                onNoInternet(R.string.no_internet_navigation_message)
+            }
         },
         viewModel = favoritesScreenViewModel
     )

@@ -24,6 +24,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team12.team12project.R
@@ -32,7 +34,9 @@ import no.uio.ifi.in2000.team12.team12project.R
 fun NavigationDrawer(
     onNavigate: (String) -> Unit,
     onClose: () -> Unit,
+    onNoInternet: (Int?) -> Unit
 ) {
+    val context = LocalContext.current
     val drawerItemColors = NavigationDrawerItemDefaults.colors(
         unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
         selectedTextColor = MaterialTheme.colorScheme.onPrimary
@@ -77,8 +81,12 @@ fun NavigationDrawer(
             ) },
             selected = false,
             onClick = {
-               onNavigate("home")
-                onClose()
+                if (NetworkUtils.isNetworkAvailable(context)) {
+                    onNavigate("home")
+                    onClose()
+                } else {
+                    onNoInternet(R.string.no_internet_map_message)
+                }
             },
             colors = drawerItemColors
         )
@@ -89,8 +97,12 @@ fun NavigationDrawer(
             ) },
             selected = false,
             onClick = {
-                onNavigate("graph")
-                onClose()
+                if (NetworkUtils.isNetworkAvailable(context)) {
+                    onNavigate("graph")
+                    onClose()
+                } else {
+                    onNoInternet(R.string.no_internet_navigation_message)
+                }
             },
             colors = drawerItemColors
         )

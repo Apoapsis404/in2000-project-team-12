@@ -7,8 +7,11 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 @Entity(tableName = "settings")
 data class SettingsEntity(
     @PrimaryKey val id: Int = 0,
-    val lightMode: Boolean,
-    val language: Languages
+    val lightMode: Boolean = true,
+    val language: Languages = Languages.ENGLISH,
+    val showDownpour: Boolean = true,
+    val showExtremeWind: Boolean = true,
+    val showFlood: Boolean = true
 )
 
 @Entity(tableName = "favorites")

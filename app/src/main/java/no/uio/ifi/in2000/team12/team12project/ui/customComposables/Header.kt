@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
+import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
@@ -46,8 +48,10 @@ fun Header(
     onClick: () -> Unit,
     homeScreenViewModel: HomeScreenViewModel,
     navHostController: NavHostController,
-    onFavoriteButtonClick: () -> Unit
+    onFavoriteButtonClick: () -> Unit,
+    onNoInternet: (Int?) -> Unit
 ){
+    val context = LocalContext.current
     val titleColors = MaterialTheme.colorScheme.onPrimary
     val currentAddress = homeScreenViewModel.uiState.collectAsState().value.address
 
@@ -104,7 +108,13 @@ fun Header(
             if(currentRoute == "graph"){
                 //Map symbol
                 TopBarIcon(
-                    { navHostController.navigate(route = "home") },
+                    { 
+                        if (NetworkUtils.isNetworkAvailable(context)) {
+                            navHostController.navigate(route = "home") 
+                        } else {
+                            onNoInternet(R.string.no_internet_map_message)
+                        }
+                    },
                     Icons.Outlined.Map,
                     "Navigate to map"
                 )
@@ -112,7 +122,13 @@ fun Header(
             }else {
                 //Graph symbol
                 TopBarIcon(
-                    { navHostController.navigate("graph") },
+                    { 
+                        if (NetworkUtils.isNetworkAvailable(context)) {
+                            navHostController.navigate("graph") 
+                        } else {
+                            onNoInternet(R.string.no_internet_navigation_message)
+                        }
+                    },
                     Icons.Outlined.DataThresholding,
                     "menu"
                 )
