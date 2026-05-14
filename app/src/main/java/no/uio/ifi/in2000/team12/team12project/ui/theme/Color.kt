@@ -18,6 +18,7 @@ val humidityBlue = Color(0xFFA5D7EC)
 val precipiationBlue = Color(0xFF2674D2)
 val sunshineYellow = Color(0xFFFFC107)
 
+val graphInfoGreen = Color(0xFF037D50)
 
 
 

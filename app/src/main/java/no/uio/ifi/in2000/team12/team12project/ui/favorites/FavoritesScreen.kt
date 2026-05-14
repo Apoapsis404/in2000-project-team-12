@@ -116,8 +116,8 @@ fun FavoritesScreenContent(
         if (uiState.showDeleteDialog && uiState.selectedLocation != null) {
             AlertDialog(
                 onDismissRequest = { viewModel.setShowDeleteDialog(false) },
-                title = { Text("Delete?") },
-                text = { Text("Do you wish to delete address ${uiState.selectedLocation.name}") },
+                title = { Text(stringResource(R.string.delete_favorite_pop_up_header)) },
+                text = { Text(stringResource(R.string.delete_favorite_pop_up_body))},
                 confirmButton = {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         TextButton(onClick = { viewModel.setShowDeleteDialog(false) }) { Text(stringResource(R.string.no)) }
@@ -131,18 +131,18 @@ fun FavoritesScreenContent(
         if (uiState.showRenameDialog && uiState.selectedLocation != null) {
             AlertDialog(
                 onDismissRequest = { viewModel.setShowRenameDialog(false) },
-                title = { Text("Enter new name") },
+                title = { Text(stringResource(R.string.favorite_new_name_header)) },
                 text = {
                     TextField(
                         value = uiState.renameTextFieldValue,
                         onValueChange = { viewModel.onRenameTextChanged(it) },
-                        placeholder = { Text("New name") }
+                        placeholder = { Text(stringResource(R.string.favorite_new_name_placeholder)) }
                     )
                 },
                 confirmButton = {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        TextButton(onClick = { viewModel.setShowRenameDialog(false) }) { Text("Cancel") }
-                        TextButton(onClick = { viewModel.confirmRename() }) { Text("Save") }
+                        TextButton(onClick = { viewModel.setShowRenameDialog(false) }) { Text(stringResource(R.string.delete_pop_up_cancel)) }
+                        TextButton(onClick = { viewModel.confirmRename() }) { Text(stringResource(R.string.save_favorite_button)) }
                     }
                 }
             )

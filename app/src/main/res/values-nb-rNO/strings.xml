@@ -28,6 +28,7 @@
     <string name="plant_predicted_humidity">Forventet luftfuktighet: %1$.1f%%</string>
     <string name="plant_predicted_sunshine">Forventet soltid: %1$.1fh</string>
     <string name="plant_predicted_precipitation">Forventet nedbør: %1$.1fmm</string>
+    <string name="plant_popup_header">Planteprognose</string>
     <string name="too_few_precipitation_data" translatable="false">Forventet nedbør: Ikke nok data</string>
     <string name="plant_prognosis_button">Planteprognose</string>
     <string name="no_climate_data_available">Ingen klimadata tilgjengelig på denne posisjonen</string>
@@ -60,7 +61,18 @@
     <string name="your_position">Din posisjon</string>
 
 
+    <!-- FAVORITES -->
+    <string name="delete_favorite_pop_up_header">Slett favoritt?</string>
+    <string name="delete_favorite_pop_up_body">Vil du slette denne favoritten?</string>
+    <string name="delete_favorite_pop_up_cancel">Avbryt</string>
+    <string name="delete_favorite_pop_up_delete">Slett</string>
+    <string name="favorite_new_name_header">Skriv inn nytt navn</string>
+    <string name="favorite_new_name_placeholder">Nytt navn</string>
+    <string name="save_favorite_button">Lagre</string>"
+
+
     <!-- NOTES -->
+    <string name="cont_desc_filter_hazards">Filtrer farevarsler</string>
     <string name="delete_note_pop_up_header">Slett notat?"</string>
     <string name="delete_note_pop_up_body">Vil du slette dette notatet?"</string>
     <string name="delete_pop_up_cancel">Avbryt</string>
@@ -79,12 +91,53 @@
     <string name="settings">Innstillinger</string>
     <string name="notes">Notater</string>
     <!-- NETWORK -->
+    <string name="info_notes_add_note">Trykk på \'Legg til Notat\' for å legge til et nytt notat</string>
     <string name="no_internet_title">Ingen internettforbindelse</string>
     <string name="no_internet_startup_message">Denne appen krever en internettforbindelse for å fungere. Vennligst sjekk tilkoblingen din og prøv igjen.</string>
     <string name="no_internet_navigation_message">Du trenger en internettforbindelse for å se grafer. Vennligst sjekk tilkoblingen din og prøv igjen.</string>
     <string name="no_internet_map_message">Du trenger en internettforbindelse for å se kartet. Vennligst sjekk tilkoblingen din og prøv igjen.</string>
     <string name="exit_app">Lukk appen</string>
     <string name="go_back">Gå tilbake</string>
+    <string name="filter_hazards">Filtrer varselikoner</string>
+    <string name="downpour">Nedbør</string>
+    <string name="extreme_wind">Ekstremvind</string>
+    <string name="flood">Flom</string>
+    <string name="close">Lukk</string>
+    <string name="favorite_edit_name">Rediger tittel</string>
+    <string name="favorite_delete">Slett</string>
+    <string name="cont_desc_favorite_graph_icon">Naviger til grafskjermen</string>
+    <string name="info_home_title">Hjemskjem:</string>
+    <string name="info_home_rain">Område utsatt for styrtregn</string>
+    <string name="info_home_wind">Område utsatt for ekstremvind</string>
+    <string name="info_home_flood">Område utsatt for flom. Området har hatt flomvarsel på nivå 4 eller høyere mer enn 8 ganger de siste 10 årene</string>
+    <string name="info_home_graph">Se klimagrafen for det valgte området</string>
+    <string name="info_home_favorites">Legg til nåvære</string>
+    <string name="info_home_my_location">Flytt kartet til din nåværende posisjon</string>
+    <string name="info_home_zoom_in">Zoom in på kartet</string>
+    <string name="info_home_zoom_out">Zoom ut på kartet</string>
+    <string name="info_graph_title">Grafskjerm:</string>
+    <string name="info_graph_map">Gå tilbake til kartet</string>
+    <string name="info_graph_blue_line">Den blå linjen på grafen viser data for valgt klimatype og måned for alle år med tilgjengelig data</string>
+    <string name="info_graph_regression">Den grønne linjen viser en regresjonsanalyse av verdiene vist av den blå linjen</string>
+    <string name="info_graph_climate_type_boxes">Klimaboksene viser gjennomsnittsverdiene for den valgte måneden over alle tilgjengelige år med data</string>
+    <string name="info_graph_plant_sub_title">Planteprognose</string>
+    <string name="info_graph_plant_slider">Glideren lar deg velge hvilket år i fremtiden du vil se progonse for</string>
+    <string name="info_graph_plant_plant_row">Plantene vist er de tre mest egnede å gro i det valgte året og måneden basert på regresjonsanalysen</string>
+    <string name="info_favorite_title">Favorittskjerm:</string>
+    <string name="info_favorite_graph_symbol">Ikon på kortet for å navigere til grafskjermen for valgt favorittposisjon</string>
+    <string name="info_favorite_card">Trykk på et kort for å redigere eller slette favoritt</string>
+    <string name="info_settings_title">Innstillingerskjerm:</string>
+    <string name="info_settings_toggle_theme">Bytt mellom lyst og mørkt tema</string>
+    <string name="info_settings_language">Bytt språk</string>
+    <string name="info_notes_title">Notatskjerm:</string>
+    <string name="info_notes_edit_delete">Trykk på et kort for å redigere eller legge til et notat</string>
+    <string name="climate_graph">Klimagraf</string>
+    <string name="plant_card_ideal_temp">Ideel temperatur</string>
+    <string name="plant_card_tolerance_range">Akseptabel temperatur</string>
+    <string name="plant_card_humidity">Luftfuktighet</string>
+    <string name="plant_card_sunshine">Daglig nødvendig sol</string>
+    <string name="plant_card_precipitation">Nedbør:</string>
+    <string name="show_avg">Vis gjennomsnitt</string>
 
 
 </resources>

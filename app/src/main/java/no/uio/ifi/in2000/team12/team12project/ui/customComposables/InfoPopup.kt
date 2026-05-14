@@ -12,11 +12,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.DataThresholding
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Grass
+import androidx.compose.material.icons.filled.LineAxis
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Square
 import androidx.compose.material.icons.filled.ToggleOn
@@ -39,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team12.team12project.R
+import no.uio.ifi.in2000.team12.team12project.ui.theme.graphInfoGreen
 
 @Composable
 fun InfoPopup(
@@ -70,8 +73,11 @@ fun InfoPopup(
                 // INFO SCREEN FOR GRAPH
                 Text(stringResource(R.string.info_graph_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 SymbolBulletPoint(Icons.Outlined.Map, stringResource(R.string.info_graph_map))
-                SymbolBulletPoint(Icons.Filled.Circle, stringResource(R.string.info_graph_blue_line), Color.Blue)
-                SymbolBulletPoint(Icons.Filled.Circle, stringResource(R.string.info_graph_regression), Color.Green)
+                SymbolBulletPoint(Icons.Filled.LineAxis, stringResource(R.string.info_graph_blue_line),
+                    Color.Blue)
+                SymbolBulletPoint(Icons.Filled.LineAxis, stringResource(R.string.info_graph_regression),
+                    graphInfoGreen
+                )
                 SymbolBulletPoint(Icons.Filled.Square, stringResource(R.string.info_graph_climate_type_boxes))
                 //plant-prognosis
                 Text(stringResource(R.string.info_graph_plant_sub_title), textAlign = TextAlign.Center)
