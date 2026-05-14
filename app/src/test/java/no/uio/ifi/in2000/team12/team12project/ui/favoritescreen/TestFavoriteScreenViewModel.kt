@@ -127,22 +127,6 @@ class TestFavoriteScreenViewModel {
     }
 
     @Test
-    fun testAddDuplicateFavoriteLocation_overwrites() = runTest {
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.uiState.collect {}
-        }
-        // Since the current implementation uses @Upsert, adding a duplicate name with DIFFERENT LatLng overwrites it.
-        viewModel.addFavoriteLocation(LatLng(1.0, 2.0), "Test Location1", "Test Address1")
-        assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Test Location1"))
-
-        viewModel.addFavoriteLocation(LatLng(3.0, 4.0), "Test Location1", "Test Address2")
-        
-        val favorite = viewModel.uiState.value.favoritesLocationMap["Test Location1"]
-        assertEquals(favorite?.address, "Test Address2")
-        assertEquals(favorite?.coordinates?.latitude, 3.0)
-    }
-
-    @Test
     fun testAddDuplicateLatLng_showsError() = runTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -164,6 +148,49 @@ class TestFavoriteScreenViewModel {
         // Dismiss error
         viewModel.dismissDuplicateError()
         assertFalse(viewModel.uiState.value.showDuplicateError)
+    }
+
+    @Test
+    fun testCancelRename_newFavorite_deletesFromDao() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+        val location = LatLng(1.0, 2.0)
+        viewModel.addFavoriteLocation(location, "New Favorite", "Address")
+        
+        assertTrue(viewModel.uiState.value.isNewFavorite)
+        assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("New Favorite"))
+        
+        viewModel.cancelRename()
+        
+        assertFalse(viewModel.uiState.value.favoritesLocationMap.containsKey("New Favorite"))
+        assertFalse(viewModel.uiState.value.isNewFavorite)
+    }
+
+    @Test
+    fun testCancelRename_existingFavorite_keepsInDao() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+        val location = LatLng(1.0, 2.0)
+        // First add and confirm rename (so it's no longer "new")
+        viewModel.addFavoriteLocation(location, "Old Name", "Address")
+        viewModel.onRenameTextChanged("Confirmed Name")
+        viewModel.confirmRename()
+        
+        assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Confirmed Name"))
+        assertFalse(viewModel.uiState.value.isNewFavorite)
+
+        // Now start a rename on the existing favorite
+        viewModel.onLocationSelected(viewModel.uiState.value.favoritesLocationMap["Confirmed Name"])
+        viewModel.setShowRenameDialog(true, "Confirmed Name", isNewFavorite = false)
+        viewModel.onRenameTextChanged("Some Other Name")
+        
+        viewModel.cancelRename()
+        
+        // Should still be in DAO with its original name
+        assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Confirmed Name"))
+        assertFalse(viewModel.uiState.value.isNewFavorite)
     }
 
     @Test

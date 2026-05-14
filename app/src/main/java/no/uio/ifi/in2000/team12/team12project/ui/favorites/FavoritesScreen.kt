@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
@@ -144,7 +147,7 @@ fun FavoritesScreenContent(
                     uiState.renameTextFieldValue != uiState.selectedLocation.name
 
             AlertDialog(
-                onDismissRequest = { viewModel.setShowRenameDialog(false) },
+                onDismissRequest = { viewModel.cancelRename() },
                 title = { Text(stringResource(R.string.favorite_new_name_header)) },
                 text = {
                     Column {
@@ -152,7 +155,16 @@ fun FavoritesScreenContent(
                             value = uiState.renameTextFieldValue,
                             onValueChange = { viewModel.onRenameTextChanged(it) },
                             placeholder = { Text(stringResource(R.string.favorite_new_name_placeholder)) },
-                            isError = isNameDuplicate
+                            isError = isNameDuplicate,
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    if (uiState.renameTextFieldValue.isNotBlank() && !isNameDuplicate) {
+                                        viewModel.confirmRename()
+                                    }
+                                }
+                            )
                         )
                         if (isNameDuplicate) {
                             Text(
@@ -166,7 +178,7 @@ fun FavoritesScreenContent(
                 },
                 confirmButton = {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        TextButton(onClick = { viewModel.setShowRenameDialog(false) }) { Text(stringResource(R.string.delete_pop_up_cancel)) }
+                        TextButton(onClick = { viewModel.cancelRename() }) { Text(stringResource(R.string.delete_pop_up_cancel)) }
                         TextButton(
                             onClick = { viewModel.confirmRename() },
                             enabled = uiState.renameTextFieldValue.isNotBlank() && !isNameDuplicate

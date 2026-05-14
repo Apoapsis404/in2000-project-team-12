@@ -20,7 +20,8 @@ data class FavoritesScreenUiState(
     val showDeleteDialog: Boolean = false,
     val showRenameDialog: Boolean = false,
     val renameTextFieldValue: String = "",
-    val showDuplicateError: Boolean = false
+    val showDuplicateError: Boolean = false,
+    val isNewFavorite: Boolean = false
 )
 
 class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
@@ -57,9 +58,9 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
         _uiState.update { it.copy(showDeleteDialog = show) }
     }
 
-    fun setShowRenameDialog(show: Boolean, initialText: String = "") {
+    fun setShowRenameDialog(show: Boolean, initialText: String = "", isNewFavorite: Boolean = false) {
         _uiState.update {
-            it.copy(showRenameDialog = show, renameTextFieldValue = initialText)
+            it.copy(showRenameDialog = show, renameTextFieldValue = initialText, isNewFavorite = isNewFavorite)
         }
     }
 
@@ -96,9 +97,22 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
                 it.copy(
                     selectedLocation = addedLoc,
                     showRenameDialog = true,
-                    renameTextFieldValue = "" // Ready for user input
+                    renameTextFieldValue = "", // Ready for user input
+                    isNewFavorite = true
                 )
             }
+        }
+    }
+
+    fun cancelRename() {
+        val state = _uiState.value
+        if (state.isNewFavorite && state.selectedLocation != null) {
+            viewModelScope.launch {
+                dao.deleteByName(state.selectedLocation.name)
+                _uiState.update { it.copy(showRenameDialog = false, selectedLocation = null, isNewFavorite = false) }
+            }
+        } else {
+            _uiState.update { it.copy(showRenameDialog = false, selectedLocation = null, isNewFavorite = false) }
         }
     }
     fun confirmDelete() {
@@ -122,7 +136,7 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
 
         viewModelScope.launch {
             dao.changeFavoriteLocationName(oldName, newName)
-            _uiState.update { it.copy(showRenameDialog = false, selectedLocation = null) }
+            _uiState.update { it.copy(showRenameDialog = false, selectedLocation = null, isNewFavorite = false) }
         }
     }
 }
