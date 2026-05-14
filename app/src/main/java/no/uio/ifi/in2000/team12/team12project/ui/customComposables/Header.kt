@@ -53,7 +53,9 @@ fun Header(
 ){
     val context = LocalContext.current
     val titleColors = MaterialTheme.colorScheme.onPrimary
-    val currentAddress = homeScreenViewModel.uiState.collectAsState().value.address
+    val uiState by homeScreenViewModel.uiState.collectAsState()
+    val currentAddress = uiState.address
+    val displayTitle = if (currentAddress.isBlank()) stringResource(R.string.app_title) else currentAddress
 
     val navStackBackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navStackBackEntry?.destination?.route
@@ -67,7 +69,7 @@ fun Header(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = currentAddress,
+                    text = displayTitle,
                     color = titleColors,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,

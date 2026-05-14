@@ -40,7 +40,7 @@ import kotlin.coroutines.resume
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 
 data class HomeScreenUiState(
-    val markerPosition: LatLng = LatLng(59.91, 10.74),
+    val markerPosition: LatLng = LatLng(59.9127, 10.7461),
     val hasInitialLocationBeenSet: Boolean = false,
     val address: String = "",
     val searchQuery: String = "",
@@ -205,11 +205,11 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
                 val address = locationObject.getAddressLine(0)
                 return withContext(Dispatchers.IO) {address}
             }else{
-                return withContext(Dispatchers.IO) {"Almanakken"}
+                return withContext(Dispatchers.IO) {""}
             }
         }catch (e : Exception){
             e.printStackTrace()
-            return withContext(Dispatchers.IO) {"Almanakken"}
+            return withContext(Dispatchers.IO) {""}
         }
     }
 
