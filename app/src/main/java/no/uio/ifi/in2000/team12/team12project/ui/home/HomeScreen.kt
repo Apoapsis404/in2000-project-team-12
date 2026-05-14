@@ -183,7 +183,9 @@ fun HomeScreen(
                 onQueryChange = { homeScreenViewModel.setSearchQuery(it) },
                 onSearch = { query ->
                     homeScreenViewModel.searchLocation(query) {
-                        scope.launch { cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f)) }
+                        scope.launch { cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
+                        homeScreenViewModel.onMapClick(it)
+                        }
                     }
                     keyboardController?.hide()
                     localFocusManager.clearFocus()
@@ -210,7 +212,10 @@ fun HomeScreen(
                     if (fineLocationGranted) {
                         @Suppress("MissingPermission")
                         homeScreenViewModel.fetchCurrentLocation { position ->
-                            scope.launch { cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(position, 15f)) }
+                            scope.launch {
+                                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(position, 15f))
+                                homeScreenViewModel.onMapClick(position)
+                            }
                         }
                     } else {
                         locationPermissionRequest.launch(
