@@ -157,4 +157,18 @@ fun FavoritesScreenContent(
                 }
             )
         }
+
+        // Duplicate Error Dialog
+        if (uiState.showDuplicateError) {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissDuplicateError() },
+                title = { Text(stringResource(R.string.duplicate_favorite_header)) },
+                text = { Text(stringResource(R.string.duplicate_favorite_body)) },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.dismissDuplicateError() }) {
+                        Text(stringResource(R.string.ok))
+                    }
+                }
+            )
+        }
     }

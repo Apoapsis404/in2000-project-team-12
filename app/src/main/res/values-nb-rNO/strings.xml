@@ -68,7 +68,10 @@
     <string name="delete_favorite_pop_up_delete">Slett</string>
     <string name="favorite_new_name_header">Skriv inn nytt navn</string>
     <string name="favorite_new_name_placeholder">Nytt navn</string>
-    <string name="save_favorite_button">Lagre</string>"
+    <string name="save_favorite_button">Lagre</string>
+    <string name="duplicate_favorite_header">Stedet er allerede lagret</string>
+    <string name="duplicate_favorite_body">Dette stedet ligger allerede i dine favoritter.</string>
+    <string name="ok">OK</string>
 
 
     <!-- NOTES -->

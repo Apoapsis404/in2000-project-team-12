@@ -83,7 +83,6 @@ class TestFavoriteScreenViewModel {
         }
         viewModel.addFavoriteLocation(LatLng(1.0, 2.0), "Test Location1", "Test Address1")
 
-        // With UnconfinedTestDispatcher, the update should be immediate in the uiState
         assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Test Location1"))
 
         viewModel.addFavoriteLocation(LatLng(3.0, 4.0), "Test Location2", "Test Address2")

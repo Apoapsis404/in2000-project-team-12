@@ -19,7 +19,8 @@ data class FavoritesScreenUiState(
     val selectedLocation: FavoriteLocation? = null,
     val showDeleteDialog: Boolean = false,
     val showRenameDialog: Boolean = false,
-    val renameTextFieldValue: String = ""
+    val renameTextFieldValue: String = "",
+    val showDuplicateError: Boolean = false
 )
 
 class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
@@ -65,8 +66,23 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
     fun onRenameTextChanged(newText: String) {
         _uiState.update { it.copy(renameTextFieldValue = newText) }
     }
+
+    fun dismissDuplicateError() {
+        _uiState.update { it.copy(showDuplicateError = false) }
+    }
+
     fun addFavoriteLocation(location: LatLng, name: String, address : String){
         viewModelScope.launch {
+            // Check for duplicate in the current favorites list
+            val isDuplicate = uiState.value.favoritesLocationMap.values.any {
+                it.coordinates.latitude == location.latitude && it.coordinates.longitude == location.longitude
+            }
+
+            if (isDuplicate) {
+                _uiState.update { it.copy(showDuplicateError = true) }
+                return@launch
+            }
+
             val entity = FavoriteLocationEntity(
                 name = name,
                 address = address,

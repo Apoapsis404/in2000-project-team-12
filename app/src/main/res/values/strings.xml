@@ -85,7 +85,10 @@
     <string name="delete_favorite_pop_up_delete">Delete</string>
     <string name="favorite_new_name_header">Enter new name</string>
     <string name="favorite_new_name_placeholder">New name</string>
-    <string name="save_favorite_button">Save</string>"
+    <string name="save_favorite_button">Save</string>
+    <string name="duplicate_favorite_header">Location already in favorites</string>
+    <string name="duplicate_favorite_body">This location is already saved in your favorites.</string>
+    <string name="ok">OK</string>
 
 
 
