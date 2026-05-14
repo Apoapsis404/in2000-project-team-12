@@ -103,8 +103,9 @@ class TestFavoriteScreenViewModel {
         viewModel.addFavoriteLocation(LatLng(3.0, 4.0), "Test Location2", "Test Address2")
 
         assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Test Location1"))
+        viewModel.onLocationSelected(viewModel.uiState.value.favoritesLocationMap["Test Location1"])
 
-        viewModel.removeFavoriteLocation("Test Location1")
+        viewModel.confirmDelete()
         assertFalse(viewModel.uiState.value.favoritesLocationMap.containsKey("Test Location1"))
         assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Test Location2"))
     }
@@ -117,7 +118,10 @@ class TestFavoriteScreenViewModel {
         viewModel.addFavoriteLocation(LatLng(1.0, 2.0), "Old Name", "Address")
         assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Old Name"))
 
-        viewModel.changeFavoriteLocationName("Old Name", "New Name")
+        viewModel.onLocationSelected(viewModel.uiState.value.favoritesLocationMap["Old Name"])
+        viewModel.setShowRenameDialog(true, "Old Name")
+        viewModel.onRenameTextChanged("New Name")
+        viewModel.confirmRename()
 
         assertFalse(viewModel.uiState.value.favoritesLocationMap.containsKey("Old Name"))
         assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("New Name"))
