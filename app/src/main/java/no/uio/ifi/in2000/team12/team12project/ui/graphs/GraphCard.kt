@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +43,7 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.ui.theme.humidityBlue
 import no.uio.ifi.in2000.team12.team12project.ui.theme.precipiationBlue
 import no.uio.ifi.in2000.team12.team12project.ui.theme.sunshineYellow
+import no.uio.ifi.in2000.team12.team12project.R
 
 private const val MIN_TEMP = -30f
 private const val MAX_TEMP = 40f
@@ -85,7 +87,8 @@ fun GraphCard(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val title = climateType.label.split(" ").last().replaceFirstChar { it.uppercase() }
+            val title = stringResource(climateType.label)
+            val description = stringResource(climateType.description)
 
             Text(
                 text = title,
@@ -120,12 +123,13 @@ fun GraphCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = if (enabled) climateType.description else "Data unavailable",
+                    text = if (enabled) description else stringResource(R.string.data_unavailable),
                     color = contentColor.copy(alpha = if (enabled) 0.7f else 0.4f),
                     fontSize = 10.sp,
                     textAlign = TextAlign.Center,
                     lineHeight = 12.sp,
-                    maxLines = 1
+                    maxLines = 1,
+
                 )
             }
         }

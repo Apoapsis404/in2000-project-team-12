@@ -24,10 +24,22 @@
     <string name="try_again">Try again</string>
     <string name="climate_summary">insights summary:</string>
     <string name="unexpected_error">An unexpected error occurred</string>
-    <string name="plant_prognosis_button" translatable="false">Plant prognosis</string>
+    <string name="plant_prognosis_button">Plant prognosis</string>
     <string name="show_avg" translatable="false">Show average</string>
     <string name="plant_popup_header" translatable="false">Plant prognosis</string>
     <string name="too_few_precipitation_data">Predicted precipitation: Not enough data available</string>
+    <string name="no_climate_data_available">No climate data available at this location</string>
+
+    <!-- CARD -->
+    <string name="humidity">Humidity</string>
+    <string name="humidity_description">Mean relative humidity</string>
+    <string name="sunshine">Sunshine</string>
+    <string name="sunshine_description">Duration of sunshine</string>
+    <string name="precipitation">Precipitation</string>
+    <string name="precipitation_description">Total precipitation</string>
+    <string name="temperature">temperature</string>
+    <string name="temperature_description">Mean temperature</string>
+    <string name="data_unavailable">Data unavailable</string>
 
     <string name="climate_graph" translatable="false">Climate graph</string>
     <string name="plant_card_ideal_temp" translatable="false">Ideal temperature:</string>

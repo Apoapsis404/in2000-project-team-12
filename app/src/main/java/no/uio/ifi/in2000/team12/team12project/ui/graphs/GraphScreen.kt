@@ -120,7 +120,6 @@ fun GraphScreen(
             when {
                 uiState.isLoading -> LoadingState()
                 uiState.errorMessage != null -> ErrorState(
-                    error = uiState.errorMessage ?: "",
                     onRetry = { graphScreenViewModel.fetchAllClimateData() }
                 )
                 else -> {
@@ -195,7 +194,7 @@ private fun LoadingState() {
 }
 
 @Composable
-private fun ErrorState(error: String, onRetry: () -> Unit) {
+private fun ErrorState(onRetry: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -204,7 +203,7 @@ private fun ErrorState(error: String, onRetry: () -> Unit) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = error,
+            text = stringResource(R.string.no_climate_data_available),
             color = MaterialTheme.colorScheme.error,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.bodyLarge

@@ -28,6 +28,19 @@
     <string name="plant_predicted_sunshine">predicted sunshine: %1$.1fh</string>
     <string name="plant_predicted_precipitation">predicted precipitation: %1$.1fmm</string>
     <string name="too_few_precipitation_data">Predicted precipitation: Not enough data available</string>
+    <string name="plant_prognosis_button">Plant prognosis</string>
+    <string name="no_climate_data_available">No climate data available at this location</string>
+
+    <!-- CARD -->
+    <string name="humidity">Humidity</string>
+    <string name="humidity_description">Mean relative humidity</string>
+    <string name="sunshine">Sunshine</string>
+    <string name="sunshine_description">Duration of sunshine</string>
+    <string name="precipitation">Precipitation</string>
+    <string name="precipitation_description">Total precipitation</string>
+    <string name="temperature">temperature</string>
+    <string name="temperature_description">Mean air temperature</string>
+    <string name="data_unavailable">Data unavailable</string>
 
 
     <!-- HOME -->
@@ -54,7 +67,7 @@
     <string name="add_note">Add note</string>
     <string name="save_note">Save</string>
     <string name="write_note">Write a note</string>
-    <string name="edit_note">Edit</string>
+    <string name="edit_note">Edit</string>"
 
     <!-- HEADER AND MENU -->
     <string name="menu">Menu</string>

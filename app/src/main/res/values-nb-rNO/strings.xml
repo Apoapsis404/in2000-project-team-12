@@ -29,6 +29,19 @@
     <string name="plant_predicted_sunshine">Forventet soltid: %1$.1fh</string>
     <string name="plant_predicted_precipitation">Forventet nedbør: %1$.1fmm</string>
     <string name="too_few_precipitation_data" translatable="false">Forventet nedbør: Ikke nok data</string>
+    <string name="plant_prognosis_button">Planteprognose</string>
+    <string name="no_climate_data_available">Ingen klimadata tilgjengelig på denne posisjonen</string>
+
+    <!-- CARD -->
+    <string name="humidity">Luftfuktighet</string>
+    <string name="humidity_description">Gjennomsnittlig luftfuktighet</string>
+    <string name="sunshine">Solskinn</string>
+    <string name="sunshine_description">Antall timer sol</string>
+    <string name="precipitation">Nedbør</string>
+    <string name="precipitation_description">Total nedbør</string>
+    <string name="temperature">Temperatur</string>
+    <string name="temperature_description">Gjennomsnittlig temperatur</string>
+    <string name="data_unavailable">Data utilgjengelig</string>
 
 
     <!-- HOME -->
