@@ -170,12 +170,7 @@ fun MainComp(
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
     //variables with the changed location on the map and to ask if user wants to add location to favorites
-    //var askpermissonforlatlng by remember { mutableStateOf<LatLng?>(null)}
     var showFavoritesAlertDialog by remember { mutableStateOf(false)}
-
-    //val context = LocalContext.current
-
-
 
     val context = LocalContext.current
     var showStartupNoInternetDialog by remember { mutableStateOf(!NetworkUtils.isNetworkAvailable(context)) }
@@ -241,7 +236,6 @@ fun MainComp(
                     homeScreenViewModel = homeScreenViewModel,
                     navHostController = navController,
                     onFavoriteButtonClick = {
-                        //askpermissonforlatlng = homeScreenViewModel.uiState.value.markerPosition
                         showFavoritesAlertDialog = true
                     },
                     onNoInternet = { messageResId ->
@@ -268,7 +262,7 @@ fun MainComp(
             )
 
         }
-        if(showFavoritesAlertDialog){//&& askpermissonforlatlng != null){
+        if(showFavoritesAlertDialog){
             AlertDialog(
                 onDismissRequest = { showFavoritesAlertDialog = false },
                 title = { Text(stringResource(R.string.favorites_popup_title)) },
@@ -287,45 +281,11 @@ fun MainComp(
                         // Confirm button
                         TextButton(
                             onClick = {
-                                //GAMMEL (FØR ADRESSE I HOMSCREENVIEWMODEL)
-
-//                                scope.launch {
-//                                    val tempname = "temp_${System.currentTimeMillis()}"
-//
-//                                    val (name, address) = getNameandAdress(
-//                                        context,
-//                                        askpermissonforlatlng!!.latitude,
-//                                        askpermissonforlatlng!!.longitude
-//                                    )
-//
-//                                    navController.navigate("favorites")
-//
-//                                    favoriteScreenViewModel.addFavoriteLocation(
-//                                        location = askpermissonforlatlng!!,
-//                                        name = tempname,
-//                                        address = address.toString()
-//                                    )
-//                                }
-//
-//                                showFavoritesAlertDialog = false
-
-                            // NY
-                                // Trenger ikke oversette addresse lenger, da den allerede er lagret i homeScreenViewModel
-
                                 val currentRoute = navController.currentBackStackEntry?.destination?.route
 
                                 if (currentRoute != "favorites") {
                                     navController.navigate("favorites")
                                 }
-                                /*
-                                if (navController.currentDestination?.route != "favorites") {
-                                    navController.navigate("favorites") {
-                                        // Avoid multiple copies of the same destination when re-selecting the same item
-                                        launchSingleTop = true
-                                        // Optional: Restore state if you want to keep the scroll position, etc.
-                                        restoreState = true
-                                    }
-                                }*/
                                 favoriteScreenViewModel.addFavoriteLocation(
                                     location = homeScreenViewModel.uiState.value.markerPosition,//askpermissonforlatlng!!,
                                     name = "temp_${System.currentTimeMillis()}",

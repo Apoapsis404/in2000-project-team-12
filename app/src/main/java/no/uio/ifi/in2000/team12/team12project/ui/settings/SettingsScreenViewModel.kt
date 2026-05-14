@@ -20,7 +20,7 @@ data class SettingsScreenUiState(
 )
 
 
-// Viewmodel for SettingsScreen. Håndterer logikken for å bytte tema og språk.
+// ViewModel for SettingsScreen. Handles the logic for switching theme and language.
 class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
 
     val uiState : StateFlow<SettingsScreenUiState> = dao.getSettings()
@@ -31,21 +31,21 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
             initialValue = SettingsScreenUiState()
         )
 
-    //Endrer mellom mørk og lys tema i appen.
+    // Toggles between dark and light theme in the app.
     fun toggleTheme(){
         updateConfig { currentState ->
             currentState.copy(lightMode = !currentState.lightMode)
         }
     }
 
-    //Endrer på språket til appen.
+    // Changes the language of the app.
     fun switchLanguage(newLanguage: Languages){
         updateConfig { currentState ->
             currentState.copy(language = newLanguage)
         }
     }
 
-    // Metoden oppdaterer config i databasen.
+    // This method updates the config in the database.
     private fun updateConfig(transform: (SettingsScreenUiState) -> SettingsScreenUiState) {
         viewModelScope.launch {
             val current = uiState.value
@@ -54,7 +54,7 @@ class SettingsScreenViewModel(private val dao: SettingsDao): ViewModel(){
     }
 }
 
-// Hjelpefunksjon for å konvertere SettingsEntity fra databasen til SettingsScreenUiState.
+// Helper function to convert SettingsEntity from the database to SettingsScreenUiState.
 fun SettingsEntity?.toUiState(): SettingsScreenUiState {
     val languageEnum = this?.language ?: Languages.ENGLISH
     return SettingsScreenUiState(
@@ -66,7 +66,7 @@ fun SettingsEntity?.toUiState(): SettingsScreenUiState {
     )
 }
 
-// Hjelpefunksjon for å konvertere SettingScreenUiState til SettingsEntity i databasen.
+// Helper function to convert SettingScreenUiState to SettingsEntity in the database.
 fun SettingsScreenUiState.toEntity(): SettingsEntity {
     return SettingsEntity(
         id = 0,

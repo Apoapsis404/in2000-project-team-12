@@ -36,7 +36,7 @@ fun SettingsScreen(
     onNoInternet: (Int?) -> Unit
 ) {
     val uiState by settingsScreenViewModel.uiState.collectAsState()
-    val activity = LocalActivity.current as? Activity
+    val activity = LocalActivity.current
     val context = LocalContext.current
 
     BackHandler {
@@ -92,7 +92,7 @@ fun SettingsScreen(
     }
 }
 
-// Gjenbrukbar metode som gir oss en rad med text label og switch.
+// Reusable method that provides a row with a text label and a switch.
 @Composable
 fun ToggleSetting(
     text: String,

@@ -75,9 +75,6 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
             )
             dao.upsertFavorite(entity)
 
-            //lastfavoriteadded = name
-            //_lastfavoriteadded.emit(name)
-            // Replaces the LaunchedEffect: Immediately prepare the UI for renaming
             val addedLoc = FavoriteLocation(location, name, address)
             _uiState.update {
                 it.copy(
@@ -106,23 +103,4 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
             _uiState.update { it.copy(showRenameDialog = false, selectedLocation = null) }
         }
     }
-    /*
-    fun removeFavoriteLocation(name: String){
-        viewModelScope.launch {
-            dao.deleteByName(name)
-        }
-    }
-
-//    fun changeFavoriteIcon(name: String, newIcon: ImageVector) {
-//        // Room databaser kan ikke lagre ImageVectors så
-//        // Må legge til funksjonalitet for å hente det
-//        // Fra strenger i stede for og så legge de strengene til
-//        // FavoriteLocationEntity
-//    }
-    fun changeFavoriteLocationName(prevname: String, changenameto: String){
-        viewModelScope.launch {
-            dao.changeFavoriteLocationName(prevname,changenameto)
-        }
-    }*/
-
 }

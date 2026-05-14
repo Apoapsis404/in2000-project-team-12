@@ -13,13 +13,14 @@ import java.io.InputStreamReader
 import android.content.Context
 
 class NVEDataSource(val context: Context){
-    // Varsler fra Flomvarslingen i Norge og www.varsom.no
+    // Warnings from the Flood Warning Service in Norway and www.varsom.no
+    
     private val url: String = "https://api01.nve.no/hydrology/forecast/flood/v1.0.10/api/Warning/1/2016-01-01/2026-01-01"
     private val json = Json { ignoreUnknownKeys = true }
 
     /*
-    * Denne metoden henter varslinger fra NVE. Den flitrerer for kommuner som har hatt varselsnivå 4 mer enn 7 ganger.
-    *Den returnerer em liste med FloodWarning objekter fra kommunene som oppfyller kravene
+    * This method fetches warnings from NVE. It filters for municipalities that have had warning level 4 more than 7 times.
+    * It returns a list of FloodWarning objects from the municipalities that meet the requirements.
     * */
     suspend fun getFloodWarning(): List<FloodWarning> = withContext(Dispatchers.IO) {
         val response: HttpResponse = KtorClient.client.get(url)
@@ -52,7 +53,7 @@ class NVEDataSource(val context: Context){
     }
 
     /*
-    * Denne metoden leser kordinatene til de forskjellige kommunene og lagrer dem i en Map, som så blir returnert.
+    * This method reads the coordinates for the different municipalities and stores them in a Map, which is then returned.
     * */
     fun loadCoordinates(): Map<Int, Pair<Double, Double>> {
         val coordinateMap = mutableMapOf<Int, Pair<Double, Double>>()
