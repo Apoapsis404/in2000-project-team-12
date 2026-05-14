@@ -97,27 +97,35 @@ Siden UI følger med på uiStaten i ViewModel vil UI reagere med å vise bruker 
 ### Bruker ønsker å legge til en posisjon som favoritt
 ```mermaid
 flowchart TD
-	Start@{ shape: circle, label: "start" } -->
-	    A{"Velg posisjon"}
-	    A --> |Søkefelt|a[Bruker skriver inn addresse] 
-	    -->b[Bruker trykker søk]
-	    -->c[Posisjon lagres i ViewModel]
-	    -->d[Trykker på hjerte-ikon]
-	    -->e[Bekreftelses-popup]
-	    -->B{"Ønsker du å legge til favoritt?"}
-	    -->|Bekreft|f[Navigerer til favoritt-skjerm]
-	    -->g[Navn-endring-popup]
-	    -->C{"Endre navn?"}
-	    -->h[Bruker skriver inn nytt navn]
-	    -->D{" "}
-	    -->|Lagre|j[Favoritt får ønsket navn]
-	    -->Slutt
-	    A-->|Trykke på kart|c
-	    B-->|Avbryt|Slutt
-	    C-->i[Bruker skriver ikke nytt navn]
-	    i-->D
-	    D-->|Avbryt|k[Favoritt får et standard-navn]
-	    k-->
-	Slutt@{ shape: dbl-circ, label: "Stop" }
+    Start@{ shape: circle, label: "start" } -->
+A{"Velg posisjon"}
+A --> |Søkefelt|a[Bruker skriver inn addresse]
+-->b[Bruker trykker søk]
+-->c[Posisjon lagres i ViewModel]
+-->d[Trykker på hjerte-ikon]
+-->e[Bekreftelses-popup]
+-->B{"Ønsker du å legge til favoritt?"}
+-->|Bekreft|f[Navigerer til favoritt-skjerm]
+-->g[Navn-endring-popup]
+-->C{"Endre navn?"}
+-->h[Bruker skriver inn nytt navn]
+-->D{" "}
+-->|Lagre|j[Favoritt får ønsket navn]
+-->Slutt
+A-->|Trykke på kart|c
+B-->|Avbryt|Slutt
+C-->i[Bruker skriver ikke nytt navn]
+i-->k
+D-->|Avbryt|k[Favoritt får et standard-navn]
+k-->
+Slutt@{ shape: dbl-circ, label: "Stop" }
 ```
-Forklaring for aktivitetsdiagram
+Vi valgte også å inkludere et aktivitetsdiagram, for å vise flyten for hvordan man legger til en favoritt fra brukerens perspektiv.
+
+Det starter med at brukeren må velge hvordan han ønsker å finne ønsket posisjon. Det kan han gjøre enten ved å søke opp en addresse eller et sted, eller 
+ved å plassere en markør på kartet. Når bruker har valgt posisjon blir denne lagret i HomeScreenViewModel, og brukeren kan trykke på "hjerte-ikonet".
+Da vil det komme en pop-up som ber om bekreftelse om at bruker ønsker å legge til en favoritt.
+
+Om bruker avbryter vil flyten gå rett til slutt, og ingen favoritt blir opprettet. Ved bekreftelse blir man navigert til favoritt-skjermen hvor en ny popup vises. 
+Den ber om at bruker skriver inn et navn for favoritten. Hvis bruker skriver inn et nytt navn og bekrefter vil favoritten få det nye navnet.
+Hvis brukeren ikke skriver inn et navn eller avbryter, vil favoritten få tildelt et unikt standardnavn.
