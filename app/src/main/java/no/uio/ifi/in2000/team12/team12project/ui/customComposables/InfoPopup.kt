@@ -19,11 +19,13 @@ import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Grass
 import androidx.compose.material.icons.filled.LineAxis
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Square
 import androidx.compose.material.icons.filled.ToggleOn
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.DataThresholding
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -67,6 +69,7 @@ fun InfoPopup(
                 SymbolBulletPoint(Icons.Default.MyLocation, stringResource(R.string.info_home_my_location))
                 SymbolBulletPoint(Icons.Outlined.AddCircleOutline, stringResource(R.string.info_home_zoom_in))
                 SymbolBulletPoint(Icons.Outlined.AddCircleOutline, stringResource(R.string.info_home_zoom_out))
+                SymbolBulletPoint(Icons.Outlined.FilterList, stringResource(R.string.filter_hazards))
             }
 
             "graph" -> {
@@ -89,6 +92,7 @@ fun InfoPopup(
                 // INFO SCREEN FOR FAVORITES
                 Text(stringResource(R.string.info_favorite_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 SymbolBulletPoint(Icons.Filled.DataThresholding, stringResource(R.string.info_favorite_graph_symbol))
+                SymbolBulletPoint(Icons.Filled.LocationOn, stringResource(R.string.info_favorite_location_symbol))
                 SymbolBulletPoint(Icons.Filled.Square, stringResource(R.string.info_favorite_card))
             }
 

@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.DataThresholding
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -44,11 +45,12 @@ import no.uio.ifi.in2000.team12.team12project.R
 
 @Composable
 fun FavoriteCard(
-    icon: ImageVector = Icons.Default.AddLocation,
+    icon: ImageVector = Icons.Default.LocationOn,
     title: String,
     subtitle: String,
     selected: Boolean = false,
-    onIconClick: () -> Unit = {},
+    onMapIconClick: () -> Unit = {},
+    onGraphIconClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
     onEditClick: () -> Unit = {}
 ) {
@@ -84,7 +86,8 @@ fun FavoriteCard(
             modifier = Modifier
                 .size(52.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(MaterialTheme.colorScheme.onPrimary),
+                .background(MaterialTheme.colorScheme.onPrimary)
+                .clickable{ onMapIconClick() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -126,7 +129,7 @@ fun FavoriteCard(
                 .size(52.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.onPrimary)
-                .clickable { onIconClick() },
+                .clickable { onGraphIconClick() },
             contentAlignment = Alignment.Center
         ) {
             Icon(

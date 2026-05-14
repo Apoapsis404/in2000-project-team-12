@@ -46,7 +46,7 @@
 
 
     <!-- HOME -->
-    <string name="favorites_popup_title">Favoritter?</string>
+    <string name="favorites_popup_title">Legg til i favoritter?</string>
     <string name="favorites_popup_question">Ønsker du å legge til denne posisjonen i favoritter?</string>
     <string name="yes">Bekreft</string>
     <string name="no">Avbryt</string>
@@ -124,7 +124,8 @@
     <string name="info_graph_plant_slider">Glideren lar deg velge hvilket år i fremtiden du vil se progonse for</string>
     <string name="info_graph_plant_plant_row">Plantene vist er de tre mest egnede å gro i det valgte året og måneden basert på regresjonsanalysen</string>
     <string name="info_favorite_title">Favorittskjerm:</string>
-    <string name="info_favorite_graph_symbol">Ikon på kortet for å navigere til grafskjermen for valgt favorittposisjon</string>
+    <string name="info_favorite_graph_symbol">Trykk på grafikonet på kortet for å navigere til grafskjermen for valgt favorittposisjon</string>
+    <string name="info_favorite_location_symbol">Trykk på markørikonet på kortet for å se favorittposisjonen på kartet</string>
     <string name="info_favorite_card">Trykk på et kort for å redigere eller slette favoritt</string>
     <string name="info_settings_title">Innstillingerskjerm:</string>
     <string name="info_settings_toggle_theme">Bytt mellom lyst og mørkt tema</string>

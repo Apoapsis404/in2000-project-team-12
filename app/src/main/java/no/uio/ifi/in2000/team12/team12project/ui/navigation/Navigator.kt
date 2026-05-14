@@ -31,6 +31,8 @@ fun Navigator(
     onNoInternet: (Int?) -> Unit
 ){
     homeViewModel.setMarkerPosition(LatLng(59.9127, 10.7461))
+
+
     NavHost(
         navController = navController,
         startDestination = "home",

@@ -45,10 +45,10 @@
 
 
     <!-- HOME -->
-    <string name="favorites_popup_title">favorites?</string>
-    <string name="favorites_popup_question">do you want this location added to your favorites?</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <string name="favorites_popup_title">Add to favorites?</string>
+    <string name="favorites_popup_question">Do you want this location added to your favorites?</string>
+    <string name="yes">Confirm</string>
+    <string name="no">Cancel</string>
     <string name="search_location">Search location…</string>
     <string name="no_result">No results</string>
     <string name="cont_desc_return_to_current_position">Return to current position</string>
@@ -99,7 +99,7 @@
     <string name="info_home_title">Home Screen:</string>
     <string name="info_home_rain">Area prone to torrential rain</string>
     <string name="info_home_wind">Area prone to extreme wind</string>
-    <string name="info_home_flood">Area prone to flooding. Area has had flood warnings of level 4 more that 8 times during the last 10 years</string>
+    <string name="info_home_flood">Area prone to flooding. Area has had flood warnings of level 4 more than 8 times during the last 10 years</string>
     <string name="info_home_graph">View climate graph for the selected location</string>
     <string name="info_home_favorites">Add markers location to favorites</string>
     <string name="info_home_my_location">Center map to your current location</string>
@@ -114,7 +114,8 @@
     <string name="info_graph_plant_slider">The slider allows you to select the year into the future you want to see the prediction for</string>
     <string name="info_graph_plant_plant_row">The plants shows the top 3 plants that can be cultivated during the selected month and year, based on the regression in the graph.</string>
     <string name="info_favorite_title">Favorite Screen:</string>
-    <string name="info_favorite_graph_symbol">Icon on card to navigate to the graph screen to show data on favorite location</string>
+    <string name="info_favorite_graph_symbol">Press the icon on card to navigate to the graph screen to show data for favorite location</string>
+    <string name="info_favorite_location_symbol">Press the icon on the card to navigate to the favorite location on the map</string>
     <string name="info_favorite_card">Click on card to edit or delete favorite</string>
     <string name="info_settings_title">Settings Screen:</string>
     <string name="info_settings_toggle_theme">Change between light and dark mode</string>

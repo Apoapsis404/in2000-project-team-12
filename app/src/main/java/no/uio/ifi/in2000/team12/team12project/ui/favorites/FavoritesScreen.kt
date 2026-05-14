@@ -65,6 +65,14 @@ fun FavoritesScreen(
                 onNoInternet(R.string.no_internet_navigation_message)
             }
         },
+        onNavigateToHome = { coords ->
+            if (NetworkUtils.isNetworkAvailable(context)) {
+                homeScreenViewModel.setMarkerPosition(coords)
+                navHostController.navigate("home") { popUpTo("home") }
+                } else {
+                onNoInternet(R.string.no_internet_navigation_message)
+            }
+        },
         viewModel = favoritesScreenViewModel
     )
 }
@@ -72,7 +80,8 @@ fun FavoritesScreen(
 fun FavoritesScreenContent(
         uiState: FavoritesScreenUiState,
         onNavigateToGraph: (LatLng) -> Unit,
-        viewModel: FavoritesScreenViewModel
+        onNavigateToHome: (LatLng) -> Unit = {},
+        viewModel: FavoritesScreenViewModel,
     ) {
         Box(modifier = Modifier) {
             LazyColumn {
@@ -97,7 +106,8 @@ fun FavoritesScreenContent(
                             title = favoriteLocation.name,
                             subtitle = favoriteLocation.address,
                             selected = isSelected,
-                            onIconClick = { onNavigateToGraph(favoriteLocation.coordinates) },
+                            onMapIconClick = { onNavigateToHome(favoriteLocation.coordinates) },
+                            onGraphIconClick = { onNavigateToGraph(favoriteLocation.coordinates) },
                             onDeleteClick = {
                                 viewModel.onLocationSelected(favoriteLocation)
                                 viewModel.setShowDeleteDialog(true)
