@@ -1,0 +1,92 @@
+# Dokumentasjon av arkitektur
+
+## Hensikt
+Dette dokumentet er tiltenkt for personer som skal videreutvikle appen, sette seg inn i den og fortsette å jobbe med kodestil/ praksis som er brukt. Dokumentet beskriver hvilke strukturelle beslutninger som er tatt, hvordan prosjektet er strukturert og kodepraksisene som er fulgt gjennom utviklingen.
+
+## Appens funksjon
+Almanakken er en klima- app for bønder, folk med småbruk og andre som ønsker klimainnsikt for å drive med jordbruk. Appen lar brukerne se hvilke områder som er utsatt for ekstremvær basert på historisk data og få anbefalinger på vekstplaner for valgte områder fra nåtid og frem i tid
+I appen kan brukerne:
+- Interagere med et kart som viser varsler for historisk data for flom, styrtregn og ekstrem vind.
+- Se historisk data for ulike vær- og klimafaktorer.
+- Se anbefalinger av vekstplaner basert på prognostiserte klimaforhold
+- Lagre favorittlokasjoner og legge ved notater til disse.
+- Bytte mellom norsk og engelsk språk
+- Bytte mellom lyst og mørkt tema
+
+## API
+// Drøft med gruppa
+Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å makismere antall enheter som kan bruke appen samtidig som det tillater utviklerne å bruke moderne API-er og biblioteker.
+
+## Teknologi brukt
+- Kotlin: Primært programmeringsspråk
+- Jetpack Compose: Deklarativt UI- rammeverk
+- Git/ GitHub: Versjonskontroll
+- Room: Lokal database
+- Google Maps SDK: Interaktivt kart og kart- markører
+- Google Places API: Søk av posisjoner og forslag til auto- complete
+- Vico: Tegning av klimagraf
+- Apache Commons Math: Utregninger av regresjonsanalyse
+
+## Eksterne API-er
+- Frost API : For historiske klimadata (temperatur, luftfuktighet, nedbør, solskinnstimer)
+- NVE API : For historisk flomdata
+- Google Maps : For interaktivt kart med markører
+- Google Places : For forslag på adresser i søkefelt
+  // KTOR?
+
+## Prosjektets struktur
+.
+├── data/                        # Datalaget: Datakilder, repositories, lokal database
+│   ├── exceptions/              # Egendefinerte unntak for håndtering av API-ene
+│   ├── frost/                   # Frost API: Klima og observasjonsstasjoner
+│   ├── local/                   # Room database
+│   ├── network/                 # Ktor klient
+│   ├── nve/                     # NVE API, datakilde og repository for flomvarsler
+│   ├── plants/                  # Plante- repository
+│   └── regression/              # Modell for lineær regresjon
+├── model/                       # Dataklasser
+│   ├── favorites/
+│   ├── frost/
+│   ├── notes/
+│   ├── nve/
+│   └── plants/
+├── ui/                          # UI- laget: Skjermer, @Composables, ViewModels
+│   ├── customComposables/       # Egendefinerte @Composables
+│   ├── favorites/               # Favorittskjerm
+│   ├── graphs/                  # Klimagrafskjerm
+│   ├── home/                    # Hjem/ kartskjerm
+│   ├── navigation/              # Navigasjonslogikk
+│   ├── notes/                   # Notatskjerm
+│   ├── settings/                # Instillingskjerm
+│   └── theme/                   # Tema, farger oversetting
+├── MainActivity.kt              # Appens inngangspunkt, med meny for navigasjon
+└── Team12Application.kt         # Initialisering av databaser
+
+# Arkitektur
+Appen følger Model - View - ViewModel (MVVM) arkitekturen med Unidirectional Data Flow (UDF).
+Hva mer skal fylles på?
+
+## Dataflow?
+
+## UDF
+Alle skjermer har en har en egen "uiState"- dataklasse som representerer hele uiState-en for den skjermen. Skjermens ViewModel henter staten via MutableStateFlow.
+UI- en gir beskjed for handlinger ved å kalle på ViewModelen sine funksjoner. ViewModelen behandler så handlingene og oppdaterer uiState-en som UI-en observerer via collectAsState(). Slik opprettholdes UDF.
+
+## Sentrale strukturelle valg
+- Varselmarkører: For å øke responstiden til appen, hentes klimadata fra frost og NVE én gang og caches i JSON- filer i 'res/raw/. Dette gjøres siden historiske data ikke endrer seg og appen slipper å gjøre mange tunge API- kall.
+- Varselmarkører: For å
+
+- Klimadata på grafskjermen: Dataen hentet fra frost API-et caches og lagres i tre maps inne i GraphScreenViewModel. Igjen gjøres dette siden historisk data ikke endrer seg og man unngår redundante API- kall hver gang brukeren endrer valg av klimadata eller måned inne på grafskjermen. Når metoden setMarkerPositionAndFetch() blir dataen klartert før den henter data fra ny posisjon.
+
+- Andre ting?
+- Room
+- Json.
+
+--- 
+
+## Kodestil
+- All kode (funksjoner, variabler, kommentarer)er skrevet på engelsk.
+- Alle variabelnavn er skrevet i **camelCase**, alle klasser er skrevet i **PascalCase**
+- UI state er representert ved dataklasser og oppdateres med .copy()
+- All forrentningslogikk ligger i ViewModels og er separert fra @Composables
+- Strenger er representert som stringResources og ligger i 'res/values/strings-en.xml' for engelsk og i 'res/values-nb-rNO/strings.xml' for norsk bokmål. 
