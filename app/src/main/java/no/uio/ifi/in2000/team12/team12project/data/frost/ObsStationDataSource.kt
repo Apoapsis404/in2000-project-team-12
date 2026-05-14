@@ -59,7 +59,7 @@ class ObsStationDataSource {
         clientSecret: String = DEFAULT_CLIENT_SECRET
     ): List<ObsStation> {
         val nearestString = "nearest(POINT ($longitude $latitude))"
-        val fieldsString = "id,name,masl,geometry"
+        val fieldsString = "id,name,geometry"
 
         val response: HttpResponse = KtorClient.client.get(URL_V0) {
             basicAuth(clientId, clientSecret)

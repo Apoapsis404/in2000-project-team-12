@@ -162,7 +162,7 @@ class GraphScreenViewModel(
                         } catch (e: CancellationException) {
                             throw e
                         } catch (e: Exception) {
-                            Log.e("GraphViewModel", "Failed to fetch $type", e)
+                            Log.i("GraphViewModel", "Failed to fetch $type", e)
                         }
                     }
                 }

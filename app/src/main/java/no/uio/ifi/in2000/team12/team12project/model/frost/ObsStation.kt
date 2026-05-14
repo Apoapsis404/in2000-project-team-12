@@ -9,7 +9,6 @@ data class ObsStation(
     val name: String,
     val geometry: Geometry,
     val distance: Double,
-    val masl: Double,
 )
 
 @Serializable

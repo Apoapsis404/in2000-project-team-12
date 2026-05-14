@@ -95,7 +95,7 @@ fun printClimateObsList(climateObsList: List<ClimateObs>) {
         return
     }
 
-    val maxElement: Int = 5
+    val maxElement = 5
 
     climateObsList.subList(0, maxElement).forEach { obs ->
         println("-------------------------------------------")
