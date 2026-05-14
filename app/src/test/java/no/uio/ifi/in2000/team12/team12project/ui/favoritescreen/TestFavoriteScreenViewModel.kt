@@ -131,7 +131,7 @@ class TestFavoriteScreenViewModel {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
         }
-        // Since the current implementation uses @Upsert, adding a duplicate name overwrites it.
+        // Since the current implementation uses @Upsert, adding a duplicate name with DIFFERENT LatLng overwrites it.
         viewModel.addFavoriteLocation(LatLng(1.0, 2.0), "Test Location1", "Test Address1")
         assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Test Location1"))
 
@@ -140,5 +140,50 @@ class TestFavoriteScreenViewModel {
         val favorite = viewModel.uiState.value.favoritesLocationMap["Test Location1"]
         assertEquals(favorite?.address, "Test Address2")
         assertEquals(favorite?.coordinates?.latitude, 3.0)
+    }
+
+    @Test
+    fun testAddDuplicateLatLng_showsError() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        val location = LatLng(1.0, 2.0)
+        viewModel.addFavoriteLocation(location, "Location 1", "Address 1")
+        assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Location 1"))
+        assertFalse(viewModel.uiState.value.showDuplicateError)
+
+        // Try to add the same LatLng again (even with different name/address)
+        viewModel.addFavoriteLocation(location, "Location 2", "Address 2")
+
+        // Should NOT be added because of duplicate LatLng
+        assertFalse(viewModel.uiState.value.favoritesLocationMap.containsKey("Location 2"))
+        // Should show duplicate error dialog
+        assertTrue(viewModel.uiState.value.showDuplicateError)
+
+        // Dismiss error
+        viewModel.dismissDuplicateError()
+        assertFalse(viewModel.uiState.value.showDuplicateError)
+    }
+
+    @Test
+    fun testChangeFavoriteLocationName_duplicateName_showsError() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+        viewModel.addFavoriteLocation(LatLng(1.0, 2.0), "Existing Name", "Address 1")
+        viewModel.addFavoriteLocation(LatLng(3.0, 4.0), "Another Location", "Address 2")
+
+        // Try to rename "Another Location" to "Existing Name"
+        viewModel.onLocationSelected(viewModel.uiState.value.favoritesLocationMap["Another Location"])
+        viewModel.setShowRenameDialog(true, "Another Location")
+        viewModel.onRenameTextChanged("Existing Name")
+        viewModel.confirmRename()
+
+        // Should NOT be renamed
+        assertTrue(viewModel.uiState.value.favoritesLocationMap.containsKey("Another Location"))
+
+        // Should show duplicate error
+        assertTrue(viewModel.uiState.value.showDuplicateError)
     }
 }

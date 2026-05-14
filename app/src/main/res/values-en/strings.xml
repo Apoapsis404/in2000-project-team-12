@@ -69,6 +69,7 @@
     <string name="save_favorite_button">Save</string>
     <string name="duplicate_favorite_header">Location already in favorites</string>
     <string name="duplicate_favorite_body">This location is already saved in your favorites.</string>
+    <string name="duplicate_name_error">This name is already taken.</string>
     <string name="ok">OK</string>
 
 

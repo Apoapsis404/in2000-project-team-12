@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -139,20 +140,39 @@ fun FavoritesScreenContent(
 
         // Rename Dialog (Handles newly added favorites automatically via State)
         if (uiState.showRenameDialog && uiState.selectedLocation != null) {
+            val isNameDuplicate = uiState.favoritesLocationMap.containsKey(uiState.renameTextFieldValue) &&
+                    uiState.renameTextFieldValue != uiState.selectedLocation.name
+
             AlertDialog(
                 onDismissRequest = { viewModel.setShowRenameDialog(false) },
                 title = { Text(stringResource(R.string.favorite_new_name_header)) },
                 text = {
-                    TextField(
-                        value = uiState.renameTextFieldValue,
-                        onValueChange = { viewModel.onRenameTextChanged(it) },
-                        placeholder = { Text(stringResource(R.string.favorite_new_name_placeholder)) }
-                    )
+                    Column {
+                        TextField(
+                            value = uiState.renameTextFieldValue,
+                            onValueChange = { viewModel.onRenameTextChanged(it) },
+                            placeholder = { Text(stringResource(R.string.favorite_new_name_placeholder)) },
+                            isError = isNameDuplicate
+                        )
+                        if (isNameDuplicate) {
+                            Text(
+                                text = stringResource(R.string.duplicate_name_error),
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                            )
+                        }
+                    }
                 },
                 confirmButton = {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         TextButton(onClick = { viewModel.setShowRenameDialog(false) }) { Text(stringResource(R.string.delete_pop_up_cancel)) }
-                        TextButton(onClick = { viewModel.confirmRename() }) { Text(stringResource(R.string.save_favorite_button)) }
+                        TextButton(
+                            onClick = { viewModel.confirmRename() },
+                            enabled = uiState.renameTextFieldValue.isNotBlank() && !isNameDuplicate
+                        ) {
+                            Text(stringResource(R.string.save_favorite_button))
+                        }
                     }
                 }
             )

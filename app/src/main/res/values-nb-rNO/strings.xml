@@ -71,6 +71,7 @@
     <string name="save_favorite_button">Lagre</string>
     <string name="duplicate_favorite_header">Stedet er allerede lagret</string>
     <string name="duplicate_favorite_body">Dette stedet ligger allerede i dine favoritter.</string>
+    <string name="duplicate_name_error">Dette navnet er allerede i bruk.</string>
     <string name="ok">OK</string>
 
 

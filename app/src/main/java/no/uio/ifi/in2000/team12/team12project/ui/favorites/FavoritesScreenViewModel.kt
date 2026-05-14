@@ -76,7 +76,7 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
             // Check for duplicate in the current favorites list
             val isDuplicate = uiState.value.favoritesLocationMap.values.any {
                 it.coordinates.latitude == location.latitude && it.coordinates.longitude == location.longitude
-            }
+            } || uiState.value.favoritesLocationMap.containsKey(name)
 
             if (isDuplicate) {
                 _uiState.update { it.copy(showDuplicateError = true) }
@@ -113,6 +113,12 @@ class FavoritesScreenViewModel(private val dao: FavoriteDao) : ViewModel() {
         val oldName = _uiState.value.selectedLocation?.name ?: return
         val newName = _uiState.value.renameTextFieldValue
         if (newName.isBlank()) return
+
+        // Check if name already exists (and it's not the same location we are currently renaming)
+        if (uiState.value.favoritesLocationMap.containsKey(newName) && newName != oldName) {
+            _uiState.update { it.copy(showDuplicateError = true) }
+            return
+        }
 
         viewModelScope.launch {
             dao.changeFavoriteLocationName(oldName, newName)
