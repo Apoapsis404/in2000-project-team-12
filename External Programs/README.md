@@ -39,4 +39,3 @@ For at appen skal fungere optimalt, kreves følgende:
 
 ### Analyse
 * **Apache Commons Math:** Et bibliotek med avanserte matematiske og statistiske funksjoner, brukt i våre regresjonsanalyser og databeregninger.
-asfsaff
