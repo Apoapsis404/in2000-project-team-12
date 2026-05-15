@@ -41,17 +41,16 @@ rain_d --> home_vm
 end
 ```
 
-Vi valgte å inkludere en aktitekturskisse fordi det gir et godt innblikk i hvordan data flyter gjennom applikasjonen, og gir en god visualisering av inndelingen med data- og UI-lag.
+Vi har valgt å inkludere en aktitekturskisse fordi det gir et tydelig innblikk i hvordan data flyter gjennom applikasjonen, samt en oversiktlig visualisering av inndelingen med data- og UI-laget.
 
-I datalaget ser vi hvordan data flyter fra API-ene Frost og NVE til DataSource og videre til Repositories. Vi ser også hvor data fra lokale filer blir behandlet. 
-I tillegg har vi en lokal Room-database med tre forskjellige DAO-er. Data fra alle disse kildene flyter gjennom datalaget, og blir cashet i ViewModels i UI-laget
+I datalaget ser vi hvordan data flyter fra API-ene Frost og NVE til DataSource og videre til Repositories. I tillegg håndteres data fra lokale filer i dette laget. 
+ Applikasjonen benytter en lokal Room-database med tre forskjellige DAO-er. Data fra disse kildene flyter gjennom datalaget, og blir cashes i ViewModels i UI-laget
 
-I UI-laget har alle skjermene hver sin ViewModel. ViewModelene for innstillinger, favoritter og notater får sin data fra hver sin DAO. GraphScreenViewModel får data fra ClimateDataRepository og PlantRepository
-, for å kunne vise grafen, gjennomsnittsverdier og en planteprognose på GraphScreen.
-HomeScreen sin ViewModel får data fra både NVE og lokale filer for vind og regn, for å kunne vise symboler på kartet. For kartvisningen i HomeScreen har vi brukt Google Maps SDK.
+I UI-laget har hver sin egen ViewModel. ViewModelene for innstillinger, favoritter og notater henter data fra sine respektive DAO-er. GraphScreenViewModel henter data fra ClimateDataRepository og PlantRepository for å kunne vise grafen, gjennomsnittsverdier og en planteprognose på GraphScreen.
+HomeScreenViewModel henter data fra både NVE og lokale filer for vind- og nedbørsdata, for å vise symboler på kartet. For kartvisningen i HomeScreen har vi brukt Google Maps SDK.
 
 ## Sekvensdiagram
-### Bruker ønsker å vise graf for soltimer på valgt område
+### Bruker ønsker å se en graf for soltimer på valgt område
 ```mermaid
 sequenceDiagram
     actor Bruker
@@ -81,17 +80,18 @@ sequenceDiagram
     ViewModel-->>-UI: uiState.ClimateType er oppdatert
     UI -->>- Bruker: Tegner graf for soltimer
 ```
-Vi har også valgt å inkludere et sekvensdiagram, for å tydeligjøre hva som faktisk skjer når bruker ønsker å få opp riktig data på grafskjermen.
+Vi har også valgt å inkludere et sekvensdiagram, for å tydeligjøre hva som faktisk skjer når bruker ønsker å hente og vise data på grafskjermen.
 
-Senarioet starter med at bruker trykker på et graf-ikon, som fører til et kall på ViewModel for å hente data, samtidig som appen navigerer til 
-graf-skjermen og viser en laste-sirkel. Her vil UI samle state hos ViewModel, som gjør at den viser data basert på hva som er i ViewModel. 
+Senarioet starter med at bruker trykker på graf-ikonet. Dette utløser et kall på ViewModel for å initiere datahenting, samtidig som appen navigerer til 
+graf-skjermen og viser en loading-indikator. UI-et observerer state fra ViewModel, og oppdateres basert på tilgjenglig data. 
 
-Mens UI viser laste-sirkelen, blir dataen hentet i datalaget. Det gjøres ved hjelp av en loop som kjører til
-brukbar data returneres, hvis ikke "gir den opp" etter 15 forsøk og kaster en Exception. Om daten er brukbar vil en liste med klima-observasjoner bli
+Mens loading-indikatoren vises, blir dataen hentet i datalaget. Det gjøres ved hjelp av en loop som kjører til
+brukbar data returneres. Dersom gyldig data ikke returneres gjentas forsøket opptil 15 ganger før det blir kastet en Exception. Om daten er brukbar vil en liste med klima-observasjoner bli
 cashet i ViewModel, og UI vil vise grafen over historiske temperatur-data.
 
-Deretter trykker bruker på boksen med et sol-ikon. Da vil UI kalle på setClimateType() i viewModel (som allerede har denne daten cashet), og oppdatere uiStaten.
-Siden UI følger med på uiStaten i ViewModel vil UI reagere med å vise bruker den riktige grafen for sol-timer.
+Deretter trykker bruker på boksen med et sol-ikon. Dette fører til et kall på setClimateType() i viewModel, som allerede har denne dataen cashet. ViewModel oppdater uiState, 
+som Ui observerer og grafen vil oppdateres til å vise soltimer i stedet for temperatur.
+
 
 ## Aktivitetsdiagram
 ### Bruker ønsker å legge til en posisjon som favoritt
@@ -165,7 +165,7 @@ Case 1: Se klimadata for valgt posisjon \
 Aktør: Hageentusiast, Bonde\
 Beskrivelse: Brukeren velger en posisjon og får opp klimadata for denne. Brukeren kan velge å se data i år eller bla bakover i tid for å se 
 historiske klimadata.
-include-->Se gjennomsnitter: Gjennomsnitter vises alltid som en del av klimavisningen
+include-->Se gjennomsnitt: Gjennomsnittlig måling vises alltid som en del av klimavisningen
 extend--> Brukeren kan valgfritt se historisk klimadata for de ulike klimatypene
 
 Case 2: Legge til og lagre adresser\
