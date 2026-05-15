@@ -127,11 +127,11 @@ Slutt@{ shape: dbl-circ, label: "Stop" }
 ```
 Vi valgte også å inkludere et aktivitetsdiagram for å vise flyten for hvordan man legger til en favoritt fra brukerens perspektiv.
 
-Navn: Bruker ønsker å legge til en posisjon som favoritt
-Aktør: Bruker.
-Prebetingelse: Internett-tilgang. Være på hjem-skjermen.
-Postbetingelse: En favoritt er opprettet, og lagret i databasen.
-Hovedflyt:
+Navn: Bruker ønsker å legge til en posisjon som favoritt\
+Aktør: Bruker.\
+Prebetingelse: Internett-tilgang. Være på hjem-skjermen.\
+Postbetingelse: En favoritt er opprettet, og lagret i databasen.\
+Hovedflyt:\
 1. Bruker trykker på ønsket område på kart
 2. Appen lagrer posisjonen i HomeScreenViewModel
 3. Bruker trykker på favoritt-ikonet
@@ -145,12 +145,16 @@ Hovedflyt:
 
 Alternativ flyt 1:\
 1a Bruker skriver hele addressen i søkefelt\
-1b Bruker trykker søk\
+1b Bruker trykker søk
 
 Alternativ flyt 2:\
 1aa Bruker skriver inn deler av addressen i søkefeltet\
 1ab UI viser ønsket forslag\
 1ac Bruker trykker på ønsket forslag\
+
+Alternativ flyt 3:\
+8a Bruker trykker på avbryt\
+8b Favoritten lagres ikke
 
 
 ## Use Case Diagram
@@ -166,7 +170,7 @@ extend--> Brukeren kan valgfritt se historisk klimadata for de ulike klimatypene
 
 Case 2: Legge til og lagre adresser\
 Aktør: Hageentusiast, Bonde\
-Beskrivelse: Brukeren kan søke opp eller markere en adresse og lagre den som favoritt for rask tilgang senere.
+Beskrivelse: Brukeren kan søke opp eller markere en adresse og lagre den som favoritt for rask tilgang senere.\
 extend --> Søk opp addresse / Velg posisjon: brukeren kan velge mellom å skrive inn en addresse i søkefeltet, eller å trykke på en posisjon på kartet.
 
 Case 3: Skrive og lagre notater\
@@ -175,8 +179,8 @@ Beskrivelse: Brukeren kan skrive notater og lagre notater.
 
 Case 4: Se hvilke planter som kan overleve på valgt posisjon\
 Aktør: Hageentusiast, Bonde\
-Beskrivelse: Brukeren få opp forslag til tre planter som kan overleve i valgt klima.
-include --> Se planter som kan overleve i år: Planter som kan overleve i år vises som en del av klimavisningen
+Beskrivelse: Brukeren få opp forslag til tre planter som kan overleve i valgt klima.\
+include --> Se planter som kan overleve i år: Planter som kan overleve i år vises som en del av klimavisningen\
 extend --> Planter som kan overleve i framtiden: Bruker kan velge å se hvilke planter som kan overleve i antatt klima framover i tid, basert på en regresjonsanalyse av tilgjengelig klimadata.
 
 
