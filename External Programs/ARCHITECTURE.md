@@ -83,8 +83,34 @@ Videre er prosjektet er delt opp i tre hovedmapper: Data, Model og UI.
 
 
 
-## Dataflow?
+## Dataflow
+```mermaid
+graph TD
+    subgraph Data Layer
+        api[(External APIs / JSON)]
+        db[(Room Database)]
+        ds[Data Source]
+        repo[Repository]
 
+        api --> ds
+        ds --> repo
+        db --> repo
+    end
+
+    subgraph UI Layer
+        vm[ViewModel]
+        screen[Screen / Composable]
+        nav[NavHost]
+
+        vm -->|UiState| screen
+        screen -->|Events| vm
+        nav --> screen
+    end
+
+    repo -->|Data| vm
+    main[MainActivity] --> nav
+
+```
 ## UDF
 Alle skjermer har en har en egen "uiState"- dataklasse som representerer hele uiState-en for den skjermen. Skjermens ViewModel henter staten via MutableStateFlow.
 UI- en gir beskjed for handlinger ved å kalle på ViewModelen sine funksjoner. ViewModelen behandler så handlingene og oppdaterer uiState-en som UI-en observerer via collectAsState(). Slik opprettholdes UDF.
