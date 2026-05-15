@@ -71,7 +71,14 @@ Dataflyten fungerer overordnet slik: DataSource --> Repository --> ViewModel -->
 Eksempelvis vil svaret på et kall på klimadata fra grafskjermen se slik ut: FrostDataSource -> FrostRepository -> GraphScreenViewModel -> GraphScreenUiState -> GraphScreen.
 
 Videre er prosjektet er delt opp i tre hovedmapper: Data, Model og UI.
-- I data pakken 
+- I data pakken ligger DataSources og Repositories for de ulike API-ene brukt og JSON-filene appen henter data fra. \
+  Her ligger også exceptions som brukes for håndtering av unntak dersom kallene til Frost API ikke returnerer ønskede resultater, \
+  og grensesnittet for roomdatabasen og de tre DAO-ene.
+- I model- pakken ligger alle data- og enum-klasser som brukes i appen.
+- I ui- pakken ligger alle skjermer og komponenter som brukes i appen, med deres respektive viewModels, \ 
+  samt en theme- pakke med verdier for farger, tema og tekst. \
+  Her ligger også navigation- pakken som holder styr på navigasjon i appen.
+
 
 
 ## Dataflow?
