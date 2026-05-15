@@ -1,9 +1,10 @@
-Navn: Vegard van Jole \
-Nicholas Uribarri,\
-Heran Jabessa-Wodajo,\
-Ada Christine Saastad, \
-Marius Iversen, \
-Ada Graah  
+## Deltakere:     
+>Vegard van Jole  
+>Nicholas Uribarri  
+>Heran Jabessa-Wodajo  
+>Ada Christine Saastad   
+>Marius Iversen   
+>Ada Graah    
 
 ## Hvordan kjøre appen
 
