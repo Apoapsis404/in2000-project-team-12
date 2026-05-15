@@ -1,34 +1,49 @@
-Navn: Vegard van Jole \
-Nicholas Uribarri,\
-Heran Jabessa-Wodajo,\
-Ada Christine Saastad, \
-Marius Iversen, \
-Ada Graah \
+## Deltakere:     
+>Vegard van Jole  
+>Nicholas Uribarri  
+>Heran Jabessa-Wodajo  
+>Ada Christine Saastad   
+>Marius Iversen   
+>Ada Graah    
 
+## Hvordan kjøre appen
 
+1. **Last ned kildekoden:** Klon repoet ved hjelp av Git:
+   ```bash
+   git clone git@github.uio.no:IN2000-V26/team-12.git
+   ```
+2. **Åpne i Android Studio:** Start Android Studio og åpne mappen `team-12`.
+3. **Synkroniser Gradle:** La Android Studio laste ned alle nødvendige avhengigheter.
+4. **Koble til enhet:** Koble til en fysisk Android-enhet, eller bruk en Android Emulator.
+5. **Kjør appen:** Trykk på den grønne "Run"-knappen øverst i verktøylinjen.
 
-### Instruksjoner:
+---
 
-#### SSH
->\$ ssh-keygen -t ed25519 \
->Skriv inn filsti (Bare trykk enter!) \
->Hopp over passord \
->Gå til GitHub.uio.no \
->Gå til Settings -> SSH / GPG keys \
->Kopier SSH nøkkel til clipboard \
->macOS: \$ pbcopy < ~/.ssh/id_ed25519.pub \
->Windows (PowerShell or Git Bash): \$ cat ~/.ssh/id_ed25519.pub | clip or \$ clip < ~/.ssh/id_ed25519.pub \
->Lim inn nøkkelen du generate i terminalen
+## Avhengigheter og Krav
 
-#### Git
+For at appen skal fungere optimalt, kreves følgende:
 
->\$ git clone git@github.uio.no:IN2000-V26/team-12.git \
->\$ cd team-12 \
->Skriv navn inn i README.md\
->\$ git status (sjekk at det har sjedd en endring)\
->\$ git add . (legger til alle filer som er modifisert eller untracked)\
->\$ git status (sjekk at filen er updatert) \
->\$ git commit -m \"\<Navn\> commit\" \
->\$ git push
+* **Internettilgang:** Nødvendig for å hente værdata fra eksterne API-er og laste inn kartfliser fra Google Maps.
+* **Android API-nivå:** Minimum SDK er satt til 33. 
 
+---
 
+## Biblioteker og Teknologier
+
+### Brukergrensesnitt (UI)
+* **Jetpack Compose:** Hoved bibliotek til all UI  
+* **Material 3:** Designsystemet som gir appen et moderne og konsistent utseende.
+* **Vico:** Bibliotek brukt for å generere grafer for klimadata.
+
+### Kart og Lokasjon
+* **Google Maps Compose:** Lar oss integrere Google Maps direkte i Compose-grensesnittet.
+* **Play Services Location:** Brukes for å hente nøyaktig geografisk posisjon fra enheten.
+
+### Data og Nettverk
+* **Ktor:** En nettverksklient som brukes til å sende asynkroniserte forespørsler til API-er (som MET og Frost) og motta data.
+* **Kotlinx Serialization:** Brukes for å oversette JSON-svar fra nettet til Kotlin-objekter som appen kan bruke.
+* **Room Database:** Et lag over SQLite som gjør det enkelt å lagre data lokalt på enheten for offline-bruk eller hurtiglagring.
+* **Gson:** Et bibliotek for konvertering mellom Java-objekter og JSON (brukt i kombinasjon med Room).
+
+### Analyse
+* **Apache Commons Math:** Et bibliotek med avanserte matematiske og statistiske funksjoner, brukt i våre regresjonsanalyser og databeregninger.

@@ -4,7 +4,7 @@
    ```bash
    git clone git@github.uio.no:IN2000-V26/team-12.git
    ```
-2. **Åpne i Android Studio:** Start Android Studio og opne mappen `team-12`.
+2. **Åpne i Android Studio:** Start Android Studio og åpne mappen `team-12`.
 3. **Synkroniser Gradle:** La Android Studio laste ned alle nødvendige avhengigheter.
 4. **Koble til enhet:** Koble til en fysisk Android-enhet, eller bruk en Android Emulator.
 5. **Kjør appen:** Trykk på den grønne "Run"-knappen øverst i verktøylinjen.
@@ -16,7 +16,7 @@
 For at appen skal fungere optimalt, kreves følgende:
 
 * **Internettilgang:** Nødvendig for å hente værdata fra eksterne API-er og laste inn kartfliser fra Google Maps.
-* **Android API-nivå:** Minimum SDK er satt til 24 (Android 7.0).
+* **Android API-nivå:** Minimum SDK er satt til 33. 
 
 ---
 
