@@ -28,8 +28,3 @@ data class Geometry(
 data class ObsStationId(
     val id: String
 )
-
-@Serializable
-data class ObsStationIdResponse (
-    val data: List<ObsStationId>
-)
