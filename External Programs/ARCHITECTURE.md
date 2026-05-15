@@ -136,7 +136,7 @@ UI- en gir beskjed for handlinger ved å kalle på ViewModelen sine funksjoner. 
 
 
 ## Kodestil
-- All kode (funksjoner, variabler, kommentarer)er skrevet på engelsk.
+- All kode (funksjoner, variabler, kommentarer) er skrevet på engelsk.
 - Alle variabelnavn er skrevet i **camelCase**, alle klasser er skrevet i **PascalCase**
 - UI state er representert ved dataklasser og oppdateres med .copy()
 - All forretningslogikk ligger i ViewModels og er separert fra @Composables
