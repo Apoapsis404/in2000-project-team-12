@@ -15,7 +15,7 @@ I appen kan brukerne:
 
 ## API
 // Drøft med gruppa
-Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å makismere antall enheter som kan bruke appen samtidig som det tillater utviklerne å bruke moderne API-er og biblioteker.
+Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å maksimere antall enheter som kan bruke appen samtidig som det tillater utviklerne å bruke moderne API-er og biblioteker.
 
 ## Teknologi brukt
 - Kotlin: Primært programmeringsspråk
@@ -28,43 +28,51 @@ Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å mak
 - Apache Commons Math: Utregninger av regresjonsanalyse
 
 ## Eksterne API-er
-- Frost API : For historiske klimadata (temperatur, luftfuktighet, nedbør, solskinnstimer)
-- NVE API : For historisk flomdata
-- Google Maps : For interaktivt kart med markører
-- Google Places : For forslag på adresser i søkefelt
-  // KTOR?
+- Frost API : Historiske klimadata (temperatur, luftfuktighet, nedbør, solskinnstimer)
+- NVE API : Historisk flomdata
+- Google Maps : Interaktivt kart med markører
+- Google Places : Forslag på adresser i søkefelt
+- Ktor : Nettverkstilgang
 
 ## Prosjektets struktur
 .
-├── data/                        # Datalaget: Datakilder, repositories, lokal database
-│   ├── exceptions/              # Egendefinerte unntak for håndtering av API-ene
-│   ├── frost/                   # Frost API: Klima og observasjonsstasjoner
-│   ├── local/                   # Room database
-│   ├── network/                 # Ktor klient
-│   ├── nve/                     # NVE API, datakilde og repository for flomvarsler
-│   ├── plants/                  # Plante- repository
-│   └── regression/              # Modell for lineær regresjon
-├── model/                       # Dataklasser
-│   ├── favorites/
-│   ├── frost/
-│   ├── notes/
-│   ├── nve/
-│   └── plants/
-├── ui/                          # UI- laget: Skjermer, @Composables, ViewModels
-│   ├── customComposables/       # Egendefinerte @Composables
-│   ├── favorites/               # Favorittskjerm
-│   ├── graphs/                  # Klimagrafskjerm
-│   ├── home/                    # Hjem/ kartskjerm
-│   ├── navigation/              # Navigasjonslogikk
-│   ├── notes/                   # Notatskjerm
-│   ├── settings/                # Instillingskjerm
-│   └── theme/                   # Tema, farger oversetting
-├── MainActivity.kt              # Appens inngangspunkt, med meny for navigasjon
-└── Team12Application.kt         # Initialisering av databaser
+├── data/                        # Datalaget: Datakilder, repositories, lokal database  \
+│   ├── exceptions/              # Egendefinerte unntak for håndtering av API-ene       \
+│   ├── frost/                   # Frost API: Klima og observasjonsstasjoner            \
+│   ├── local/                   # Room database                                        \
+│   ├── network/                 # Ktor klient                                          \
+│   ├── nve/                     # NVE API, datakilde og repository for flomvarsler     \
+│   ├── plants/                  # Plante- repository                                   \
+│   └── regression/              # Modell for lineær regresjon                          \
+├── model/                       # Dataklasser                                          \
+│   ├── favorites/                                                                      \
+│   ├── frost/                                                                          \
+│   ├── notes/                                                                          \
+│   ├── nve/                                                                            \
+│   └── plants/                                                                         \
+├── ui/                          # UI- laget: Skjermer, @Composables, ViewModels        \
+│   ├── customComposables/       # Egendefinerte @Composables                           \
+│   ├── favorites/               # Favorittskjerm                                       \
+│   ├── graphs/                  # Klimagrafskjerm                                      \
+│   ├── home/                    # Hjem/ kartskjerm                                     \
+│   ├── navigation/              # Navigasjonslogikk                                    \
+│   ├── notes/                   # Notatskjerm                                          \
+│   ├── settings/                # Innstillingskjerm                                    \
+│   └── theme/                   # Tema, farger oversetting                             \
+├── utils/                       # Utility-funksjoner for nettverkstilgang              \
+├── MainActivity.kt              # Appens inngangspunkt, med meny for navigasjon        \
+└── Team12Application.kt         # Initialisering av databaser                          
+
+---
 
 # Arkitektur
 Appen følger Model - View - ViewModel (MVVM) arkitekturen med Unidirectional Data Flow (UDF).
-Hva mer skal fylles på?
+Dataflyten fungerer overordnet slik: DataSource --> Repository --> ViewModel --> uiState --> UI. \
+Eksempelvis vil svaret på et kall på klimadata fra grafskjermen se slik ut: FrostDataSource -> FrostRepository -> GraphScreenViewModel -> GraphScreenUiState -> GraphScreen.
+
+Videre er prosjektet er delt opp i tre hovedmapper: Data, Model og UI.
+- I data pakken 
+
 
 ## Dataflow?
 
@@ -73,14 +81,21 @@ Alle skjermer har en har en egen "uiState"- dataklasse som representerer hele ui
 UI- en gir beskjed for handlinger ved å kalle på ViewModelen sine funksjoner. ViewModelen behandler så handlingene og oppdaterer uiState-en som UI-en observerer via collectAsState(). Slik opprettholdes UDF.
 
 ## Sentrale strukturelle valg
-- Varselmarkører: For å øke responstiden til appen, hentes klimadata fra frost og NVE én gang og caches i JSON- filer i 'res/raw/. Dette gjøres siden historiske data ikke endrer seg og appen slipper å gjøre mange tunge API- kall.
-- Varselmarkører: For å
+- Flomvarsler: For å øke innlastingstiden til appen, hentes historisk flomdata fra NVE API kun når appen starter opp og caches i HomeScreenUIState. 
+  Dette gjøres siden dataen er historisk og endrer seg minimalt over korte tidsperioder. Siden det kun opprettes én instans av hver viewmodel, beholdes 
+  verdiene og ved hver rekomponering, og redundante API- kall er ikke nødvendig.
 
-- Klimadata på grafskjermen: Dataen hentet fra frost API-et caches og lagres i tre maps inne i GraphScreenViewModel. Igjen gjøres dette siden historisk data ikke endrer seg og man unngår redundante API- kall hver gang brukeren endrer valg av klimadata eller måned inne på grafskjermen. Når metoden setMarkerPositionAndFetch() blir dataen klartert før den henter data fra ny posisjon.
+- Klimadatavarsler: Dataen som ligger til grunn for å vise symboler for styrtregn og ekstremvind er hentet fra frost ligger lagret i '/res/raw/high_wind_speed_stations.json og /res/raw/torrential_rain_stations.json' 
+  Dette er gjort siden API- kallet som henter dataen er svært omfattende og tidkrevende. For å kunne levere nødvendig informasjon til brukerne, er dette hentet fra frost API-et på forhånd og lagret lokalt.
 
-- Andre ting?
-- Room
-- Json.
+- Klimadata på grafskjermen: Dataen hentet fra frost API-et caches og lagres i tre maps inne i GraphScreenViewModel. 
+  Igjen gjøres dette siden historisk data ikke endrer seg og man unngår redundante API- kall hver gang brukeren endrer valg av klimadata eller måned inne på grafskjermen.
+  Når metoden setMarkerPositionAndFetch() blir dataen klartert før den henter data fra ny posisjon.
+
+- Det er opprettet en lokal room- database der brukerne kan lagre generelle innstillinger, favorittlokasjoner, og personlige notater. 
+  Vi har valgt denne løsningen for å opprettholde personvern og sikre at kun brukeren selv har tilgang til sin egen persondata,
+  og for å øke brukeropplevelsen ved at dataen vedvarer etter lukking av applikasjonen. 
+  
 
 --- 
 
@@ -88,5 +103,5 @@ UI- en gir beskjed for handlinger ved å kalle på ViewModelen sine funksjoner. 
 - All kode (funksjoner, variabler, kommentarer)er skrevet på engelsk.
 - Alle variabelnavn er skrevet i **camelCase**, alle klasser er skrevet i **PascalCase**
 - UI state er representert ved dataklasser og oppdateres med .copy()
-- All forrentningslogikk ligger i ViewModels og er separert fra @Composables
+- All forretningslogikk ligger i ViewModels og er separert fra @Composables
 - Strenger er representert som stringResources og ligger i 'res/values/strings-en.xml' for engelsk og i 'res/values-nb-rNO/strings.xml' for norsk bokmål. 
