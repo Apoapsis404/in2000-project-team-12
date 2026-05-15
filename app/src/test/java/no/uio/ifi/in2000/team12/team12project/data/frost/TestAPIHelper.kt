@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
-import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.Observation
 import org.junit.Test

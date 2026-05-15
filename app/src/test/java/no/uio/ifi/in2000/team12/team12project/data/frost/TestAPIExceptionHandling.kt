@@ -22,7 +22,7 @@ class TestAPIExceptionHandling {
     fun testUnauthorizedException() = runTest {
         val dataSource = ObsStationDataSource()
         assertFailsWith<UnauthorizedException> {
-            dataSource.getNearestStation(59.9423, 10.72, clientId = "invalid", clientSecret = "invalid");
+            dataSource.getNearestStation(59.9423, 10.72, clientId = "invalid", clientSecret = "invalid")
         }
     }
 
@@ -30,7 +30,7 @@ class TestAPIExceptionHandling {
     fun testNoDataException() = runTest {
         val dataSource = ObsStationDataSource()
         assertFailsWith<NoDataException> {
-            dataSource.getNearestStation(59.9423, 10.72, maxCount = 0);
+            dataSource.getNearestStation(59.9423, 10.72, maxCount = 0)
         }
     }
 
@@ -38,7 +38,7 @@ class TestAPIExceptionHandling {
     fun testNoAvailableTimeSeriesException() = runTest {
         val dataSource = ClimateDataSource()
         assertFailsWith<NoAvailableTimeSeriesException> {
-            dataSource.getClimateData("SN18701", "mean(air_temperature P1M)", "1982-01-01/1983-01-01");
+            dataSource.getClimateData("SN18701", "mean(air_temperature P1M)", "1982-01-01/1983-01-01")
         }
     }
 }

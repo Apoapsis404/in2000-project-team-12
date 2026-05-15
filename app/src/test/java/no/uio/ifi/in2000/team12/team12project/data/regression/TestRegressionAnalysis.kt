@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.data.regression
 
 import org.junit.Test
-import kotlin.test.fail
 
 class TestRegressionAnalysis {
 

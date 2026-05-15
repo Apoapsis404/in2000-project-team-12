@@ -12,13 +12,10 @@ import kotlinx.coroutines.test.setMain
 import no.uio.ifi.in2000.team12.team12project.data.local.FavoriteLocationEntity
 import no.uio.ifi.in2000.team12.team12project.data.local.dao.FavoriteDao
 import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenViewModel
-import no.uio.ifi.in2000.team12.team12project.ui.favorites.FavoritesScreenUiState
-import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -44,12 +41,12 @@ class FakeFavoriteDao : FavoriteDao {
         _favorites.value = current
     }
 
-    override suspend fun changeFavoriteLocationName(prevname: String, changenameto: String) {
+    override suspend fun changeFavoriteLocationName(oldName: String, newName: String) {
         val current = _favorites.value.toMutableList()
-        val index = current.indexOfFirst { it.name == prevname }
+        val index = current.indexOfFirst { it.name == oldName }
         if (index != -1) {
             val old = current[index]
-            current[index] = old.copy(name = changenameto)
+            current[index] = old.copy(name = newName)
             _favorites.value = current
         }
     }
