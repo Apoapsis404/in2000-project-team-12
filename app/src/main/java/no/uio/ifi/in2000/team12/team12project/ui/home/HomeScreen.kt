@@ -181,19 +181,27 @@ fun HomeScreen(
                 uiState = uiState,
                 isSearchFocused = isSearchFocused,
                 onFocusChanged = { isSearchFocused = it },
-                onQueryChange = { homeScreenViewModel.setSearchQuery(it) },
+                onQueryChange = {
+                    homeScreenViewModel.fetchSuggestions(it)
+                    homeScreenViewModel.setSearchQuery(it)
+                                },
                 onSearch = { query ->
                     homeScreenViewModel.searchLocation(query) {
-                        scope.launch { cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
-                        homeScreenViewModel.onMapClick(it)
+                        scope.launch {
+                            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
+                            homeScreenViewModel.onMapClick(it)
                         }
+
                     }
                     keyboardController?.hide()
                     localFocusManager.clearFocus()
                 },
                 onSuggestionClick = { suggestion ->
                     homeScreenViewModel.searchLocation(suggestion) {
-                        scope.launch { cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f)) }
+                        scope.launch {
+                            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it, 15f))
+                            homeScreenViewModel.onMapClick(it)
+                        }
                     }
                     homeScreenViewModel.clearSuggestions()
                     keyboardController?.hide()
