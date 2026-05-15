@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import no.uio.ifi.in2000.team12.team12project.R
 import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateHazard
 import no.uio.ifi.in2000.team12.team12project.data.local.AppDatabase
 import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
@@ -310,8 +311,8 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     // Updates the uiState with the position of hazard markers
     private fun loadHazardMarkers() {
         val context = getApplication<Application>().applicationContext
-        val downpourMarkers = climateHazard.readLatLngFromJson(context, "torrential_rain_stations_new.json")
-        val windMarkers = climateHazard.readLatLngFromJson(context, "high_wind_speed_stations_new.json")
+        val downpourMarkers = climateHazard.readLatLngFromJson(context, R.raw.torrential_rain_stations_new)
+        val windMarkers = climateHazard.readLatLngFromJson(context, R.raw.high_wind_station_new)
         _uiState.update {
             it.copy(
                 downpourList = downpourMarkers,

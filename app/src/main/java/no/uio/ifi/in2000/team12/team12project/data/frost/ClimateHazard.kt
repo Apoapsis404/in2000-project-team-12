@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
 import android.content.Context
+import androidx.annotation.RawRes
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -127,16 +128,15 @@ class ClimateHazard(
      * Reads station coordinates from a JSON file in the raw resources.
      *
      * @param context The application context.
-     * @param fileName The name of the JSON file in res/raw (e.g., "torrential_rain_stations.json").
+     * @param resourceId The resource ID of the JSON file in res/raw.
      * @return A list of LatLng coordinates.
      */
-    fun readLatLngFromJson(context: Context, fileName: String): List<LatLng> {
-        val resourceName = fileName.substringBeforeLast(".")
-        val resourceId = context.resources.getIdentifier(resourceName, "raw", context.packageName)
-
-        if (resourceId == 0) return emptyList()
-
-        val jsonString = context.resources.openRawResource(resourceId).bufferedReader().use { it.readText() }
+    fun readLatLngFromJson(context: Context, @RawRes resourceId: Int): List<LatLng> {
+        val jsonString = try {
+            context.resources.openRawResource(resourceId).bufferedReader().use { it.readText() }
+        } catch (_: Exception) {
+            return emptyList()
+        }
         return parseLatLngFromJson(jsonString)
     }
 
