@@ -310,8 +310,8 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     // Updates the uiState with the position of hazard markers
     private fun loadHazardMarkers() {
         val context = getApplication<Application>().applicationContext
-        val downpourMarkers = climateHazard.readLatLngFromJson(context, "torrential_rain_stations.json")
-        val windMarkers = climateHazard.readLatLngFromJson(context, "high_wind_speed_stations.json")
+        val downpourMarkers = climateHazard.readLatLngFromJson(context, "torrential_rain_stations_new.json")
+        val windMarkers = climateHazard.readLatLngFromJson(context, "high_wind_speed_stations_new.json")
         _uiState.update {
             it.copy(
                 downpourList = downpourMarkers,

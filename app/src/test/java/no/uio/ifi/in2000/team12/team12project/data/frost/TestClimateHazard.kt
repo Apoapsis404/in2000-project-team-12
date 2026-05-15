@@ -1,11 +1,9 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
-import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
-class TestTorrentialRain {
+class TestClimateHazard {
 
     val climateHazard = ClimateHazard()
 
