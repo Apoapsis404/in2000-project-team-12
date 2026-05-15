@@ -37,7 +37,7 @@
     <string name="sunshine_description">Duration of sunshine</string>
     <string name="precipitation">Precipitation</string>
     <string name="precipitation_description">Total precipitation</string>
-    <string name="temperature">temperature</string>
+    <string name="temperature">Temperature</string>
     <string name="temperature_description">Mean temperature</string>
     <string name="data_unavailable">Data unavailable</string>
 
