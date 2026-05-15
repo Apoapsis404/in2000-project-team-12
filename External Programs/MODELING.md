@@ -159,7 +159,9 @@ Alternativ flyt 3:\
 
 ## Use Case Diagram
 
-Mermaid egner seg ikke til å lage Use case diagrammer, så denne er lagt til i ExternalPrograms/UseCase.png.
+![Use Case Diagram](Team12UseCase.png)
+
+
 
 Case 1: Se klimadata for valgt posisjon \
 Aktør: Hageentusiast, Bonde\
@@ -175,7 +177,7 @@ extend --> Søk opp addresse / Velg posisjon: brukeren kan velge mellom å skriv
 
 Case 3: Skrive og lagre notater\
 Aktør: Hageentusiast, Bonde\
-Beskrivelse: Brukeren kan skrive notater og lagre notater.
+Beskrivelse: På notatskjermen kan bruker opprette et nytt notat og lagre dette. Bruker kan også få opp en oversikt over lagrede notater.
 
 Case 4: Se hvilke planter som kan overleve på valgt posisjon\
 Aktør: Hageentusiast, Bonde\
