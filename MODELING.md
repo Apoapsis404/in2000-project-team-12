@@ -159,7 +159,7 @@ Alternativ flyt 3:\
 
 ## Use Case Diagram
 
-![Use Case Diagram](Team12UseCase.png)
+![Use Case Diagram](External Documents/Team12UseCase.png)
 
 
 
