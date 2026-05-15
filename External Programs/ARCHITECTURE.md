@@ -1,20 +1,20 @@
 # Dokumentasjon av arkitektur
 
 ## Hensikt
-Dette dokumentet er tiltenkt for personer som skal videreutvikle appen, sette seg inn i den og fortsette å jobbe med kodestil/ praksis som er brukt. Dokumentet beskriver hvilke strukturelle beslutninger som er tatt, hvordan prosjektet er strukturert og kodepraksisene som er fulgt gjennom utviklingen.
+Dette dokumentet er tiltenkt for personer som skal videreutvikle appen, sette seg inn i den og fortsette å jobbe med kodestil/ praksis som er brukt. Dokumentet beskriver hvilke strukturelle beslutninger som er tatt, hvordan prosjektet er strukturert og kodepraksisene som er fulgt gjennom utviklingen av produktet.
 
 ## Appens funksjon
-Almanakken er en klima- app for bønder, folk med småbruk og andre som ønsker klimainnsikt for å drive med jordbruk. Appen lar brukerne se hvilke områder som er utsatt for ekstremvær basert på historisk data og få anbefalinger på vekstplaner for valgte områder fra nåtid og frem i tid.
+Almanakken er en klima- app for bønder, folk med småbruk og andre entusiaster som ønsker klimainnsikt for å drive med jordbruk. Appen lar brukerne se hvilke områder i Norge som er utsatt for ekstremvær basert på historisk data og få anbefalinger på vekstplaner for valgte områder fra nåtid og frem i tid.
 I appen kan brukerne:
 - Interagere med et kart som viser varsler for historisk data for flom, styrtregn og ekstrem vind.
+- Søke opp adresser i søkefeltet på kartet
 - Se årlig historisk data for solskinnstimer, nedbør, luftfuktighet og temperatur per måned.
 - Se anbefalinger av vekstplaner basert på prognostiserte klimaforhold
 - Lagre favorittlokasjoner og legge ved notater til disse.
 - Bytte mellom norsk og engelsk språk
 - Bytte mellom lyst og mørkt tema
 
-## Valg av SDK
-Det valgte API- nivået for appen er minimum SDK på API 24. 
+## Valg av SDK 
 Det valgte API- nivået for appen er minimum SDK på API 33. Dette er valgt siden appen bruker moderne API-er som Google Maps SDK og Google Places der Geocoder er brukt for å konvertere adresser til posisjoner. 
 Bønder i dag bruker mye moderne teknologi, så enhetene brukt av målgruppen vil i stor grad støtte denne løsningen.
 
@@ -65,7 +65,7 @@ Bønder i dag bruker mye moderne teknologi, så enhetene brukt av målgruppen vi
 ├── MainActivity.kt              # Appens inngangspunkt, med meny for navigasjon        \
 └── Team12Application.kt         # Initialisering av databaser                          
 
----
+
 
 # Arkitektur
 Appen følger Model - View - ViewModel (MVVM) arkitekturen med Unidirectional Data Flow (UDF).
@@ -83,7 +83,7 @@ Videre er prosjektet er delt opp i tre hovedmapper: Data, Model og UI.
 
 
 
-## Dataflow
+## Dataflyt - visuelt
 ```mermaid
 graph TD
     subgraph Data Layer
@@ -129,10 +129,11 @@ UI- en gir beskjed for handlinger ved å kalle på ViewModelen sine funksjoner. 
 
 - Det er opprettet en lokal room- database der brukerne kan lagre generelle innstillinger, favorittlokasjoner, og personlige notater. 
   Vi har valgt denne løsningen for å opprettholde personvern og sikre at kun brukeren selv har tilgang til sin egen persondata,
-  og for å øke brukeropplevelsen ved at dataen vedvarer etter lukking av applikasjonen. 
+  og for å øke brukeropplevelsen ved at dataen vedvarer etter lukking av applikasjonen.
+
+- Dataen i plants_data.json er generert med KI/ ChatGPT. Dette er fordi vi ikke fant noen tilstrekkelige API-er for plantedata som ikke var bak betalingsmurer. Dette er et punkt for forbedringspotensiale, men det er valgt å gjøre det slik for å idéen visjonen for funksjonen for anbefalte planter.
   
 
---- 
 
 ## Kodestil
 - All kode (funksjoner, variabler, kommentarer)er skrevet på engelsk.
