@@ -6,7 +6,8 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class TestTorrentialRain {
-    private val torrentialRain = TorrentialRain()
+
+    val climateHazard = ClimateHazard()
 
     @Test
     fun testParseLatLngFromJson() {
@@ -17,7 +18,7 @@ class TestTorrentialRain {
             ]
         """.trimIndent()
         
-        val result = torrentialRain.parseLatLngFromJson(jsonString)
+        val result = climateHazard.parseLatLngFromJson(jsonString)
         
         assertEquals(2, result.size)
         // Check first station (Longitude 10.72, Latitude 59.9423)
