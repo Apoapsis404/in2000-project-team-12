@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.ui.settings
 
-import android.app.Activity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

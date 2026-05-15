@@ -1,8 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.notes
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,9 +19,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -98,7 +93,7 @@ fun NotesScreenContent(
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(
                     notes,
-                    key = { it.id ?: it.hashCode() }
+                    key = { it.id }
                 ) { note ->
                     val isSelected = uiState.selectedNote?.id == note.id
 

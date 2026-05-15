@@ -23,7 +23,6 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -35,10 +34,8 @@ import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVERepository
 import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
-import no.uio.ifi.in2000.team12.team12project.model.frost.Languages
 import java.util.Locale
 import kotlin.coroutines.resume
-import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 
 data class HomeScreenUiState(
     val markerPosition: LatLng = LatLng(59.9127, 10.7461),
@@ -115,7 +112,7 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    // Fetches suggestions from google places based on the query in the TextField
+    // Fetches suggestions from Google places based on the query in the TextField
     fun fetchSuggestions(query: String) {
         if (query.isBlank()) {
             _uiState.update { it.copy(suggestions = emptyList()) }
@@ -311,8 +308,8 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     // Updates the uiState with the position of hazard markers
     private fun loadHazardMarkers() {
         val context = getApplication<Application>().applicationContext
-        val downpourMarkers = climateHazard.readLatLngFromJson(context, R.raw.torrential_rain_stations_new)
-        val windMarkers = climateHazard.readLatLngFromJson(context, R.raw.high_wind_station_new)
+        val downpourMarkers = climateHazard.readLatLngFromJson(context, R.raw.torrential_rain_stations)
+        val windMarkers = climateHazard.readLatLngFromJson(context, R.raw.high_wind_stations)
         _uiState.update {
             it.copy(
                 downpourList = downpourMarkers,

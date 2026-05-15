@@ -6,16 +6,13 @@ import androidx.compose.ui.graphics.Color
 // Light mode
 val prim1 = Color(0xFFA47251)
 val sec1 = Color(0xFFDD9E59)
-//val sec1 = Color(0xFF593D1F)
 val ter1 = Color(0xFFD53737)
 val onprim1 = Color(0xFFF1DEB6)
-//val onprim1 = Color(0xFF2A1705)
-//val onprim1 = Color(0xFFC4B084)
 val onback1 = Color(0xFF2F2F2F)
 val back1 = Color(0xFFF0E1C3)
 
 val humidityBlue = Color(0xFFA5D7EC)
-val precipiationBlue = Color(0xFF2674D2)
+val precipitationBlue = Color(0xFF2674D2)
 val sunshineYellow = Color(0xFFFFC107)
 
 val graphInfoGreen = Color(0xFF037D50)

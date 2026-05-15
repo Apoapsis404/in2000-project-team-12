@@ -20,12 +20,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -38,7 +34,6 @@ import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.R
-import no.uio.ifi.in2000.team12.team12project.model.favorites.FavoriteLocation
 import no.uio.ifi.in2000.team12.team12project.ui.home.HomeScreenViewModel
 
 @Composable

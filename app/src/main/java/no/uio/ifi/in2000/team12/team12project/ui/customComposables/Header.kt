@@ -55,7 +55,7 @@ fun Header(
     val titleColors = MaterialTheme.colorScheme.onPrimary
     val uiState by homeScreenViewModel.uiState.collectAsState()
     val currentAddress = uiState.address
-    val displayTitle = if (currentAddress.isBlank()) stringResource(R.string.app_title) else currentAddress
+    val displayTitle = currentAddress.ifBlank { stringResource(R.string.app_title) }
 
     val navStackBackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navStackBackEntry?.destination?.route

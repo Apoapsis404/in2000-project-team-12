@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.ui.theme.humidityBlue
-import no.uio.ifi.in2000.team12.team12project.ui.theme.precipiationBlue
+import no.uio.ifi.in2000.team12.team12project.ui.theme.precipitationBlue
 import no.uio.ifi.in2000.team12.team12project.ui.theme.sunshineYellow
 import no.uio.ifi.in2000.team12.team12project.R
 
@@ -223,7 +223,7 @@ fun PrecipitationVisual(value: Double, baseColor: Color) {
                     .fillMaxWidth()
                     .fillMaxHeight(progress)
                     .align(Alignment.BottomCenter)
-                    .background(precipiationBlue)
+                    .background(precipitationBlue)
             )
         }
         Icon(
