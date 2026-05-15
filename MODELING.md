@@ -41,7 +41,7 @@ rain_d --> home_vm
 end
 ```
 
-Vi har valgt å inkludere en aktitekturskisse fordi det gir et tydelig innblikk i hvordan data flyter gjennom applikasjonen, samt en oversiktlig visualisering av inndelingen med data- og UI-laget.
+Vi har valgt å inkludere en arkitekturskisse fordi det gir et tydelig innblikk i hvordan data flyter gjennom applikasjonen, samt en oversiktlig visualisering av inndelingen med data- og UI-laget.
 
 I datalaget ser vi hvordan data flyter fra API-ene Frost og NVE til DataSource og videre til Repositories. I tillegg håndteres data fra lokale filer i dette laget. 
  Applikasjonen benytter en lokal Room-database med tre forskjellige DAO-er. Data fra disse kildene flyter gjennom datalaget, og blir cashes i ViewModels i UI-laget
