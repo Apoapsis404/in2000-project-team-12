@@ -7,25 +7,6 @@ import kotlin.test.assertTrue
 
 class TestTorrentialRain {
     private val torrentialRain = TorrentialRain()
-    private val durationElement = "sum(duration_of_precipitation PT1H)"
-    private val amountElement = "sum(precipitation_amount P1D)"
-
-
-    @Test
-    fun testCalculateTorrentialRain() = runTest {
-        val monthsBack = 120u
-        val duration = torrentialRain.getClimateData("SN18700", monthsBack, durationElement)
-        val amount = torrentialRain.getClimateData("SN18700", monthsBack, amountElement)
-        val map = torrentialRain.calculateTorrentialRainInstances(duration, amount)
-        println(map)
-    }
-
-    @Test
-    fun testIsTorrentialRainThread() = runTest {
-        val sourceId = "SN18700"
-        val res = torrentialRain.isTorrentialRainThreat(sourceId)
-        println(res)
-    }
 
     @Test
     fun testParseLatLngFromJson() {

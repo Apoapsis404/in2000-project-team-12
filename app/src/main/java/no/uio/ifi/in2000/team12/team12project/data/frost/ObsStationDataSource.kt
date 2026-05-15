@@ -74,6 +74,26 @@ class ObsStationDataSource {
     }
 
     /**
+     * Fetches all MET.NO sensor system stations that support the given element.
+     *
+     * @param element The element ID to filter stations by.
+     * @return A list of [ObsStation]s.
+     */
+    suspend fun getMetStations(element: String): List<ObsStation> {
+        val response: HttpResponse = KtorClient.client.get(URL_V0) {
+            basicAuth(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_SECRET)
+            url {
+                parameters.append("elements", element)
+                parameters.append("types", "SensorSystem")
+                parameters.append("stationholder", "MET.NO")
+                parameters.append("fields", "id,name,geometry")
+            }
+        }
+
+        return handleResponse<ObsStationResponse>(response).data
+    }
+
+    /**
      * Fetches all MET.NO sensor system stations in Norway.
      *
      * @return A list of station IDs.

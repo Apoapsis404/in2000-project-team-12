@@ -47,10 +47,6 @@ def months_since(date):
 def years_since(date):
     return months_since(date) // 12
  
-print(months_since("2016-01-01"))
-print(years_since("2016-01-01"))
-print(last_n_months(124))
-
 def get_time_series(source, element):
     endpoint = 'https://frost.met.no/observations/availableTimeSeries/v0.jsonld'
     params = {
@@ -91,18 +87,12 @@ def get_frost_data(source, time_range, element):
         return None
 
 def analyze_rain(data):
-    # Threshold: 50mm/h. For a 10min period, this is 50 / 6 = 8.33mm
-    TORRENTIAL_LIMIT_10M = 7.5 #mm
+    TORRENTIAL_LIMIT_10M = 20 #mm
     
     found_events = 0
     
     for observation in data:
-        time = observation['referenceTime']
-        # The 'value' is the mm amount recorded in those 10 minutes
         val = observation['observations'][0]['value']
-        
-        # Calculate hourly rate for reporting
-        hourly_rate = val * 6 
         
         if val >= TORRENTIAL_LIMIT_10M:
             found_events += 1
@@ -110,10 +100,11 @@ def analyze_rain(data):
 
     return found_events
 
-def get_met_stations():
+def get_met_stations(element):
     endpoint = 'https://frost.met.no/sources/v0.jsonld'
     params = {
-        # 'ids': "SN18700,SN18500",
+        # 'ids': "SN59450, SN18700, SN87110, SN40250, SN5350, SN80740, SN26990, SN26900, SN83710, SN85890",
+        'elements': element,
         'types': "SensorSystem",
         'stationholder': "MET.NO"
     }
@@ -126,37 +117,25 @@ def get_met_stations():
         return r.json()['data']
     else:
         print(f"Error! Status code: {r.status_code}")
-        # print(f"Server says: {r.text}") # This will tell you the ACTUAL problem
         return None
 
-print(get_met_stations()[0]['geometry']['coordinates']) 
     
 def get_rain_events_from_stations():
-    # List of sourceIds
-    sources = get_met_stations()
-    # print(sources[0]['geometry']['coordinates'])
-    # return
+    rain_element = "sum(precipitation_amount PT1H)"
+    
+    sources = get_met_stations(rain_element)
     res = []
     def process_station(source):
         sourceName = source['id']
-        print(f"Trying to find data for station: {sourceName}")
-        timeSeries = get_time_series(sourceName)
-        if timeSeries is None:
-            return None
+        raw_data = get_frost_data(sourceName, construct_time_series(120), rain_element)
+        
+        if raw_data == None:
+            return 
 
-        print(f"Found time series: {timeSeries[0]['validFrom']}")
-
-        months = min(years_since(timeSeries[0]['validFrom']) * 12, 60)
-        events = 0
-        for i in range(0, months, 12):
-            raw_data = get_frost_data(sourceName, construct_time_series(i + 12, last_n_months(i)))
-            if raw_data is None:
-                continue
-
-            events += analyze_rain(raw_data)
+        events = analyze_rain(raw_data)
 
         print(f"Found {events} events for {sourceName}")
-        return (source['geometry']['coordinates'], events) if events > 5 else None
+        return (source['geometry']['coordinates'], events) if events >= 3 else None
 
     res = []
     max_workers = min(5, len(sources))
@@ -167,17 +146,13 @@ def get_rain_events_from_stations():
 
     return res
 
-# print(get_rain_events_from_stations())
 
 def analyze_wind(data):
-    # Threshold: 50mm/h. For a 10min period, this is 50 / 6 = 8.33mm
-    STRONG_WIND = 11.2 #m/s source: https://www.hastings.gov.uk/content/weather-management/Beaufort_Wind_Scale.pdf
+    STRONG_WIND = 17.2 #m/s source: https://www.hastings.gov.uk/content/weather-management/Beaufort_Wind_Scale.pdf
     
     found_events = 0
     
     for observation in data:
-        time = observation['referenceTime']
-        # The 'value' is the mm amount recorded in those 10 minutes
         val = observation['observations'][0]['value']
         
         if val >= STRONG_WIND:
@@ -187,11 +162,9 @@ def analyze_wind(data):
 
 
 def get_wind_events_from_stations():
-    # List of sourceIds
-
     wind_element = "max(wind_speed P1D)"
 
-    sources = get_met_stations()
+    sources = get_met_stations(wind_element)
     res = []
     def process_station(source):
         sourceName = source['id']
@@ -200,9 +173,11 @@ def get_wind_events_from_stations():
         if raw_data is None:
             return
         events += analyze_wind(raw_data)
+        
+        years = max(years_since(raw_data[0]['referenceTime']), 1)
 
         print(f"Found {events} events for {sourceName}")
-        return (source['geometry']['coordinates'], events) if events > 1 else None
+        return (source['geometry']['coordinates'], events // years) if events / years >= 5 else None
 
     res = []
     max_workers = min(5, len(sources))
@@ -214,41 +189,18 @@ def get_wind_events_from_stations():
     return res
 
 
-
-# timeSeries = get_time_series()
-# if timeSeries:
-#     print("time series: ", timeSeries[0]['validFrom'])
-#     print(months_since(timeSeries[0]['validFrom']))
-
-
-
 # Start the timer
 start_time = time.perf_counter()
 
 # # Run it
+# print([x['id'] for x in get_met_stations("sum(precipitation_amount PT1H)")]) 
+print(get_rain_events_from_stations())
 # print(get_wind_events_from_stations())
 
 
-# # Got Data!
 
 end_time = time.perf_counter()
 
 # Calculate and print duration
 execution_time = end_time - start_time
 print(f"Executed in {execution_time:.4f} seconds")
-
-# # timeSeries = get_time_series()
-# # if timeSeries:
-# #     print(timeSeries)
-
-
-# if raw_data:
-#     events = analyze_rain(raw_data)
-#     print(events)
-
-# # End the timer
-# end_time = time.perf_counter()
-
-# # Calculate and print duration
-# execution_time = end_time - start_time
-# print(f"Executed in {execution_time:.4f} seconds")
