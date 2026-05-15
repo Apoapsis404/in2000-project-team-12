@@ -167,8 +167,8 @@ Case 1: Se klimadata for valgt posisjon \
 Aktør: Hageentusiast, Bonde\
 Beskrivelse: Brukeren velger en posisjon og får opp klimadata for denne. Brukeren kan velge å se data i år eller bla bakover i tid for å se 
 historiske klimadata.
-include-->Se gjennomsnitt: Gjennomsnittlig måling vises alltid som en del av klimavisningen
-extend--> Brukeren kan valgfritt se historisk klimadata for de ulike klimatypene
+include-->Se gjennomsnitt: Gjennomsnittlige målinger vises alltid som en del av klimavisningen
+extend--> Brukeren kan se historisk klimadata for de ulike klimatypene ved å trykke på ønsket klimatype (f.eks. soltimer)
 
 Case 2: Legge til og lagre adresser\
 Aktør: Hageentusiast, Bonde\
@@ -188,6 +188,6 @@ extend --> Planter som kan overleve i framtiden: Bruker kan velge å se hvilke p
 
 Case 5: Se områder på kart som er spesielt utsatt for naturhendelser\
 Aktør: Bonde\
-Beskrivelse: Brukeren får opp steder som er spesielt utsatt for flom, styrtregn eller ekstrem vind på kart.
+Beskrivelse: Brukeren får opp steder som er spesielt utsatt for flom, styrtregn eller ekstrem vind på kart, gjennom ikoner. Ved å trykke på informasjons- knapp får brukeren opp ytterligere informasjon om symbolene og hva de innebærer.
 
 
