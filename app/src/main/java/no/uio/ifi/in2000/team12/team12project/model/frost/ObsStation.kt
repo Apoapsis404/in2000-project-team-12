@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ObsStation(
     val id: String,
-    val name: String,
+    val name: String = "",
     val geometry: Geometry,
-    val distance: Double,
+    val distance: Double = 0.0,
 )
 
 @Serializable

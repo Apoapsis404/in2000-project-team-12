@@ -11,6 +11,7 @@ import no.uio.ifi.in2000.team12.team12project.data.exceptions.ServerErrorExcepti
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.ServiceBusyException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.UnauthorizedException
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
+import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationIdResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationResponse
@@ -55,6 +56,7 @@ class ObsStationDataSource {
         latitude: Double,
         longitude: Double,
         maxCount: Int = 5,
+        element: String = "*",
         clientId: String = DEFAULT_CLIENT_ID,
         clientSecret: String = DEFAULT_CLIENT_SECRET
     ): List<ObsStation> {
@@ -65,6 +67,7 @@ class ObsStationDataSource {
             basicAuth(clientId, clientSecret)
             url {
                 parameters.append("geometry", nearestString)
+                parameters.append("elements", element)
                 parameters.append("nearestmaxcount", maxCount.toString())
                 parameters.append("fields", fieldsString)
             }
@@ -74,22 +77,24 @@ class ObsStationDataSource {
     }
 
     /**
-     * Fetches all MET.NO sensor system stations in Norway.
+     * Fetches all MET.NO sensor system stations that support the given element.
      *
-     * @return A list of station IDs.
+     * @param element The element ID to filter stations by.
+     * @return A list of [ObsStation]s.
      */
-    suspend fun getMetStations(): List<String> {
+    suspend fun getMetStations(element: String): List<ObsStation> {
         val response: HttpResponse = KtorClient.client.get(URL_V0) {
             basicAuth(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_SECRET)
             url {
+                parameters.append("elements", element)
                 parameters.append("country", "norge")
                 parameters.append("types", "SensorSystem")
                 parameters.append("stationholder", "MET.NO")
-                parameters.append("fields", "id")
+                parameters.append("fields", "id,name,geometry")
             }
         }
 
-        return handleResponse<ObsStationIdResponse>(response).data.map { it.id }
+        return handleResponse<ObsStationResponse>(response).data
     }
 
     /**
