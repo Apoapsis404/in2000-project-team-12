@@ -44,7 +44,7 @@ end
 Vi har valgt å inkludere en arkitekturskisse fordi det gir et tydelig innblikk i hvordan data flyter gjennom applikasjonen, samt en oversiktlig visualisering av inndelingen med data- og UI-laget.
 
 I datalaget ser vi hvordan data flyter fra API-ene Frost og NVE til DataSource og videre til Repositories. I tillegg håndteres data fra lokale filer i dette laget. 
- Applikasjonen benytter en lokal Room-database med tre forskjellige DAO-er. Data fra disse kildene flyter gjennom datalaget, og blir cashes i ViewModels i UI-laget
+ Applikasjonen benytter en lokal Room-database med tre forskjellige DAO-er. Data fra disse kildene flyter gjennom datalaget, og blir cashet i ViewModels i UI-laget.
 
 I UI-laget har hver sin egen ViewModel. ViewModelene for innstillinger, favoritter og notater henter data fra sine respektive DAO-er. GraphScreenViewModel henter data fra ClimateDataRepository og PlantRepository for å kunne vise grafen, gjennomsnittsverdier og en planteprognose på GraphScreen.
 HomeScreenViewModel henter data fra både NVE og lokale filer for vind- og nedbørsdata, for å vise symboler på kartet. For kartvisningen i HomeScreen har vi brukt Google Maps SDK.
@@ -61,11 +61,11 @@ sequenceDiagram
     par Ui displays loading
         UI->>ViewModel: uiState.collectAsState()
         ViewModel-->>UI: uiState: isLoading = true
-        UI-->>Bruker: Viser grafskjerm med laste-sirkel
+        UI-->>Bruker: Viser grafskjerm med loading- indicator
     and backend fetches data
 
         ViewModel->>+Data: GetClimateData()
-        loop Repeat til station is found OR 15 times
+        loop Repeat til station is found OR 25 times
             Data ->> +Frost: GET httpResponse
             Frost -->> -Data: Json response
             Data->>Data: Parse
@@ -86,7 +86,7 @@ Senarioet starter med at bruker trykker på graf-ikonet. Dette utløser et kall 
 graf-skjermen og viser en loading-indikator. UI-et observerer state fra ViewModel, og oppdateres basert på tilgjenglig data. 
 
 Mens loading-indikatoren vises, blir dataen hentet i datalaget. Det gjøres ved hjelp av en loop som kjører til
-brukbar data returneres. Dersom gyldig data ikke returneres gjentas forsøket opptil 15 ganger før det blir kastet en Exception. Om daten er brukbar vil en liste med klima-observasjoner bli
+brukbar data returneres. Dersom gyldig data ikke returneres gjentas forsøket opptil 25 ganger før det blir kastet en Exception. Om daten er brukbar vil en liste med klima-observasjoner bli
 cashet i ViewModel, og UI vil vise grafen over historiske temperatur-data.
 
 Deretter trykker bruker på boksen med et sol-ikon. Dette fører til et kall på setClimateType() i viewModel, som allerede har denne dataen cashet. ViewModel oppdater uiState, 
