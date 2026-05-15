@@ -71,6 +71,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import no.uio.ifi.in2000.team12.team12project.BuildConfig
 import no.uio.ifi.in2000.team12.team12project.R
 import java.util.Locale
 import kotlin.coroutines.resume
@@ -131,7 +132,7 @@ fun HomeScreen(
             onMapLoaded = { homeScreenViewModel.onMapReady() },
             onMapClick = onMapOrMarkerClick,
             googleMapOptionsFactory = {
-                GoogleMapOptions().mapId("48427ab8c098a917274af32e")
+                GoogleMapOptions().mapId(BuildConfig.MAPS_ID)
             },
             uiSettings = mapUiSettings,
         ) {
