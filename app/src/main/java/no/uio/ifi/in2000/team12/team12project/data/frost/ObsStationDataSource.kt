@@ -11,9 +11,7 @@ import no.uio.ifi.in2000.team12.team12project.data.exceptions.ServerErrorExcepti
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.ServiceBusyException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.UnauthorizedException
 import no.uio.ifi.in2000.team12.team12project.data.network.KtorClient
-import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStation
-import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationIdResponse
 import no.uio.ifi.in2000.team12.team12project.model.frost.ObsStationResponse
 
 private const val TAG = "ObsStationDataSource"

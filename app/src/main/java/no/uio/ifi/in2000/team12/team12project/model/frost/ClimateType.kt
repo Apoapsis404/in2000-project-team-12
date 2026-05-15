@@ -12,8 +12,8 @@ import no.uio.ifi.in2000.team12.team12project.R
 enum class ClimateType(
     val elementId: String,
     val unit: String,
-    @StringRes val description: Int,
-    @StringRes val label: Int,
+    @get:StringRes val description: Int,
+    @get:StringRes val label: Int,
     val icon: ImageVector
 ) {
     MEAN_AIR_TEMP(

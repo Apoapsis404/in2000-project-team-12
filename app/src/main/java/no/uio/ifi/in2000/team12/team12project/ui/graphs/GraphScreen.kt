@@ -135,8 +135,8 @@ fun GraphScreen(
 
             // Month selection dropdown
             DropDown<Months>(
-                defaultName = uiState.month.localizedName(context),
-                labelMapper = { it.localizedName(context) }
+                defaultName = uiState.month.localizedName(),
+                labelMapper = { it.localizedName() }
             ) { selectedMonth ->
                 graphScreenViewModel.setMonth(selectedMonth)
             }

@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,10 +45,9 @@ fun PlantPopup(
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        val context = LocalContext.current
         DropDown<Months>(
-            defaultName = uiState.month.localizedName(context),
-            labelMapper = { it.localizedName(context) },
+            defaultName = uiState.month.localizedName(),
+            labelMapper = { it.localizedName() },
             onClick = {
                 graphScreenViewModel.setMonth(it)
                 // updatePredictedClimate is now internal and triggered automatically by setMonth

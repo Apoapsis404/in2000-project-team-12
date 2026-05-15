@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.model.frost
 
-import android.content.Context
 import java.util.Locale
 
 enum class Months(val value: Int, val english : String, val norwegian : String) {
@@ -18,6 +17,6 @@ enum class Months(val value: Int, val english : String, val norwegian : String) 
     DECEMBER(12, "December", "Desember")
 }
 
-    fun Months.localizedName(context: Context): String {
+    fun Months.localizedName(): String {
         return if (Locale.getDefault().language == "nb") norwegian else english
     }

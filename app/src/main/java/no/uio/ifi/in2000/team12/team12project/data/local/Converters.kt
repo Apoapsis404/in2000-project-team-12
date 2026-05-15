@@ -10,7 +10,7 @@ class Converters {
     @TypeConverter
     fun toLanguage(value: String): Languages = try {
         Languages.valueOf(value)
-    } catch (e: IllegalArgumentException) {
+    } catch (_: IllegalArgumentException) {
         Languages.ENGLISH
     }
 }
