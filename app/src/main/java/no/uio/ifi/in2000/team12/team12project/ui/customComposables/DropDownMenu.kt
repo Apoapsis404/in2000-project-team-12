@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.customComposables
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -16,10 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlin.enums.enumEntries
@@ -33,7 +30,7 @@ inline fun <reified E : Enum<E>> DropDown(
     crossinline onClick: (E) -> Unit
 ) {
     val options = enumEntries<E>()
-    var expanded by remember { mutableStateOf(false) }
+    val expanded = remember { mutableStateOf(false) }
     val textFieldState = rememberTextFieldState(defaultName)
 
     LaunchedEffect(defaultName) {
@@ -41,16 +38,16 @@ inline fun <reified E : Enum<E>> DropDown(
     }
 
     ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = modifier.heightIn(max = 280.dp),
+        expanded = expanded.value,
+        onExpandedChange = { expanded.value = it },
+        modifier = modifier,
     ) {
         TextField(
-            modifier = modifier
+            modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
             shape = RoundedCornerShape(16.dp),
             state = textFieldState,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(
                 focusedTextColor = MaterialTheme.colorScheme.onPrimary,
                 focusedContainerColor = MaterialTheme.colorScheme.primary,
@@ -65,8 +62,8 @@ inline fun <reified E : Enum<E>> DropDown(
             lineLimits = TextFieldLineLimits.SingleLine,
         )
         ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false },
             modifier = Modifier.background(MaterialTheme.colorScheme.primary)
         ) {
             options.forEach { option ->
@@ -80,7 +77,7 @@ inline fun <reified E : Enum<E>> DropDown(
                     onClick = {
                         onClick(option)
                         textFieldState.setTextAndPlaceCursorAtEnd(labelMapper(option))
-                        expanded = false
+                        expanded.value = false
                     },
                     modifier = Modifier.background(MaterialTheme.colorScheme.primary)
                 )
