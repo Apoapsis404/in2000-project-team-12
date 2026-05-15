@@ -4,18 +4,26 @@
 Dette dokumentet er tiltenkt for personer som skal videreutvikle appen, sette seg inn i den og fortsette å jobbe med kodestil/ praksis som er brukt. Dokumentet beskriver hvilke strukturelle beslutninger som er tatt, hvordan prosjektet er strukturert og kodepraksisene som er fulgt gjennom utviklingen.
 
 ## Appens funksjon
-Almanakken er en klima- app for bønder, folk med småbruk og andre som ønsker klimainnsikt for å drive med jordbruk. Appen lar brukerne se hvilke områder som er utsatt for ekstremvær basert på historisk data og få anbefalinger på vekstplaner for valgte områder fra nåtid og frem i tid
+Almanakken er en klima- app for bønder, folk med småbruk og andre som ønsker klimainnsikt for å drive med jordbruk. Appen lar brukerne se hvilke områder som er utsatt for ekstremvær basert på historisk data og få anbefalinger på vekstplaner for valgte områder fra nåtid og frem i tid.
 I appen kan brukerne:
 - Interagere med et kart som viser varsler for historisk data for flom, styrtregn og ekstrem vind.
-- Se historisk data for ulike vær- og klimafaktorer.
+- Se årlig historisk data for solskinnstimer, nedbør, luftfuktighet og temperatur per måned.
 - Se anbefalinger av vekstplaner basert på prognostiserte klimaforhold
 - Lagre favorittlokasjoner og legge ved notater til disse.
 - Bytte mellom norsk og engelsk språk
 - Bytte mellom lyst og mørkt tema
 
-## API
-// Drøft med gruppa
-Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å maksimere antall enheter som kan bruke appen samtidig som det tillater utviklerne å bruke moderne API-er og biblioteker.
+## Valg av SDK
+Det valgte API- nivået for appen er minimum SDK på API 24. 
+Det valgte API- nivået for appen er minimum SDK på API 33. Dette er valgt siden appen bruker moderne API-er som Google Maps SDK og Google Places der Geocoder er brukt for å konvertere adresser til posisjoner. 
+Bønder i dag bruker mye moderne teknologi, så enhetene brukt av målgruppen vil i stor grad støtte denne løsningen.
+
+## Eksterne API-er
+- Frost API : Historiske klimadata (temperatur, luftfuktighet, nedbør, solskinnstimer)
+- NVE API : Historisk flomdata
+- Google Maps : Interaktivt kart med markører
+- Google Places : Forslag på adresser i søkefelt
+- Ktor : Nettverkstilgang
 
 ## Teknologi brukt
 - Kotlin: Primært programmeringsspråk
@@ -27,12 +35,6 @@ Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å mak
 - Vico: Tegning av klimagraf
 - Apache Commons Math: Utregninger av regresjonsanalyse
 
-## Eksterne API-er
-- Frost API : Historiske klimadata (temperatur, luftfuktighet, nedbør, solskinnstimer)
-- NVE API : Historisk flomdata
-- Google Maps : Interaktivt kart med markører
-- Google Places : Forslag på adresser i søkefelt
-- Ktor : Nettverkstilgang
 
 ## Prosjektets struktur
 .
@@ -67,16 +69,16 @@ Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å mak
 
 # Arkitektur
 Appen følger Model - View - ViewModel (MVVM) arkitekturen med Unidirectional Data Flow (UDF).
-Dataflyten fungerer overordnet slik: DataSource --> Repository --> ViewModel --> uiState --> UI. \
+Dataflyten fungerer overordnet slik: DataSource --> Repository --> ViewModel --> uiState --> UI. 
 Eksempelvis vil svaret på et kall på klimadata fra grafskjermen se slik ut: FrostDataSource -> FrostRepository -> GraphScreenViewModel -> GraphScreenUiState -> GraphScreen.
 
 Videre er prosjektet er delt opp i tre hovedmapper: Data, Model og UI.
-- I data pakken ligger DataSources og Repositories for de ulike API-ene brukt og JSON-filene appen henter data fra. \
-  Her ligger også exceptions som brukes for håndtering av unntak dersom kallene til Frost API ikke returnerer ønskede resultater, \
+- I data pakken ligger DataSources og Repositories for de ulike API-ene brukt og JSON-filene appen henter data fra. 
+  Her ligger også exceptions som brukes for håndtering av unntak dersom kallene til Frost API ikke returnerer ønskede resultater, 
   og grensesnittet for roomdatabasen og de tre DAO-ene.
 - I model- pakken ligger alle data- og enum-klasser som brukes i appen.
-- I ui- pakken ligger alle skjermer og komponenter som brukes i appen, med deres respektive viewModels, \ 
-  samt en theme- pakke med verdier for farger, tema og tekst. \
+- I ui- pakken ligger alle skjermer og komponenter som brukes i appen, med deres respektive viewModels, 
+  samt en theme- pakke med verdier for farger, tema og tekst. 
   Her ligger også navigation- pakken som holder styr på navigasjon i appen.
 
 
