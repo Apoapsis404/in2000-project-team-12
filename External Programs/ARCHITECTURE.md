@@ -1,21 +1,29 @@
 # Dokumentasjon av arkitektur
 
 ## Hensikt
-Dette dokumentet er tiltenkt for personer som skal videreutvikle appen, sette seg inn i den og fortsette å jobbe med kodestil/ praksis som er brukt. Dokumentet beskriver hvilke strukturelle beslutninger som er tatt, hvordan prosjektet er strukturert og kodepraksisene som er fulgt gjennom utviklingen.
+Dette dokumentet er tiltenkt for personer som skal videreutvikle appen, sette seg inn i den og fortsette å jobbe med kodestil/ praksis som er brukt. Dokumentet beskriver hvilke strukturelle beslutninger som er tatt, hvordan prosjektet er strukturert og kodepraksisene som er fulgt gjennom utviklingen av produktet.
 
 ## Appens funksjon
-Almanakken er en klima- app for bønder, folk med småbruk og andre som ønsker klimainnsikt for å drive med jordbruk. Appen lar brukerne se hvilke områder som er utsatt for ekstremvær basert på historisk data og få anbefalinger på vekstplaner for valgte områder fra nåtid og frem i tid
+Almanakken er en klima- app for bønder, folk med småbruk og andre entusiaster som ønsker klimainnsikt for å drive med jordbruk. Appen lar brukerne se hvilke områder i Norge som er utsatt for ekstremvær basert på historisk data og få anbefalinger på vekstplaner for valgte områder fra nåtid og frem i tid.
 I appen kan brukerne:
 - Interagere med et kart som viser varsler for historisk data for flom, styrtregn og ekstrem vind.
-- Se historisk data for ulike vær- og klimafaktorer.
+- Søke opp adresser i søkefeltet på kartet
+- Se årlig historisk data for solskinnstimer, nedbør, luftfuktighet og temperatur per måned.
 - Se anbefalinger av vekstplaner basert på prognostiserte klimaforhold
 - Lagre favorittlokasjoner og legge ved notater til disse.
 - Bytte mellom norsk og engelsk språk
 - Bytte mellom lyst og mørkt tema
 
-## API
-// Drøft med gruppa
-Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å maksimere antall enheter som kan bruke appen samtidig som det tillater utviklerne å bruke moderne API-er og biblioteker.
+## Valg av SDK 
+Det valgte API- nivået for appen er minimum SDK på API 33. Dette er valgt siden appen bruker moderne API-er som Google Maps SDK og Google Places der Geocoder er brukt for å konvertere adresser til posisjoner. 
+Bønder i dag bruker mye moderne teknologi, så enhetene brukt av målgruppen vil i stor grad støtte denne løsningen.
+
+## Eksterne API-er
+- Frost API : Historiske klimadata (temperatur, luftfuktighet, nedbør, solskinnstimer)
+- NVE API : Historisk flomdata
+- Google Maps : Interaktivt kart med markører
+- Google Places : Forslag på adresser i søkefelt
+- Ktor : Nettverkstilgang
 
 ## Teknologi brukt
 - Kotlin: Primært programmeringsspråk
@@ -27,12 +35,6 @@ Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å mak
 - Vico: Tegning av klimagraf
 - Apache Commons Math: Utregninger av regresjonsanalyse
 
-## Eksterne API-er
-- Frost API : Historiske klimadata (temperatur, luftfuktighet, nedbør, solskinnstimer)
-- NVE API : Historisk flomdata
-- Google Maps : Interaktivt kart med markører
-- Google Places : Forslag på adresser i søkefelt
-- Ktor : Nettverkstilgang
 
 ## Prosjektets struktur
 .
@@ -63,26 +65,52 @@ Det valgte API- nivået for appen er minimum SDK på API 24. Dette er for å mak
 ├── MainActivity.kt              # Appens inngangspunkt, med meny for navigasjon        \
 └── Team12Application.kt         # Initialisering av databaser                          
 
----
+
 
 # Arkitektur
 Appen følger Model - View - ViewModel (MVVM) arkitekturen med Unidirectional Data Flow (UDF).
-Dataflyten fungerer overordnet slik: DataSource --> Repository --> ViewModel --> uiState --> UI. \
+Dataflyten fungerer overordnet slik: DataSource --> Repository --> ViewModel --> uiState --> UI. 
 Eksempelvis vil svaret på et kall på klimadata fra grafskjermen se slik ut: FrostDataSource -> FrostRepository -> GraphScreenViewModel -> GraphScreenUiState -> GraphScreen.
 
 Videre er prosjektet er delt opp i tre hovedmapper: Data, Model og UI.
-- I data pakken ligger DataSources og Repositories for de ulike API-ene brukt og JSON-filene appen henter data fra. \
-  Her ligger også exceptions som brukes for håndtering av unntak dersom kallene til Frost API ikke returnerer ønskede resultater, \
+- I data pakken ligger DataSources og Repositories for de ulike API-ene brukt og JSON-filene appen henter data fra. 
+  Her ligger også exceptions som brukes for håndtering av unntak dersom kallene til Frost API ikke returnerer ønskede resultater, 
   og grensesnittet for roomdatabasen og de tre DAO-ene.
 - I model- pakken ligger alle data- og enum-klasser som brukes i appen.
-- I ui- pakken ligger alle skjermer og komponenter som brukes i appen, med deres respektive viewModels, \ 
-  samt en theme- pakke med verdier for farger, tema og tekst. \
+- I ui- pakken ligger alle skjermer og komponenter som brukes i appen, med deres respektive viewModels, 
+  samt en theme- pakke med verdier for farger, tema og tekst. 
   Her ligger også navigation- pakken som holder styr på navigasjon i appen.
 
 
 
-## Dataflow?
+## Dataflyt - visuelt
+```mermaid
+graph TD
+    subgraph Data Layer
+        api[(External APIs / JSON)]
+        db[(Room Database)]
+        ds[Data Source]
+        repo[Repository]
 
+        api --> ds
+        ds --> repo
+        db --> repo
+    end
+
+    subgraph UI Layer
+        vm[ViewModel]
+        screen[Screen / Composable]
+        nav[NavHost]
+
+        vm -->|UiState| screen
+        screen -->|Events| vm
+        nav --> screen
+    end
+
+    repo -->|Data| vm
+    main[MainActivity] --> nav
+
+```
 ## UDF
 Alle skjermer har en har en egen "uiState"- dataklasse som representerer hele uiState-en for den skjermen. Skjermens ViewModel henter staten via MutableStateFlow.
 UI- en gir beskjed for handlinger ved å kalle på ViewModelen sine funksjoner. ViewModelen behandler så handlingene og oppdaterer uiState-en som UI-en observerer via collectAsState(). Slik opprettholdes UDF.
@@ -101,13 +129,14 @@ UI- en gir beskjed for handlinger ved å kalle på ViewModelen sine funksjoner. 
 
 - Det er opprettet en lokal room- database der brukerne kan lagre generelle innstillinger, favorittlokasjoner, og personlige notater. 
   Vi har valgt denne løsningen for å opprettholde personvern og sikre at kun brukeren selv har tilgang til sin egen persondata,
-  og for å øke brukeropplevelsen ved at dataen vedvarer etter lukking av applikasjonen. 
+  og for å øke brukeropplevelsen ved at dataen vedvarer etter lukking av applikasjonen.
+
+- Dataen i plants_data.json er generert med KI/ ChatGPT. Dette er fordi vi ikke fant noen tilstrekkelige API-er for plantedata som ikke var bak betalingsmurer. Dette er et punkt for forbedringspotensiale, men det er valgt å gjøre det slik for å idéen visjonen for funksjonen for anbefalte planter.
   
 
---- 
 
 ## Kodestil
-- All kode (funksjoner, variabler, kommentarer)er skrevet på engelsk.
+- All kode (funksjoner, variabler, kommentarer) er skrevet på engelsk.
 - Alle variabelnavn er skrevet i **camelCase**, alle klasser er skrevet i **PascalCase**
 - UI state er representert ved dataklasser og oppdateres med .copy()
 - All forretningslogikk ligger i ViewModels og er separert fra @Composables
