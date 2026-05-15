@@ -22,6 +22,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import no.uio.ifi.in2000.team12.team12project.utils.NetworkUtils
+import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -67,7 +69,7 @@ class MainActivity : ComponentActivity() {
         val defaultLang = if (systemLocale.startsWith("nb") || systemLocale.startsWith("nn") || systemLocale.startsWith("no")) "nb" else "en"
         val langCode = prefs.getString("language", defaultLang) ?: defaultLang
 
-        val locale = Locale(langCode)
+        val locale = Locale.forLanguageTag(langCode)
         Locale.setDefault(locale)
         val config = Configuration(newBase.resources.configuration)
         config.setLocale(locale)
@@ -112,8 +114,9 @@ class MainActivity : ComponentActivity() {
             setLocale(settings.language.name)
         }
 
+        @Suppress("DEPRECATION")
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
+            Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY, Locale.getDefault())
         }
         enableEdgeToEdge()
         setContent {
@@ -146,14 +149,15 @@ class MainActivity : ComponentActivity() {
             "NORSK" -> "nb"
             else -> language.lowercase()
         }
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         val config = resources.configuration
         config.setLocale(locale)
         createConfigurationContext(config)
+        @Suppress("DEPRECATION")
         resources.updateConfiguration(config, resources.displayMetrics)
         val prefs = getSharedPreferences("settings", MODE_PRIVATE)
-        prefs.edit().putString("language", languageCode).apply()
+        prefs.edit(commit = false) { putString("language", languageCode) }
     }
 }
 
@@ -174,8 +178,8 @@ fun MainComp(
 
     val context = LocalContext.current
     var showStartupNoInternetDialog by remember { mutableStateOf(!NetworkUtils.isNetworkAvailable(context)) }
-    var showNavigationNoInternetDialog by remember { mutableStateOf(false) }
-    var noInternetMessageResId by remember { mutableStateOf(R.string.no_internet_navigation_message) }
+    val showNavigationNoInternetDialog = remember { mutableStateOf(false) }
+    var noInternetMessageResId by remember { mutableIntStateOf(R.string.no_internet_navigation_message) }
 
     // Dialog for no internet at startup
     if (showStartupNoInternetDialog) {
@@ -196,17 +200,17 @@ fun MainComp(
     }
 
     // Dialog for no internet when navigating
-    if (showNavigationNoInternetDialog) {
+    if (showNavigationNoInternetDialog.value) {
         AlertDialog(
             onDismissRequest = { 
-                showNavigationNoInternetDialog = false
+                showNavigationNoInternetDialog.value = false
             },
             title = { Text(stringResource(R.string.no_internet_title)) },
             text = { Text(stringResource(noInternetMessageResId)) },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        showNavigationNoInternetDialog = false
+                        showNavigationNoInternetDialog.value = false
                     }
                 ) {
                     Text(stringResource(R.string.close))
@@ -224,7 +228,7 @@ fun MainComp(
                 onClose = {scope.launch { drawerState.close() }},
                 onNoInternet = { messageResId ->
                     noInternetMessageResId = messageResId ?: R.string.no_internet_navigation_message
-                    showNavigationNoInternetDialog = true 
+                    showNavigationNoInternetDialog.value = true 
                 }
             )
         }
@@ -240,7 +244,7 @@ fun MainComp(
                     },
                     onNoInternet = { messageResId ->
                         noInternetMessageResId = messageResId ?: R.string.no_internet_navigation_message
-                        showNavigationNoInternetDialog = true 
+                        showNavigationNoInternetDialog.value = true 
                     }
                 )
             },
@@ -257,7 +261,7 @@ fun MainComp(
                 navController = navController,
                 onNoInternet = { messageResId ->
                     noInternetMessageResId = messageResId ?: R.string.no_internet_navigation_message
-                    showNavigationNoInternetDialog = true 
+                    showNavigationNoInternetDialog.value = true
                 }
             )
 
