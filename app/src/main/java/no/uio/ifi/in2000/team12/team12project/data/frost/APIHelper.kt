@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team12.team12project.data.frost
 
-import com.google.android.gms.maps.model.LatLng
 import no.uio.ifi.in2000.team12.team12project.model.ClimateChartData
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
@@ -9,8 +8,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlin.math.pow
-import kotlin.math.roundToInt
 
 private const val DATE_FORMAT = "yyyy-MM-dd"
 
@@ -75,15 +72,7 @@ fun isFromYear(referenceTime: String, year: Int): Boolean {
     return extractYear(referenceTime) == year
 }
 
-/**
- * Rounds LatLng to n decimals.
- */
-fun LatLng.round(decimals: Int = 2): LatLng {
-    val multiplier = 10.0.pow(decimals)
-    val lat = (latitude * multiplier).roundToInt() / multiplier
-    val lng = (longitude * multiplier).roundToInt() / multiplier
-    return LatLng(lat, lng)
-}
+
 
 fun getStationIdsFromList(stationList: List<ObsStation>): String {
     return stationList.joinToString(",") { it.id }

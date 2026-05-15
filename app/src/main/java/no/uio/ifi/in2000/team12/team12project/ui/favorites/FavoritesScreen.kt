@@ -84,15 +84,12 @@ fun FavoritesScreenContent(
     ) {
         Box(modifier = Modifier) {
             LazyColumn {
-                items(uiState.favoritesLocationMap.toList()) { (key, favoriteLocation) ->
+                items(uiState.favoritesLocationMap.toList()) { (_, favoriteLocation) ->
                     val isSelected = uiState.selectedLocation?.name == favoriteLocation.name
 
                     Box(modifier = Modifier
                         .clickable { viewModel.onLocationSelected(favoriteLocation) }
-                        //.padding(6.dp)
                         .padding(top = 4.dp, start = 4.dp, end = 4.dp)
-
-                        //.padding(horizontal = 20.dp, vertical = 18.dp)
                         .border(
                             width = if(isSelected) 4.dp else 0.dp,
                             color = if(isSelected) MaterialTheme.colorScheme.secondary else Color.Transparent,

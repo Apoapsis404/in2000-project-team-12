@@ -24,7 +24,4 @@ data class Geometry(
     val nearest: Boolean
 )
 
-@Serializable
-data class ObsStationId(
-    val id: String
-)
+

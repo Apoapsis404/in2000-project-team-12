@@ -27,7 +27,6 @@ import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateObs
 import no.uio.ifi.in2000.team12.team12project.model.frost.ClimateType
 import no.uio.ifi.in2000.team12.team12project.model.frost.Months
 import no.uio.ifi.in2000.team12.team12project.model.plants.Plant
-import java.util.PriorityQueue
 import kotlin.math.min
 
 data class GraphScreenUiState(
@@ -65,9 +64,7 @@ class GraphScreenViewModel(
         const val DEFAULT_PREDICTED_SUNSHINE = 100f
         const val DEFAULT_PREDICTED_PRECIPITATION = 100f
 
-        const val FALLBACK_HUMIDITY = 50f
-        const val FALLBACK_SUNSHINE = 7f
-        const val FALLBACK_PRECIPITATION = 5f
+
 
         // New Constants for logic and UI sync
         const val DAYS_IN_MONTH = 30f
@@ -96,10 +93,6 @@ class GraphScreenViewModel(
 
     private fun setClimateData(climateType: ClimateType, climateData: ClimateData) {
         climateMap[climateType] = climateData
-    }
-
-    private fun getClimateData(climateType: ClimateType): ClimateData? {
-        return climateMap[climateType]
     }
 
     private fun computeAllMeans() {
@@ -190,11 +183,6 @@ class GraphScreenViewModel(
         }
     }
 
-    fun getClimateObs() {
-        _uiState.update {
-            it.copy(climateObs = getClimateData(it.climateType)?.climateObs ?: emptyList())
-        }
-    }
 
     fun setMonth(month: Months) {
         _uiState.update { it.copy(month = month) }
@@ -294,15 +282,4 @@ class GraphScreenViewModel(
         updatePredictedClimateInternal()
     }
 
-    // This method is now redundant for the Popup but kept for other potential callers
-    fun getBestPlants(
-        targetTemp: Float,
-        targetHumidity: Float = FALLBACK_HUMIDITY,
-        targetSunshine: Float = FALLBACK_SUNSHINE,
-        targetPrecipitation: Float? = FALLBACK_PRECIPITATION
-    ): PriorityQueue<Plant> {
-        return plantsRepository.getBestPlantsPriorityQueue(
-            targetTemp, targetHumidity, targetSunshine, targetPrecipitation
-        )
-    }
 }

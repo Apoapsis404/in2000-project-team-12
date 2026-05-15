@@ -36,16 +36,6 @@ class ClimateDataRepository(
         )
     }
 
-    /**
-     * Fetch climate time series for the given station.
-     */
-    suspend fun getClimateTimeSeries(
-        sourceId: String,
-        elementId: String,
-        fields: String = "validFrom,validTo"
-    ): String {
-        return climateDataSource.getClimateTimeSeries(sourceId, elementId, fields)
-    }
 
     /**
      * Finds a station near the position that has a long enough time series for the given climate type.

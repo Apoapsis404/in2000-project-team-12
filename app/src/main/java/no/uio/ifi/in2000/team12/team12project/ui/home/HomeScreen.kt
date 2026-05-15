@@ -1,8 +1,6 @@
 package no.uio.ifi.in2000.team12.team12project.ui.home
 
 import android.Manifest
-import android.location.Geocoder
-import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -67,14 +65,9 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team12.team12project.BuildConfig
 import no.uio.ifi.in2000.team12.team12project.R
-import java.util.Locale
-import kotlin.coroutines.resume
 
 @Composable
 fun HomeScreen(
