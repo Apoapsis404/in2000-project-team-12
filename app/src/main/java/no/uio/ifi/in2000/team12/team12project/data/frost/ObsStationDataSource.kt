@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.basicAuth
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import no.uio.ifi.in2000.team12.team12project.BuildConfig
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.BadRequestException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoDataException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.ServerErrorException
@@ -26,11 +27,6 @@ class ObsStationDataSource {
     private companion object {
         // Frost API v0 endpoint for sources
         const val URL_V0 = "https://frost.met.no/sources/v0.jsonld"
-
-        // Default credentials for the Frost API. 
-        // Note: In a production app, these should be stored securely (e.g., BuildConfig or EncryptedSharedPreferences)
-        const val DEFAULT_CLIENT_ID = "7dcf024d-0589-4aa3-afa7-79bc4904d7e2"
-        const val DEFAULT_CLIENT_SECRET = "58727131-5656-406b-84f7-4838513e45f0"
     }
 
     /**
@@ -55,8 +51,8 @@ class ObsStationDataSource {
         longitude: Double,
         maxCount: Int = 5,
         element: String = "*",
-        clientId: String = DEFAULT_CLIENT_ID,
-        clientSecret: String = DEFAULT_CLIENT_SECRET
+        clientId: String = BuildConfig.FROST_CLIENT_ID,
+        clientSecret: String = BuildConfig.FROST_CLIENT_SECRET
     ): List<ObsStation> {
         val nearestString = "nearest(POINT ($longitude $latitude))"
         val fieldsString = "id,name,geometry"
@@ -82,7 +78,7 @@ class ObsStationDataSource {
      */
     suspend fun getMetStations(element: String): List<ObsStation> {
         val response: HttpResponse = KtorClient.client.get(URL_V0) {
-            basicAuth(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_SECRET)
+            basicAuth(BuildConfig.FROST_CLIENT_ID, BuildConfig.FROST_CLIENT_SECRET)
             url {
                 parameters.append("elements", element)
                 parameters.append("country", "norge")

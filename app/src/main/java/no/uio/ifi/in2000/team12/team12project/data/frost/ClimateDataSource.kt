@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.basicAuth
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import no.uio.ifi.in2000.team12.team12project.BuildConfig
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.BadRequestException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoAvailableTimeSeriesException
 import no.uio.ifi.in2000.team12.team12project.data.exceptions.NoDataException
@@ -27,10 +28,6 @@ class ClimateDataSource {
     private companion object {
         const val URL_OBSERVATIONS = "https://frost.met.no/observations/v0.jsonld"
         const val URL_TIME_SERIES = "https://frost.met.no/observations/availableTimeSeries/v0.jsonld"
-
-        // Default credentials for the Frost API.
-        const val DEFAULT_CLIENT_ID = "7dcf024d-0589-4aa3-afa7-79bc4904d7e2"
-        const val DEFAULT_CLIENT_SECRET = "58727131-5656-406b-84f7-4838513e45f0"
     }
 
     /**
@@ -51,7 +48,7 @@ class ClimateDataSource {
         fields: String = "validFrom,validTo"
     ): String {
         val response: HttpResponse = KtorClient.client.get(URL_TIME_SERIES) {
-            basicAuth(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_SECRET)
+            basicAuth(BuildConfig.FROST_CLIENT_ID, BuildConfig.FROST_CLIENT_SECRET)
             url {
                 parameters.append("sources", sourceId)
                 parameters.append("elements", elementId)
@@ -87,7 +84,7 @@ class ClimateDataSource {
         fields: String = "sourceId,referenceTime,elementId,unit,value"
     ): List<ClimateObs> {
         val response: HttpResponse = KtorClient.client.get(URL_OBSERVATIONS) {
-            basicAuth(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_SECRET)
+            basicAuth(BuildConfig.FROST_CLIENT_ID, BuildConfig.FROST_CLIENT_SECRET)
             url {
                 parameters.append("sources", sources)
                 parameters.append("referencetime", referenceTime)
