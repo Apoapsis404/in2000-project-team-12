@@ -120,8 +120,8 @@
     <string name="favorite_delete">Delete</string>
     <string name="cont_desc_favorite_graph_icon">Navigate to graph screen</string>
     <string name="info_home_title">Home Screen:</string>
-    <string name="info_home_rain">Area prone to torrential rain</string>
-    <string name="info_home_wind">Area prone to extreme wind</string>
+    <string name="info_home_rain">Area prone to torrential rain. Rain over 20 mm/h</string>
+    <string name="info_home_wind">Area prone to extreme wind. Wind speed over 17.2 m/s</string>
     <string name="info_home_flood">Area prone to flooding. Area has had flood warnings of level 4 more than 8 times during the last 10 years</string>
     <string name="info_home_graph">View climate graph for the selected location</string>
     <string name="info_home_favorites">Add marker\'s location to favorites</string>

@@ -111,8 +111,8 @@
     <string name="favorite_delete">Slett</string>
     <string name="cont_desc_favorite_graph_icon">Naviger til grafskjermen</string>
     <string name="info_home_title">Hjemskjem:</string>
-    <string name="info_home_rain">Område utsatt for styrtregn</string>
-    <string name="info_home_wind">Område utsatt for ekstremvind</string>
+    <string name="info_home_rain">Område utsatt for styrtregn. Regn mer enn 20 mm/t</string>
+    <string name="info_home_wind">Område utsatt for ekstremvind. Vindhastighet over 17,2 m/s</string>
     <string name="info_home_flood">Område utsatt for flom. Området har hatt flomvarsel på nivå 4 eller høyere mer enn 8 ganger de siste 10 årene</string>
     <string name="info_home_graph">Se klimagrafen for det valgte området</string>
     <string name="info_home_favorites">Legg til nåvære</string>
