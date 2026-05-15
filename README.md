@@ -8,14 +8,18 @@
 
 ## Hvordan kjøre appen
 
+MERK: Om kildekoden lastes ned fra devilry.ifi.uio.no, kan man se bort fra punktene om API- nøkler. 
+
 1. **Last ned kildekoden:** Klon repoet ved hjelp av Git:
    ```bash
    git clone git@github.uio.no:IN2000-V26/team-12.git
    ```
 2. **Åpne i Android Studio:** Start Android Studio og åpne mappen `team-12`.
-3. **Synkroniser Gradle:** La Android Studio laste ned alle nødvendige avhengigheter.
-4. **Koble til enhet:** Koble til en fysisk Android-enhet, eller bruk en Android Emulator.
-5. **Kjør appen:** Trykk på den grønne "Run"-knappen øverst i verktøylinjen.
+3. **Hent Frost API nøkler:** Før du kjører applikasjonen må du legge til “FROST_CLIENT_ID” og “FROST_CLIENT_SECRET” fra Frost i local.properties, som du kan få tak i her: https://frost.met.no/auth/requestCredentials.html
+4. **Google Maps API nøkkel:** Legg til “MAPS_API_KEY” i local.properties.
+4. **Synkroniser Gradle:** La Android Studio laste ned alle nødvendige avhengigheter.
+5. **Koble til enhet:** Koble til en fysisk Android-enhet, eller bruk en Android Emulator.
+6. **Kjør appen:** Trykk på den grønne "Run"-knappen øverst i verktøylinjen.
 
 ---
 
