@@ -131,7 +131,7 @@ Navn: Bruker ønsker å legge til en posisjon som favoritt\
 Aktør: Bruker.\
 Prebetingelse: Internett-tilgang. Være på hjem-skjermen.\
 Postbetingelse: En favoritt er opprettet, og lagret i databasen.\
-Hovedflyt:\
+Hovedflyt:
 1. Bruker trykker på ønsket område på kart
 2. Appen lagrer posisjonen i HomeScreenViewModel
 3. Bruker trykker på favoritt-ikonet
