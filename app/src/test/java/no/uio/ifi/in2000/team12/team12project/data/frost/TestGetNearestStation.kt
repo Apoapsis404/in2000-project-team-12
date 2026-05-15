@@ -28,14 +28,4 @@ class GetNearestStationTest {
             assertEquals(expected, stationIds)
         }
     }
-
-    @Test
-    fun testGetMetStation() = runTest {
-        val dataSource = ObsStationDataSource()
-
-        val stations = dataSource.getMetStations()
-        println(stations)
-        assertEquals(stations.size, 404)
-    }
-
 }

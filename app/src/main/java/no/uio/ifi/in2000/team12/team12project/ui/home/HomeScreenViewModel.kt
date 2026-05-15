@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import no.uio.ifi.in2000.team12.team12project.data.frost.TorrentialRain
+import no.uio.ifi.in2000.team12.team12project.data.frost.ClimateHazard
 import no.uio.ifi.in2000.team12.team12project.data.local.AppDatabase
 import no.uio.ifi.in2000.team12.team12project.data.local.SettingsEntity
 import no.uio.ifi.in2000.team12.team12project.data.nve.NVEDataSource
@@ -59,7 +59,7 @@ data class HomeScreenUiState(
 
 class HomeScreenViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val torrentialRain = TorrentialRain()
+    private val climateHazard: ClimateHazard = ClimateHazard()
     private val nveRepository = NVERepository(NVEDataSource(application))
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
     private val placesClient = Places.createClient(application)
@@ -310,8 +310,8 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
     // Updates the uiState with the position of hazard markers
     private fun loadHazardMarkers() {
         val context = getApplication<Application>().applicationContext
-        val downpourMarkers = torrentialRain.readLatLngFromJson(context, "torrential_rain_stations.json")
-        val windMarkers = torrentialRain.readLatLngFromJson(context, "high_wind_speed_stations.json")
+        val downpourMarkers = climateHazard.readLatLngFromJson(context, "torrential_rain_stations_new.json")
+        val windMarkers = climateHazard.readLatLngFromJson(context, "high_wind_speed_stations_new.json")
         _uiState.update {
             it.copy(
                 downpourList = downpourMarkers,

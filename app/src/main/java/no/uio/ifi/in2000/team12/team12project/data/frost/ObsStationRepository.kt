@@ -54,7 +54,8 @@ class ObsStationRepository(
             val stations = obsStationDataSource.getNearestStation(
                 latitude = latitude,
                 longitude = longitude,
-                maxCount = maxCount
+                maxCount = maxCount,
+                element = climateType.elementId,
             )
 
             // 3. Filter by distance locally and return
@@ -66,20 +67,6 @@ class ObsStationRepository(
             // Re-throw to allow higher-level repositories (like ClimateDataRepository) to handle 
             // specific API exceptions (e.g., NoDataException, UnauthorizedException)
             throw e
-        }
-    }
-
-    /**
-     * Fetches all MET.NO sensor system station IDs in Norway.
-     * 
-     * @return List of station IDs or an empty list if an error occurs.
-     */
-    suspend fun getMetStations(): List<String> {
-        return try {
-            obsStationDataSource.getMetStations()
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to fetch MET stations: ${e.message}", e)
-            emptyList()
         }
     }
 
