@@ -97,16 +97,17 @@ Siden UI følger med på uiStaten i ViewModel vil UI reagere med å vise bruker 
 ### Bruker ønsker å legge til en posisjon som favoritt
 ```mermaid
 flowchart TD
-    Start@{ shape: circle, label: "start" } -->
+    Start@{ shape: circle, label: "start"} -->
 A{"Velg posisjon"}
-A --> |Søkefelt|a[Bruker skriver inn addresse]
--->b[Bruker trykker søk]
--->c[Posisjon lagres i ViewModel]
--->d[Trykker på hjerte-ikon]
--->e[Bekreftelses-popup]
+A --> |Søkefelt|a[Bruker skriver i søkefelt]
+-->E{"Skrevet hele addressen?"}
+-->|Ja|b[Bruker trykker søk]
+-->c[Valgt posisjon lagres i HomeScreenViewModel]
+-->d[Trykker på hjerte/favoritt-ikon]
+-->e[UI viser bekreftelses-popup]
 -->B{"Ønsker du å legge til favoritt?"}
--->|Bekreft|f[Navigerer til favoritt-skjerm]
--->g[Navn-endring-popup]
+-->|Bekreft|f[Appen navigerer til favoritt-skjerm]
+-->g[UI viser navn-endrings-popup]
 -->C{"Endre navn?"}
 -->h[Bruker skriver inn nytt navn]
 -->D{" "}
@@ -114,18 +115,73 @@ A --> |Søkefelt|a[Bruker skriver inn addresse]
 -->Slutt
 A-->|Trykke på kart|c
 B-->|Avbryt|Slutt
-C-->i[Bruker skriver ikke nytt navn]
-i-->k
-D-->|Avbryt|k[Favoritt får et standard-navn]
+C-->|Avbryt|k
+D-->|Avbryt|k[Favoritt lagres ikke]
+E-->|Nei|l[UI viser forslag]
+--> m{"Vises ønsket forslag?"}
+-->|ja|o[Bruker trykker ønsket forslag]
+-->c
+m-->|Nei|a
 k-->
 Slutt@{ shape: dbl-circ, label: "Stop" }
 ```
-Vi valgte også å inkludere et aktivitetsdiagram, for å vise flyten for hvordan man legger til en favoritt fra brukerens perspektiv.
+Vi valgte også å inkludere et aktivitetsdiagram for å vise flyten for hvordan man legger til en favoritt fra brukerens perspektiv.
 
-Det starter med at brukeren må velge hvordan han ønsker å finne ønsket posisjon. Det kan han gjøre enten ved å søke opp en addresse eller et sted, eller 
-ved å plassere en markør på kartet. Når bruker har valgt posisjon blir denne lagret i HomeScreenViewModel, og brukeren kan trykke på "hjerte-ikonet".
-Da vil det komme en pop-up som ber om bekreftelse om at bruker ønsker å legge til en favoritt.
+Navn: Bruker ønsker å legge til en posisjon som favoritt
+Aktør: Bruker.
+Prebetingelse: Internett-tilgang. Være på hjem-skjermen.
+Postbetingelse: En favoritt er opprettet, og lagret i databasen.
+Hovedflyt:
+1. Bruker trykker på ønsket område på kart
+2. Appen lagrer posisjonen i HomeScreenViewModel
+3. Bruker trykker på favoritt-ikonet
+4. UI viser bekreftelses-popup
+5. Bruker trykker på bekreft
+6. Appen navigerer til favoritt-skjerm
+7. UI viser navn-endrings-popup
+8. Bruker skriver inn nytt navn
+9. Bruker trykker Lagre
+10. Favoritt får ønsket navn og blir lagret i databasen.
 
-Om bruker avbryter vil flyten gå rett til slutt, og ingen favoritt blir opprettet. Ved bekreftelse blir man navigert til favoritt-skjermen hvor en ny popup vises. 
-Den ber om at bruker skriver inn et navn for favoritten. Hvis bruker skriver inn et nytt navn og bekrefter vil favoritten få det nye navnet.
-Hvis brukeren ikke skriver inn et navn eller avbryter, vil favoritten få tildelt et unikt standardnavn.
+Alternativ flyt 1:\
+1a Bruker skriver hele addressen i søkefelt\
+1b Bruker trykker søk\
+
+Alternativ flyt 2:\
+1aa Bruker skriver inn deler av addressen i søkefeltet\
+1ab UI viser ønsket forslag\
+1ac Bruker trykker på ønsket forslag\
+
+
+## Use Case Diagram
+
+Mermaid egner seg ikke til å lage Use case diagrammer, så denne er lagt til i ExternalPrograms/UseCase.png.
+
+Case 1: Se klimadata for valgt posisjon \
+Aktør: Hageentusiast, Bonde\
+Beskrivelse: Brukeren velger en posisjon og får opp klimadata for denne. Brukeren kan velge å se data i år eller bla bakover i tid for å se 
+historiske klimadata.
+include-->Se gjennomsnitter: Gjennomsnitter vises alltid som en del av klimavisningen
+extend--> Brukeren kan valgfritt se historisk klimadata for de ulike klimatypene
+
+Case 2: Legge til og lagre adresser\
+Aktør: Hageentusiast, Bonde\
+Beskrivelse: Brukeren kan søke opp eller markere en adresse og lagre den som favoritt for rask tilgang senere.
+extend --> Søk opp addresse / Velg posisjon: brukeren kan velge mellom å skrive inn en addresse i søkefeltet, eller å trykke på en posisjon på kartet.
+
+Case 3: Skrive og lagre notater\
+Aktør: Hageentusiast, Bonde\
+Beskrivelse: Brukeren kan skrive notater og lagre notater.
+
+Case 4: Se hvilke planter som kan overleve på valgt posisjon\
+Aktør: Hageentusiast, Bonde\
+Beskrivelse: Brukeren få opp forslag til tre planter som kan overleve i valgt klima.
+include --> Se planter som kan overleve i år: Planter som kan overleve i år vises som en del av klimavisningen
+extend --> Planter som kan overleve i framtiden: Bruker kan velge å se hvilke planter som kan overleve i antatt klima framover i tid, basert på en regresjonsanalyse av tilgjengelig klimadata.
+
+
+Case 5: Se områder på kart som er spesielt utsatt for naturhendelser\
+Aktør: Bonde\
+Beskrivelse: Brukeren får opp steder som er spesielt utsatt for flom, styrtregn eller ekstrem vind på kart.
+
+
