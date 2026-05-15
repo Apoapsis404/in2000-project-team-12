@@ -1,0 +1,82 @@
+{
+  "variant": "light",
+  "styles": [
+    {
+      "id": "infrastructure.building.commercial",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#c2c0bd"
+      }
+    },
+    {
+      "id": "infrastructure.building.indoor",
+      "geometry": {
+        "fillOpacity": 0.2,
+        "fillColor": "#b1afaa"
+      }
+    },
+    {
+      "id": "infrastructure.businessCorridor",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#a09d98"
+      }
+    },
+    {
+      "id": "infrastructure.urbanArea",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#c8c0c0"
+      }
+    },
+    {
+      "id": "natural.land.landCover.crops",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#dcbf8f"
+      }
+    },
+    {
+      "id": "natural.land.landCover.dryCrops",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#bdd6a4"
+      }
+    },
+    {
+      "id": "natural.land.landCover.forest",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#78a26d"
+      }
+    },
+    {
+      "id": "natural.land.landCover.ice",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#dedede"
+      }
+    },
+    {
+      "id": "natural.land.landCover.sand",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#e9dbc4"
+      }
+    },
+    {
+      "id": "natural.land.landCover.shrub",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#65b86b"
+      }
+    },
+    {
+      "id": "natural.land.landCover.tundra",
+      "geometry": {
+        "fillOpacity": 1,
+        "fillColor": "#99714d"
+      }
+    }
+  ]
+}

@@ -16,10 +16,12 @@ MERK: Om kildekoden lastes ned fra devilry.ifi.uio.no, kan man se bort fra punkt
    ```
 2. **Åpne i Android Studio:** Start Android Studio og åpne mappen `team-12`.
 3. **Hent Frost API nøkler:** Før du kjører applikasjonen må du legge til “FROST_CLIENT_ID” og “FROST_CLIENT_SECRET” fra Frost i local.properties, som du kan få tak i her: https://frost.met.no/auth/requestCredentials.html
-4. **Google Maps API nøkkel:** Legg til “MAPS_API_KEY” i local.properties.
-4. **Synkroniser Gradle:** La Android Studio laste ned alle nødvendige avhengigheter.
-5. **Koble til enhet:** Koble til en fysisk Android-enhet, eller bruk en Android Emulator.
-6. **Kjør appen:** Trykk på den grønne "Run"-knappen øverst i verktøylinjen.
+4. **Google Maps API nøkkel:** Legg til “MAPS_API_KEY” i local.properties. Guide for henting av MAPS_API_KEY finnes her: https://developers.google.com/maps/documentation/android-sdk/get-api-key
+5. **Legg inn MAPS_ID**: Legg inn MAPS_ID i local.properties. 
+6. **Last inn Google Maps stil** Kopier innholdet i filen '/External Documents/maps_style.json' og legg den inn på din Google Cloud konto under 'map management'.
+7. **Synkroniser Gradle:** La Android Studio laste ned alle nødvendige avhengigheter.
+8. **Koble til enhet:** Koble til en fysisk Android-enhet, eller bruk en Android Emulator.
+9. **Kjør appen:** Trykk på den grønne "Run"-knappen øverst i verktøylinjen.
 
 ---
 
